@@ -8,5 +8,5 @@ package talentv2
 const (
 	ProductionURL = "https://talent.kruzhok.org/v2"
 	StageURL      = "https://talent.test.kruzhok.org/v2"
-	InternalURL   = "http://t2-api:8000"
+	InternalURL   = "http://t2-api:8000/v2"
 )
