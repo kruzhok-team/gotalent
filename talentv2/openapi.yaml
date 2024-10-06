@@ -1,0 +1,341 @@
+openapi: 3.1.0
+info:
+  title: Talent API v2
+  version: '0.1'
+  contact:
+    email: talent@kruzhok.org
+servers:
+  - url: https://talent.kruzhok.org/v2
+    description: Production Server
+  - url: https://talent.test.kruzhok.org/v2
+    description: Development Server
+tags:
+  - name: events-read
+    x-displayName: Чтение мероприятий
+  - name: events-schema
+    x-displayName: Схемы для мероприятий
+  - name: offset
+    x-displayName: Пагинация
+    description: |-
+      Пагинация может быть представлена как параметром `offset`, так и параметром `id_offset`. Параметр `offset` позволяет указать кол-во объектов для пропуска из читаемой выборки. В `id_offset` указывается идентификатор, объекты с идентификатором равном или менее указанному будут исключены из выборки.
+
+      > Предпочтительно, когда есть возможность, использовать `id_offset`. Так же надо учитывать, что допустимое значение для `offset` имеет ограничения.
+    x-traitTag: true
+x-tagGroups:
+  - name: Общие свойства API
+    tags:
+      - offset
+  - name: Мероприятия
+    tags:
+      - events-read
+      - events-schema
+paths:
+  /events/{event_id}:
+    get:
+      operationId: EventRetrieve
+      summary: Чтение свойств мероприятия
+      tags:
+        - events-read
+      description: |-
+        По-умолчанию возвращаются только мета-данные.
+        Для получения полного набора свойств используйте параметр `extend`.
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/EventMeta'
+                  - $ref: '#/components/schemas/Event'
+        '404':
+          description: Мероприятие не найдено
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    parameters:
+      - $ref: '#/components/parameters/event_id'
+      - name: extend
+        in: query
+        description: Вернуть в ответе полный набор свойств.
+        schema:
+          type: boolean
+          default: false
+components:
+  schemas:
+    EventMeta:
+      x-tags:
+        - events-schema
+      type: object
+      title: Метаданные мероприятия
+      required:
+        - id
+        - created_at
+        - updated_at
+        - draft
+        - public
+        - hidden
+        - canceled
+        - title
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: ID мероприятия.
+        created_at:
+          type: string
+          format: date-time
+          description: Дата создания.
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата обновления.
+        draft:
+          type: boolean
+          description: |-
+            Мероприятие находится в статусе черновика.
+            На такое мероприятие нельзя зарегистрироваться.
+        public:
+          type: boolean
+          description: Статус публичности мероприятия.
+        hidden:
+          type: boolean
+          description: Исключение мероприятия из календаря.
+        canceled:
+          type: boolean
+          description: Статус отмены мероприятия.
+        title:
+          type: string
+          description: Название мероприятия.
+        start:
+          type: string
+          format: date-time
+          description: Дата начала мероприятия.
+        end:
+          type: string
+          format: date-time
+          description: Дата окончания мероприятия.
+        format:
+          type: string
+          description: Формат проведения мероприятия.
+          enum:
+            - offline
+            - online
+          # x-enumDescriptions:
+          #   offline: Оффлайн мероприятие.
+          #   online: Онлайн мероприятие.
+        organization_id:
+          type: integer
+          format: int32
+          description: ID организации мероприятия.
+        meta_event_id:
+          type: integer
+          format: int32
+          description: ID мета-мероприятия.
+        created_by_id:
+          type: integer
+          format: int32
+          description: ID автора мероприятия.
+        venue_id:
+          type: integer
+          format: int32
+          description: ID [площадки](/venue-api/docs/).
+    Event:
+      x-tags:
+        - events-schema
+      title: Мероприятие полностью
+      allOf:
+        - $ref: '#/components/schemas/EventMeta'
+        - type: object
+          required:
+            - achievements_allowed
+            - requests_allowed
+            - simplified_registration
+            - self_check_in
+            - teams_involved
+            - owner_can_moderate
+            - user_in_multiple_teams
+            - mentors_allowed
+            - support_i18n
+            - gir_collection
+            - time_matters
+            - promoted
+            - team_create_notification
+            - diplomas_dark_theme
+            - achievement_roles_count
+            - talent_roles_count
+            - achievements_count
+            - requests_count
+          properties:
+            achievements_allowed:
+              type: boolean
+              description: Допуск на создания достижений на это мероприятие.
+            requests_allowed:
+              type: boolean
+            simplified_registration:
+              type: boolean
+            self_check_in:
+              type: boolean
+            teams_involved:
+              type: string
+              description: Формат участия.
+              enum:
+                - any
+                - teams
+                - individual
+              x-enumDescriptions:
+                any: Допускаются и индивидуальное и командное участия
+                teams: Допускается регистрация только в команде
+                individual: Допускается только индивидуальная регистрация
+            owner_can_moderate:
+              type: boolean
+            user_in_multiple_teams:
+              type: boolean
+            mentors_allowed:
+              type: boolean
+            support_i18n:
+              type: boolean
+            gir_collection:
+              type: boolean
+            time_matters:
+              type: boolean
+            promoted:
+              type: boolean
+            max_users:
+              type: integer
+            team_create_notification:
+              type: boolean
+            team_assignment_method:
+              type: string
+              enum:
+                - completion
+                - completion_soft
+                - single
+                - single_soft
+              x-enumDescriptions:
+                completion: Команды будут дополняться до максимального количества.
+                completion_soft: |-
+                  Команды будут дополняться до максимального количества.
+                  У участников есть возможность отказаться от дополнения их команды.
+                single: |-
+                  Команды будут создаваться только из участников-одиночек и команд из одного участника.
+                single_soft: |-
+                  Команды будут создаваться только из участников-одиночек и команд из одного участника.
+                  У участников есть возможность отказаться от изменения их команды.
+            diplomas_dark_theme:
+              type: boolean
+            is_diplomas_issued:
+              type: string
+              description: Статус выдачи дипломов. Отсутствие значения означает что дипломы не выданы.
+              enum:
+                - all
+                - roles
+              x-enumDescriptions:
+                all: Выданы всем.
+                roles: Выданы по ролям.
+            achievement_roles_count:
+              type: integer
+              format: int32
+            achievements_count:
+              type: integer
+              format: int32
+            requests_count:
+              type: integer
+              format: int32
+            cover:
+              type: string
+              # format: url
+              # description: Ссылка на обложку мероприятия.
+            background:
+              type: string
+            url:
+              type: string
+              format: url
+              maxLength: 200
+              description: Адрес online мероприятия.
+            type_id:
+              type: integer
+              format: int32
+              description: ID типа мероприятия.
+            expected_start:
+              type: string
+              format: date-time
+            description:
+              type: string
+              description: Описание мероприятия.
+            alt_title:
+              type: string
+              description: Альтернативное название мероприятия.
+            cancellation_reason:
+              type: string
+              description: Причина отмены мероприятия.
+            questionnaire_completed_message:
+              type: string
+              description: Сообщение о заполненной анкете.
+  responses:
+    ErrorResponse:
+      description: Error
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error
+            properties:
+              error:
+                type: string
+  parameters:
+    id_offset_32:
+      name: id_offset
+      in: query
+      description: Пропуск объектов с идентификатором равном или менее указанного.
+      schema:
+        type: integer
+        format: int32
+    id_offset_64:
+      name: id_offset
+      in: query
+      description: Пропуск объектов с идентификатором равном или менее указанного.
+      schema:
+        type: integer
+        format: int64
+    offset:
+      name: offset
+      in: query
+      description: Кол-во объектов выборки для пропуска.
+      schema:
+        type: integer
+        format: int32
+        default: 0
+        minumum: 0
+        maximum: 200
+    limit:
+      name: limit
+      in: query
+      description: Максимум объектов возвращаемых в теле ответа.
+      schema:
+        type: integer
+        format: int32
+        default: 20
+        minimum: 1
+        maximum: 100
+    event_id:
+      name: event_id
+      in: path
+      description: ID мероприятия
+      required: true
+      schema:
+        type: integer
+        format: int32
+  headers:
+    X-Count:
+      required: true
+      description: Общее кол-во объектов, входящих в выборку без учета пагинации.
+      schema:
+        type: integer
+        format: int64
+  securitySchemes:
+    TalentOAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: TalentOAuth JWT
