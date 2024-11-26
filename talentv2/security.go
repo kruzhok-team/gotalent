@@ -25,7 +25,10 @@ func (c *clientCredentials) Credentials(context.Context) (clientID string, clien
 }
 
 func ClientCredentialsSecurity(clientID, clientSecret string) SecuritySource {
-	return Security(&clientCredentials{}, nil)
+	return Security(&clientCredentials{
+		id:     clientID,
+		secret: clientSecret,
+	}, nil)
 }
 
 func Security(ccsrc ClientCredentialsSource, tauth TalentTokenSource) SecuritySource {
