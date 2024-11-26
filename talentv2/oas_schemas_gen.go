@@ -4,6 +4,7 @@ package talentv2
 
 import (
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/go-faster/errors"
@@ -11,6 +12,31 @@ import (
 
 func (s *ErrorResponseStatusCode) Error() string {
 	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
+}
+
+type ClientCredentials struct {
+	Username string
+	Password string
+}
+
+// GetUsername returns the value of Username.
+func (s *ClientCredentials) GetUsername() string {
+	return s.Username
+}
+
+// GetPassword returns the value of Password.
+func (s *ClientCredentials) GetPassword() string {
+	return s.Password
+}
+
+// SetUsername sets the value of Username.
+func (s *ClientCredentials) SetUsername(val string) {
+	s.Username = val
+}
+
+// SetPassword sets the value of Password.
+func (s *ClientCredentials) SetPassword(val string) {
+	s.Password = val
 }
 
 type ErrorResponse struct {
@@ -52,6 +78,11 @@ func (s *ErrorResponseStatusCode) SetStatusCode(val int) {
 func (s *ErrorResponseStatusCode) SetResponse(val ErrorResponse) {
 	s.Response = val
 }
+
+func (*ErrorResponseStatusCode) eventRetrieveRes()  {}
+func (*ErrorResponseStatusCode) personReadRes()     {}
+func (*ErrorResponseStatusCode) socialAuthListRes() {}
+func (*ErrorResponseStatusCode) teamReadRes()       {}
 
 // Merged schema.
 // Ref: #/components/schemas/Event
@@ -880,11 +911,6 @@ func (s *EventMetaFormat) UnmarshalText(data []byte) error {
 	}
 }
 
-// EventRetrieveNotFound is response for EventRetrieve operation.
-type EventRetrieveNotFound struct{}
-
-func (*EventRetrieveNotFound) eventRetrieveRes() {}
-
 // EventRetrieveOK represents sum type.
 type EventRetrieveOK struct {
 	Type      EventRetrieveOKType // switch on this field
@@ -1423,6 +1449,52 @@ func (o OptInt32) Or(d int32) int32 {
 	return d
 }
 
+// NewOptSocialAuthProvider returns new OptSocialAuthProvider with value set to v.
+func NewOptSocialAuthProvider(v SocialAuthProvider) OptSocialAuthProvider {
+	return OptSocialAuthProvider{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptSocialAuthProvider is optional SocialAuthProvider.
+type OptSocialAuthProvider struct {
+	Value SocialAuthProvider
+	Set   bool
+}
+
+// IsSet returns true if OptSocialAuthProvider was set.
+func (o OptSocialAuthProvider) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptSocialAuthProvider) Reset() {
+	var v SocialAuthProvider
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptSocialAuthProvider) SetTo(v SocialAuthProvider) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptSocialAuthProvider) Get() (v SocialAuthProvider, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptSocialAuthProvider) Or(d SocialAuthProvider) SocialAuthProvider {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -1468,3 +1540,481 @@ func (o OptString) Or(d string) string {
 	}
 	return d
 }
+
+// NewOptTeamContactLink returns new OptTeamContactLink with value set to v.
+func NewOptTeamContactLink(v TeamContactLink) OptTeamContactLink {
+	return OptTeamContactLink{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptTeamContactLink is optional TeamContactLink.
+type OptTeamContactLink struct {
+	Value TeamContactLink
+	Set   bool
+}
+
+// IsSet returns true if OptTeamContactLink was set.
+func (o OptTeamContactLink) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptTeamContactLink) Reset() {
+	var v TeamContactLink
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptTeamContactLink) SetTo(v TeamContactLink) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptTeamContactLink) Get() (v TeamContactLink, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptTeamContactLink) Or(d TeamContactLink) TeamContactLink {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+type PersonReadOK struct {
+	// TalentID пользователя, которому принадлежит персона.
+	UserID int32 `json:"user_id"`
+}
+
+// GetUserID returns the value of UserID.
+func (s *PersonReadOK) GetUserID() int32 {
+	return s.UserID
+}
+
+// SetUserID sets the value of UserID.
+func (s *PersonReadOK) SetUserID(val int32) {
+	s.UserID = val
+}
+
+func (*PersonReadOK) personReadRes() {}
+
+// Ref: #/components/schemas/SocialAuth
+type SocialAuth struct {
+	Provider SocialAuthProvider `json:"provider"`
+	// ID пользователя в провайдере авторизации.
+	UID string `json:"uid"`
+}
+
+// GetProvider returns the value of Provider.
+func (s *SocialAuth) GetProvider() SocialAuthProvider {
+	return s.Provider
+}
+
+// GetUID returns the value of UID.
+func (s *SocialAuth) GetUID() string {
+	return s.UID
+}
+
+// SetProvider sets the value of Provider.
+func (s *SocialAuth) SetProvider(val SocialAuthProvider) {
+	s.Provider = val
+}
+
+// SetUID sets the value of UID.
+func (s *SocialAuth) SetUID(val string) {
+	s.UID = val
+}
+
+// SocialAuthListOKHeaders wraps []SocialAuth with response headers.
+type SocialAuthListOKHeaders struct {
+	XCount   int64
+	Response []SocialAuth
+}
+
+// GetXCount returns the value of XCount.
+func (s *SocialAuthListOKHeaders) GetXCount() int64 {
+	return s.XCount
+}
+
+// GetResponse returns the value of Response.
+func (s *SocialAuthListOKHeaders) GetResponse() []SocialAuth {
+	return s.Response
+}
+
+// SetXCount sets the value of XCount.
+func (s *SocialAuthListOKHeaders) SetXCount(val int64) {
+	s.XCount = val
+}
+
+// SetResponse sets the value of Response.
+func (s *SocialAuthListOKHeaders) SetResponse(val []SocialAuth) {
+	s.Response = val
+}
+
+func (*SocialAuthListOKHeaders) socialAuthListRes() {}
+
+// Ref: #/components/schemas/SocialAuthProvider
+type SocialAuthProvider string
+
+const (
+	SocialAuthProviderGithub        SocialAuthProvider = "github"
+	SocialAuthProviderGithubLegacy  SocialAuthProvider = "github_legacy"
+	SocialAuthProviderGitlab        SocialAuthProvider = "gitlab"
+	SocialAuthProviderLeader        SocialAuthProvider = "leader"
+	SocialAuthProviderMos           SocialAuthProvider = "mos"
+	SocialAuthProviderStackoverflow SocialAuthProvider = "stackoverflow"
+	SocialAuthProviderStepik        SocialAuthProvider = "stepik"
+	SocialAuthProviderUnti          SocialAuthProvider = "unti"
+	SocialAuthProviderVkid          SocialAuthProvider = "vkid"
+	SocialAuthProviderVkOAuth2      SocialAuthProvider = "vk-oauth2"
+	SocialAuthProviderYandex        SocialAuthProvider = "yandex"
+)
+
+// AllValues returns all SocialAuthProvider values.
+func (SocialAuthProvider) AllValues() []SocialAuthProvider {
+	return []SocialAuthProvider{
+		SocialAuthProviderGithub,
+		SocialAuthProviderGithubLegacy,
+		SocialAuthProviderGitlab,
+		SocialAuthProviderLeader,
+		SocialAuthProviderMos,
+		SocialAuthProviderStackoverflow,
+		SocialAuthProviderStepik,
+		SocialAuthProviderUnti,
+		SocialAuthProviderVkid,
+		SocialAuthProviderVkOAuth2,
+		SocialAuthProviderYandex,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SocialAuthProvider) MarshalText() ([]byte, error) {
+	switch s {
+	case SocialAuthProviderGithub:
+		return []byte(s), nil
+	case SocialAuthProviderGithubLegacy:
+		return []byte(s), nil
+	case SocialAuthProviderGitlab:
+		return []byte(s), nil
+	case SocialAuthProviderLeader:
+		return []byte(s), nil
+	case SocialAuthProviderMos:
+		return []byte(s), nil
+	case SocialAuthProviderStackoverflow:
+		return []byte(s), nil
+	case SocialAuthProviderStepik:
+		return []byte(s), nil
+	case SocialAuthProviderUnti:
+		return []byte(s), nil
+	case SocialAuthProviderVkid:
+		return []byte(s), nil
+	case SocialAuthProviderVkOAuth2:
+		return []byte(s), nil
+	case SocialAuthProviderYandex:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SocialAuthProvider) UnmarshalText(data []byte) error {
+	switch SocialAuthProvider(data) {
+	case SocialAuthProviderGithub:
+		*s = SocialAuthProviderGithub
+		return nil
+	case SocialAuthProviderGithubLegacy:
+		*s = SocialAuthProviderGithubLegacy
+		return nil
+	case SocialAuthProviderGitlab:
+		*s = SocialAuthProviderGitlab
+		return nil
+	case SocialAuthProviderLeader:
+		*s = SocialAuthProviderLeader
+		return nil
+	case SocialAuthProviderMos:
+		*s = SocialAuthProviderMos
+		return nil
+	case SocialAuthProviderStackoverflow:
+		*s = SocialAuthProviderStackoverflow
+		return nil
+	case SocialAuthProviderStepik:
+		*s = SocialAuthProviderStepik
+		return nil
+	case SocialAuthProviderUnti:
+		*s = SocialAuthProviderUnti
+		return nil
+	case SocialAuthProviderVkid:
+		*s = SocialAuthProviderVkid
+		return nil
+	case SocialAuthProviderVkOAuth2:
+		*s = SocialAuthProviderVkOAuth2
+		return nil
+	case SocialAuthProviderYandex:
+		*s = SocialAuthProviderYandex
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type TalentOAuth struct {
+	Token string
+}
+
+// GetToken returns the value of Token.
+func (s *TalentOAuth) GetToken() string {
+	return s.Token
+}
+
+// SetToken sets the value of Token.
+func (s *TalentOAuth) SetToken(val string) {
+	s.Token = val
+}
+
+// Ref: #/components/schemas/Team
+type Team struct {
+	// ID команды.
+	ID int32 `json:"id"`
+	// Дата создания.
+	CreatedAt time.Time `json:"created_at"`
+	// Дата обновления.
+	UpdatedAt time.Time `json:"updated_at"`
+	// Название команды.
+	Title string `json:"title"`
+	// Описание команды.
+	Description string `json:"description"`
+	// Команда участвует в автораспределении.
+	AssignmentParticipation bool `json:"assignment_participation"`
+	// Команда создана автораспределением.
+	CreatedByAssignment bool `json:"created_by_assignment"`
+	// ID мероприятия команды.
+	EventID int32 `json:"event_id"`
+	// ID проекта команды.
+	ProjectID int32 `json:"project_id"`
+	// TalentID капитана команды.
+	// > Доступно только для участников команды и
+	// организатора мероприятия.
+	OwnerID OptInt32 `json:"owner_id"`
+	// Контактная ссылка команды.
+	// > Доступно только для участников команды и
+	// организатора мероприятия.
+	ContactLink OptString `json:"contact_link"`
+	// Код для вступления в команду.
+	// > Доступен только капитану команды.
+	InviteCode OptString `json:"invite_code"`
+}
+
+// GetID returns the value of ID.
+func (s *Team) GetID() int32 {
+	return s.ID
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *Team) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *Team) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// GetTitle returns the value of Title.
+func (s *Team) GetTitle() string {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *Team) GetDescription() string {
+	return s.Description
+}
+
+// GetAssignmentParticipation returns the value of AssignmentParticipation.
+func (s *Team) GetAssignmentParticipation() bool {
+	return s.AssignmentParticipation
+}
+
+// GetCreatedByAssignment returns the value of CreatedByAssignment.
+func (s *Team) GetCreatedByAssignment() bool {
+	return s.CreatedByAssignment
+}
+
+// GetEventID returns the value of EventID.
+func (s *Team) GetEventID() int32 {
+	return s.EventID
+}
+
+// GetProjectID returns the value of ProjectID.
+func (s *Team) GetProjectID() int32 {
+	return s.ProjectID
+}
+
+// GetOwnerID returns the value of OwnerID.
+func (s *Team) GetOwnerID() OptInt32 {
+	return s.OwnerID
+}
+
+// GetContactLink returns the value of ContactLink.
+func (s *Team) GetContactLink() OptString {
+	return s.ContactLink
+}
+
+// GetInviteCode returns the value of InviteCode.
+func (s *Team) GetInviteCode() OptString {
+	return s.InviteCode
+}
+
+// SetID sets the value of ID.
+func (s *Team) SetID(val int32) {
+	s.ID = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *Team) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *Team) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetTitle sets the value of Title.
+func (s *Team) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *Team) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetAssignmentParticipation sets the value of AssignmentParticipation.
+func (s *Team) SetAssignmentParticipation(val bool) {
+	s.AssignmentParticipation = val
+}
+
+// SetCreatedByAssignment sets the value of CreatedByAssignment.
+func (s *Team) SetCreatedByAssignment(val bool) {
+	s.CreatedByAssignment = val
+}
+
+// SetEventID sets the value of EventID.
+func (s *Team) SetEventID(val int32) {
+	s.EventID = val
+}
+
+// SetProjectID sets the value of ProjectID.
+func (s *Team) SetProjectID(val int32) {
+	s.ProjectID = val
+}
+
+// SetOwnerID sets the value of OwnerID.
+func (s *Team) SetOwnerID(val OptInt32) {
+	s.OwnerID = val
+}
+
+// SetContactLink sets the value of ContactLink.
+func (s *Team) SetContactLink(val OptString) {
+	s.ContactLink = val
+}
+
+// SetInviteCode sets the value of InviteCode.
+func (s *Team) SetInviteCode(val OptString) {
+	s.InviteCode = val
+}
+
+func (*Team) teamReadRes()   {}
+func (*Team) teamUpdateRes() {}
+
+type TeamContactLink url.URL
+
+// TeamContactValidateOK is response for TeamContactValidate operation.
+type TeamContactValidateOK struct{}
+
+func (*TeamContactValidateOK) teamContactValidateRes() {}
+
+// TeamContactValidateUnprocessableEntity is response for TeamContactValidate operation.
+type TeamContactValidateUnprocessableEntity struct{}
+
+func (*TeamContactValidateUnprocessableEntity) teamContactValidateRes() {}
+
+type TeamUpdateForbidden ErrorResponseStatusCode
+
+func (*TeamUpdateForbidden) teamUpdateRes() {}
+
+type TeamUpdateNotFound ErrorResponseStatusCode
+
+func (*TeamUpdateNotFound) teamUpdateRes() {}
+
+type TeamUpdateReq struct {
+	Title       OptString `json:"title"`
+	Description OptString `json:"description"`
+	// Команда участвует в автораспределении.
+	AssignmentParticipation OptBool `json:"assignment_participation"`
+	// ID проекта команды.
+	// > Доступно для обновления только капитану команды.
+	ProjectID   OptInt32           `json:"project_id"`
+	ContactLink OptTeamContactLink `json:"contact_link"`
+}
+
+// GetTitle returns the value of Title.
+func (s *TeamUpdateReq) GetTitle() OptString {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *TeamUpdateReq) GetDescription() OptString {
+	return s.Description
+}
+
+// GetAssignmentParticipation returns the value of AssignmentParticipation.
+func (s *TeamUpdateReq) GetAssignmentParticipation() OptBool {
+	return s.AssignmentParticipation
+}
+
+// GetProjectID returns the value of ProjectID.
+func (s *TeamUpdateReq) GetProjectID() OptInt32 {
+	return s.ProjectID
+}
+
+// GetContactLink returns the value of ContactLink.
+func (s *TeamUpdateReq) GetContactLink() OptTeamContactLink {
+	return s.ContactLink
+}
+
+// SetTitle sets the value of Title.
+func (s *TeamUpdateReq) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *TeamUpdateReq) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetAssignmentParticipation sets the value of AssignmentParticipation.
+func (s *TeamUpdateReq) SetAssignmentParticipation(val OptBool) {
+	s.AssignmentParticipation = val
+}
+
+// SetProjectID sets the value of ProjectID.
+func (s *TeamUpdateReq) SetProjectID(val OptInt32) {
+	s.ProjectID = val
+}
+
+// SetContactLink sets the value of ContactLink.
+func (s *TeamUpdateReq) SetContactLink(val OptTeamContactLink) {
+	s.ContactLink = val
+}
+
+type TeamUpdateUnprocessableEntity ErrorResponseStatusCode
+
+func (*TeamUpdateUnprocessableEntity) teamUpdateRes() {}

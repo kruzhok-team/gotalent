@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Talent API v2
-  version: '0.1'
+  version: '0.2'
   contact:
     email: talent@kruzhok.org
 servers:
@@ -14,6 +14,30 @@ tags:
     x-displayName: Чтение мероприятий
   - name: events-schema
     x-displayName: Схемы для мероприятий
+  - name: persons
+    x-displayName: Персоны пользователей
+  - name: social-auths
+    x-displayName: Внешние провайдеры авторизации
+  - name: teams
+    x-displayName: Команды пользователей
+  - name: teams-schema
+    x-displayName: Схемы для команд
+  - name: auth
+    x-displayName: Аутентификация
+    description: |-
+      ## TalentOAuth
+
+      Аутентификация токеном TalentOAuth пользователем Таланта.
+      Передается в заголовке `Authorization: Bearer` в формате JWT.
+
+      При использовании этой аутентификации,
+      авторизация сервисом выполняется в отношении пользователя,
+      авторизовавшего переданный токен.
+
+      ## ClientCredentials
+
+      Аутентификация учетными данными OAuth2 клиента TalentOAuth.
+      В качестве `username` используется `client_id`, а в `password` - `client_secret`.
   - name: offset
     x-displayName: Пагинация
     description: |-
@@ -24,11 +48,20 @@ tags:
 x-tagGroups:
   - name: Общие свойства API
     tags:
+      - auth
       - offset
   - name: Мероприятия
     tags:
       - events-read
       - events-schema
+  - name: Пользователи
+    tags:
+      - persons
+      - social-auths
+  - name: Команды
+    tags:
+      - teams
+      - teams-schema
 paths:
   /events/{event_id}:
     get:
@@ -50,6 +83,7 @@ paths:
                   - $ref: '#/components/schemas/Event'
         '404':
           description: Мероприятие не найдено
+          $ref: '#/components/responses/ErrorResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
     parameters:
@@ -60,13 +94,195 @@ paths:
         schema:
           type: boolean
           default: false
+  /persons/{person_id}:
+    get:
+      operationId: PersonRead
+      summary: Чтение персоны пользователя
+      tags:
+        - persons
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - user_id
+                properties:
+                  user_id:
+                    type: integer
+                    format: int32
+                    description: TalentID пользователя, которому принадлежит персона.
+        '404':
+          description: Персона не найдена
+          $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    parameters:
+      - name: person_id
+        in: path
+        required: true
+        description: ID персоны.
+        schema:
+          type: integer
+          format: int32
+  /social-auths/{user_id}:
+    get:
+      operationId: SocialAuthList
+      summary: Список авторизаций пользователя в соц. сетях
+      security:
+        - TalentOAuth: ['user']
+        - ClientCredentials: []
+      tags:
+        - social-auths
+      parameters:
+        - name: provider
+          in: query
+          required: false
+          description: Фильтрация по провайдеру авторизации
+          schema:
+            $ref: '#/components/schemas/SocialAuthProvider'
+        - $ref: '#/components/parameters/id_offset_32'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/limit'
+      responses:
+        '200':
+          description: Ok
+          headers:
+            X-Count:
+              $ref: '#/components/headers/X-Count'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SocialAuth'
+        '403':
+          description: Отсутствует доступ либо у OAuth клиента либо у пользователя.
+          x-summary: Отсутствует доступ
+          $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        description: ID пользователя.
+        schema:
+          type: integer
+          format: int32
+  /teams/{team_id}:
+    get:
+      operationId: TeamRead
+      summary: Чтение параметров команды
+      description: |-
+        Часть данных возвращается только при наличии аутентификации и определенных прав у пользователя,
+        от лица которого выполняется запрос.
+      tags:
+        - teams
+      security:
+        - TalentOAuth: ['teams', 'user']
+        - {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        '404':
+          description: Команда не найдена
+          $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    patch:
+      operationId: TeamUpdate
+      summary: Обновление параметров команды
+      description: Доступно только для капитана команды и организатора мероприятия.
+      tags:
+        - teams
+      security:
+        - TalentOAuth: ['teams', 'user']
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  maxLength: 255
+                description:
+                  type: string
+                  maxLength: 2000
+                assignment_participation:
+                  type: boolean
+                  description: Команда участвует в автораспределении.
+                project_id:
+                  type: integer
+                  format: int32
+                  description: |-
+                    ID проекта команды.
+
+                    > Доступно для обновления только капитану команды.
+                contact_link:
+                  $ref: '#/components/schemas/TeamContactLink'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        '403':
+          description: Пользователь не является ни капитаном команды ни организатором мероприятия
+          x-summary: Нет доступа к обновлению команды
+          $ref: '#/components/responses/ErrorResponse'
+        '404':
+          description: Команда не найдена
+          $ref: '#/components/responses/ErrorResponse'
+        '422':
+          description: Контактная ссылка не прошла валидацию
+          $ref: '#/components/responses/ErrorResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    parameters:
+      - name: team_id
+        in: path
+        required: true
+        description: ID команды.
+        schema:
+          type: integer
+          format: int32
+  /teams/contact-validate:
+    post:
+      operationId: TeamContactValidate
+      summary: Валидация контактной ссылки
+      tags:
+        - teams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamContactLink'
+      responses:
+        '200':
+          description: Ссылка корректна для использования в качестве контактной ссылки команды
+          x-summary: Ссылка прошла валидацию
+        '422':
+          description: Ссылка не прошла валидацию
+        default:
+          $ref: '#/components/responses/ErrorResponse'
 components:
   schemas:
     EventMeta:
       x-tags:
         - events-schema
-      type: object
       title: Метаданные мероприятия
+      type: object
       required:
         - id
         - created_at
@@ -271,6 +487,102 @@ components:
             questionnaire_completed_message:
               type: string
               description: Сообщение о заполненной анкете.
+    SocialAuth:
+      type: object
+      required:
+        - provider
+        - uid
+      properties:
+        provider:
+          $ref: '#/components/schemas/SocialAuthProvider'
+        uid:
+          type: string
+          description: ID пользователя в провайдере авторизации.
+    SocialAuthProvider:
+      type: string
+      enum:
+        - github
+        - github_legacy
+        - gitlab
+        - leader
+        - mos
+        - stackoverflow
+        - stepik
+        - unti
+        - vkid
+        - vk-oauth2
+        - yandex
+    Team:
+      x-tags:
+        - teams-schema
+      title: Команда пользователей
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - title
+        - description
+        - assignment_participation
+        - created_by_assignment
+        - event_id
+        - project_id
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: ID команды.
+        created_at:
+          type: string
+          format: date-time
+          description: Дата создания.
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата обновления.
+        title:
+          type: string
+          description: Название команды.
+        description:
+          type: string
+          description: Описание команды.
+        assignment_participation:
+          type: boolean
+          description: Команда участвует в автораспределении.
+        created_by_assignment:
+          type: boolean
+          description: Команда создана автораспределением.
+        event_id:
+          type: integer
+          format: int32
+          description: ID мероприятия команды.
+        project_id:
+          type: integer
+          format: int32
+          description: ID проекта команды.
+        owner_id:
+          type: integer
+          format: int32
+          description: |-
+            TalentID капитана команды.
+
+            > Доступно только для участников команды и организатора мероприятия.
+        contact_link:
+          type: string
+          description: |-
+            Контактная ссылка команды.
+
+            > Доступно только для участников команды и организатора мероприятия.
+        invite_code:
+          type: string
+          description: |-
+            Код для вступления в команду.
+
+            > Доступен только капитану команды.
+    TeamContactLink:
+      type: string
+      format: uri
+      description: Контактная ссылка.
   responses:
     ErrorResponse:
       description: Error
@@ -338,4 +650,8 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: TalentOAuth JWT
+      description: Аутентификация токеном TalentOAuth пользователем Таланта.
+    ClientCredentials:
+      type: http
+      scheme: basic
+      description: Аутентификация учетными данными OAuth2 клиента TalentOAuth.

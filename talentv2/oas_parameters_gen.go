@@ -9,3 +9,36 @@ type EventRetrieveParams struct {
 	// Вернуть в ответе полный набор свойств.
 	Extend OptBool
 }
+
+// PersonReadParams is parameters of PersonRead operation.
+type PersonReadParams struct {
+	// ID персоны.
+	PersonID int32
+}
+
+// SocialAuthListParams is parameters of SocialAuthList operation.
+type SocialAuthListParams struct {
+	// Фильтрация по провайдеру авторизации.
+	Provider OptSocialAuthProvider
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
+	// ID пользователя.
+	UserID int32
+}
+
+// TeamReadParams is parameters of TeamRead operation.
+type TeamReadParams struct {
+	// ID команды.
+	TeamID int32
+}
+
+// TeamUpdateParams is parameters of TeamUpdate operation.
+type TeamUpdateParams struct {
+	// ID команды.
+	TeamID int32
+}
