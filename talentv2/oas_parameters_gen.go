@@ -2,12 +2,285 @@
 
 package talentv2
 
+import (
+	"github.com/google/uuid"
+)
+
+// AddAchievementEventListParams is parameters of AddAchievementEventList operation.
+type AddAchievementEventListParams struct {
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
+	// Поиск по названию, ключевым словам и описанию.
+	Search OptString
+	// Фильтр по массиву идентификаторов мероприятий.
+	EventID []int32
+	// Фильтрация по формату мероприятий.
+	Format OptEventFormat
+	// Мероприятия с датой начала ранее указанной.
+	StartBefore OptDateTime
+	// Мероприятия с датой завершения после указанной.
+	EndAfter OptDateTime
+	// Фильтр по массиву идентификаторов брендов.
+	BrandID []int32
+	// Фильтр по массиву идентификаторов компетенций
+	// Конкурса Талант.
+	CompetencyID []int32
+	// Фильтрация по названию региона.
+	Region OptString
+}
+
+// CalendarEventListParams is parameters of CalendarEventList operation.
+type CalendarEventListParams struct {
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
+	// Критерий сортировки результатов.
+	OrderBy OptCalendarEventListOrderBy
+}
+
+// EventBrandListParams is parameters of EventBrandList operation.
+type EventBrandListParams struct {
+	// Фильтр по массиву идентификаторов мероприятий.
+	EventID []int32
+	// Фильтр по массиву идентификаторов брендов.
+	BrandID []int32
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
+}
+
+// EventCountParams is parameters of EventCount operation.
+type EventCountParams struct {
+	// Фильтр по массиву идентификаторов мероприятий.
+	EventID []int32
+	// Фильтрация мероприятий по ID организации.
+	OrganizationID []int32
+	// Фильтрация мероприятий по ID мета-мероприятия.
+	MetaEventID []int32
+	// Фильтрация мероприятий по ID площадки их проведения.
+	VenueID []int32
+	// Мероприятия с датой начала ранее указанной.
+	StartBefore OptDateTime
+	// Мероприятия с датой завершения после указанной.
+	EndAfter OptDateTime
+	// Поиск по названию, ключевым словам и описанию.
+	Search OptString
+	// Фильтрация по формату мероприятий.
+	Format OptEventFormat
+}
+
+// EventDiplomaRoleAddParams is parameters of EventDiplomaRoleAdd operation.
+type EventDiplomaRoleAddParams struct {
+	// ID мероприятия.
+	EventID int32
+	// ID роли достижения.
+	RoleID int32
+}
+
+// EventDiplomaRoleDeleteParams is parameters of EventDiplomaRoleDelete operation.
+type EventDiplomaRoleDeleteParams struct {
+	// ID мероприятия.
+	EventID int32
+	// ID роли достижения.
+	RoleID int32
+}
+
+// EventDiplomaSettingsCreateParams is parameters of EventDiplomaSettingsCreate operation.
+type EventDiplomaSettingsCreateParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// EventDiplomaSettingsListParams is parameters of EventDiplomaSettingsList operation.
+type EventDiplomaSettingsListParams struct {
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
+	// ID мероприятий, записывается в формате `?event_ids=1,2,3`.
+	EventIds []int32
+}
+
+// EventDiplomaSettingsReadParams is parameters of EventDiplomaSettingsRead operation.
+type EventDiplomaSettingsReadParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// EventDiplomaSettingsUpdateParams is parameters of EventDiplomaSettingsUpdate operation.
+type EventDiplomaSettingsUpdateParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// EventListParams is parameters of EventList operation.
+type EventListParams struct {
+	// Фильтр по массиву идентификаторов мероприятий.
+	EventID []int32
+	// Фильтрация мероприятий по ID организации.
+	OrganizationID []int32
+	// Фильтрация мероприятий по ID мета-мероприятия.
+	MetaEventID []int32
+	// Фильтрация мероприятий по ID площадки их проведения.
+	VenueID []int32
+	// Мероприятия с датой начала ранее указанной.
+	StartBefore OptDateTime
+	// Мероприятия с датой завершения после указанной.
+	EndAfter OptDateTime
+	// Поиск по названию, ключевым словам и описанию.
+	Search OptString
+	// Фильтрация по формату мероприятий.
+	Format OptEventFormat
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit   OptInt32
+	OrderBy OptEventListOrderBy
+}
+
 // EventRetrieveParams is parameters of EventRetrieve operation.
 type EventRetrieveParams struct {
 	// ID мероприятия.
 	EventID int32
 	// Вернуть в ответе полный набор свойств.
 	Extend OptBool
+}
+
+// EventRouteListParams is parameters of EventRouteList operation.
+type EventRouteListParams struct {
+	// Фильтр по массиву идентификаторов мероприятий.
+	EventID []int32
+	// Фильтр по массиву идентификаторов направлений.
+	RouteID []int32
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
+}
+
+// FileConfirmUploadParams is parameters of FileConfirmUpload operation.
+type FileConfirmUploadParams struct {
+	// ID файла.
+	FileID uuid.UUID
+}
+
+// FileMetaListParams is parameters of FileMetaList operation.
+type FileMetaListParams struct {
+	// Статус публичности файла.
+	IsPublic OptBool
+	// Пространство имен для объекта, где используется файл,
+	// в формате
+	// <сервис>/<таблица БД>/<поле со ссылкой на файл>
+	// (например, polls/questions/picture, venues/venue/cover, etc.).
+	Namespace OptString
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
+	// Поле, по которому будет отсортирован список файлов.
+	OrderBy OptFileMetaListOrderBy
+}
+
+// FileMetaReadParams is parameters of FileMetaRead operation.
+type FileMetaReadParams struct {
+	// ID файла.
+	FileID uuid.UUID
+}
+
+// FileMetaUpdateParams is parameters of FileMetaUpdate operation.
+type FileMetaUpdateParams struct {
+	// ID файла.
+	FileID uuid.UUID
+}
+
+// FileReadParams is parameters of FileRead operation.
+type FileReadParams struct {
+	// ID файла.
+	FileID uuid.UUID
+}
+
+// FileReferenceCreateParams is parameters of FileReferenceCreate operation.
+type FileReferenceCreateParams struct {
+	// ID файла.
+	FileID uuid.UUID
+	// ID связанного объекта.
+	ObjectID string
+}
+
+// FileReferenceDeleteParams is parameters of FileReferenceDelete operation.
+type FileReferenceDeleteParams struct {
+	// ID файла.
+	FileID uuid.UUID
+	// ID связанного объекта.
+	ObjectID string
+}
+
+// FileUploadParams is parameters of FileUpload operation.
+type FileUploadParams struct {
+	// ID файла.
+	FileID uuid.UUID
+}
+
+// OrganizationEventListParams is parameters of OrganizationEventList operation.
+type OrganizationEventListParams struct {
+	// ID организации.
+	OrganizationID int32
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
+	// Фильтр по массиву идентификаторов мероприятий.
+	EventID []int32
+	// Поиск по названию, ключевым словам и описанию.
+	Search OptString
+	// Фильтрация по формату мероприятий.
+	Format OptEventFormat
+	// Мероприятия с датой начала ранее указанной.
+	StartBefore OptDateTime
+	// Мероприятия с датой завершения после указанной.
+	EndAfter OptDateTime
+	// Фильтрация по названию города.
+	City OptString
+	// Критерий сортировки результатов.
+	// При использовании текстового поиска,
+	// результаты будут отсортированы сначала в порядке
+	// релевантности,
+	// а потом в соответствии с указанным этим параметром
+	// критерием.
+	OrderBy OptOrganizationEventListOrderBy
+}
+
+// OrganizationListParams is parameters of OrganizationList operation.
+type OrganizationListParams struct {
+	// Фильтр по массиву идентификаторов организаций.
+	OrganizationID []int32
+	// ID родительской организации.
+	ParentOrganizationID OptInt32
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
+	// Критерий сортировки результатов.
+	OrderBy OptOrganizationListOrderBy
 }
 
 // PersonReadParams is parameters of PersonRead operation.
