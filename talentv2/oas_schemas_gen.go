@@ -4641,6 +4641,121 @@ func (s *OrganizationMeta) SetEducationalCategory(val EducationalCategory) {
 	s.EducationalCategory = val
 }
 
+// Merged schema.
+// Ref: #/components/schemas/OrganizationSubject
+type OrganizationSubject struct {
+	ID             int32     `json:"id"`
+	CreatedAt      time.Time `json:"created_at"`
+	OrganizationID int32     `json:"organization_id"`
+	// ID [тематики](#tag/organization-subjects/operation/SubjectList).
+	SubjectID int32 `json:"subject_id"`
+}
+
+// GetID returns the value of ID.
+func (s *OrganizationSubject) GetID() int32 {
+	return s.ID
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *OrganizationSubject) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetOrganizationID returns the value of OrganizationID.
+func (s *OrganizationSubject) GetOrganizationID() int32 {
+	return s.OrganizationID
+}
+
+// GetSubjectID returns the value of SubjectID.
+func (s *OrganizationSubject) GetSubjectID() int32 {
+	return s.SubjectID
+}
+
+// SetID sets the value of ID.
+func (s *OrganizationSubject) SetID(val int32) {
+	s.ID = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *OrganizationSubject) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetOrganizationID sets the value of OrganizationID.
+func (s *OrganizationSubject) SetOrganizationID(val int32) {
+	s.OrganizationID = val
+}
+
+// SetSubjectID sets the value of SubjectID.
+func (s *OrganizationSubject) SetSubjectID(val int32) {
+	s.SubjectID = val
+}
+
+func (*OrganizationSubject) organizationSubjectCreateRes() {}
+
+// Ref: #/components/schemas/OrganizationSubjectBody
+type OrganizationSubjectBody struct {
+	OrganizationID int32 `json:"organization_id"`
+	// ID [тематики](#tag/organization-subjects/operation/SubjectList).
+	SubjectID int32 `json:"subject_id"`
+}
+
+// GetOrganizationID returns the value of OrganizationID.
+func (s *OrganizationSubjectBody) GetOrganizationID() int32 {
+	return s.OrganizationID
+}
+
+// GetSubjectID returns the value of SubjectID.
+func (s *OrganizationSubjectBody) GetSubjectID() int32 {
+	return s.SubjectID
+}
+
+// SetOrganizationID sets the value of OrganizationID.
+func (s *OrganizationSubjectBody) SetOrganizationID(val int32) {
+	s.OrganizationID = val
+}
+
+// SetSubjectID sets the value of SubjectID.
+func (s *OrganizationSubjectBody) SetSubjectID(val int32) {
+	s.SubjectID = val
+}
+
+// OrganizationSubjectCreateConflict is response for OrganizationSubjectCreate operation.
+type OrganizationSubjectCreateConflict struct{}
+
+func (*OrganizationSubjectCreateConflict) organizationSubjectCreateRes() {}
+
+// OrganizationSubjectCreateForbidden is response for OrganizationSubjectCreate operation.
+type OrganizationSubjectCreateForbidden struct{}
+
+func (*OrganizationSubjectCreateForbidden) organizationSubjectCreateRes() {}
+
+// OrganizationSubjectListResponseHeaders wraps []OrganizationSubject with response headers.
+type OrganizationSubjectListResponseHeaders struct {
+	XCount   int64
+	Response []OrganizationSubject
+}
+
+// GetXCount returns the value of XCount.
+func (s *OrganizationSubjectListResponseHeaders) GetXCount() int64 {
+	return s.XCount
+}
+
+// GetResponse returns the value of Response.
+func (s *OrganizationSubjectListResponseHeaders) GetResponse() []OrganizationSubject {
+	return s.Response
+}
+
+// SetXCount sets the value of XCount.
+func (s *OrganizationSubjectListResponseHeaders) SetXCount(val int64) {
+	s.XCount = val
+}
+
+// SetResponse sets the value of Response.
+func (s *OrganizationSubjectListResponseHeaders) SetResponse(val []OrganizationSubject) {
+	s.Response = val
+}
+
 type PersonReadOK struct {
 	// TalentID пользователя, которому принадлежит персона.
 	UserID int32 `json:"user_id"`
@@ -4816,6 +4931,58 @@ func (s *SocialAuthProvider) UnmarshalText(data []byte) error {
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
+}
+
+// Ref: #/components/schemas/Subject
+type Subject struct {
+	ID    int32  `json:"id"`
+	Title string `json:"title"`
+}
+
+// GetID returns the value of ID.
+func (s *Subject) GetID() int32 {
+	return s.ID
+}
+
+// GetTitle returns the value of Title.
+func (s *Subject) GetTitle() string {
+	return s.Title
+}
+
+// SetID sets the value of ID.
+func (s *Subject) SetID(val int32) {
+	s.ID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *Subject) SetTitle(val string) {
+	s.Title = val
+}
+
+// SubjectListResponseHeaders wraps []Subject with response headers.
+type SubjectListResponseHeaders struct {
+	XCount   int64
+	Response []Subject
+}
+
+// GetXCount returns the value of XCount.
+func (s *SubjectListResponseHeaders) GetXCount() int64 {
+	return s.XCount
+}
+
+// GetResponse returns the value of Response.
+func (s *SubjectListResponseHeaders) GetResponse() []Subject {
+	return s.Response
+}
+
+// SetXCount sets the value of XCount.
+func (s *SubjectListResponseHeaders) SetXCount(val int64) {
+	s.XCount = val
+}
+
+// SetResponse sets the value of Response.
+func (s *SubjectListResponseHeaders) SetResponse(val []Subject) {
+	s.Response = val
 }
 
 type TalentOAuth struct {

@@ -283,6 +283,21 @@ type OrganizationListParams struct {
 	OrderBy OptOrganizationListOrderBy
 }
 
+// OrganizationSubjectListParams is parameters of OrganizationSubjectList operation.
+type OrganizationSubjectListParams struct {
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
+	// Фильтр по массиву идентификаторов организаций.
+	OrganizationID []int32
+	// Фильтр по массиву идентификаторов тематик.
+	SubjectID []int32
+}
+
 // PersonReadParams is parameters of PersonRead operation.
 type PersonReadParams struct {
 	// ID персоны.
@@ -302,6 +317,17 @@ type SocialAuthListParams struct {
 	Limit OptInt32
 	// ID пользователя.
 	UserID int32
+}
+
+// SubjectListParams is parameters of SubjectList operation.
+type SubjectListParams struct {
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
 }
 
 // TeamReadParams is parameters of TeamRead operation.

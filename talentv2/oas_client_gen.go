@@ -187,6 +187,20 @@ type Invoker interface {
 	//
 	// GET /organizations
 	OrganizationList(ctx context.Context, params OrganizationListParams) (*OrganizationListResponseHeaders, error)
+	// OrganizationSubjectCreate invokes OrganizationSubjectCreate operation.
+	//
+	// > Запрос необходимо выполнять от ментора или
+	// владельца организации,
+	// > указываемой в свойстве `organization_id` тела запроса.
+	//
+	// POST /organization-subjects
+	OrganizationSubjectCreate(ctx context.Context, request *OrganizationSubjectBody) (OrganizationSubjectCreateRes, error)
+	// OrganizationSubjectList invokes OrganizationSubjectList operation.
+	//
+	// Список связей организаций и тематик.
+	//
+	// GET /organization-subjects
+	OrganizationSubjectList(ctx context.Context, params OrganizationSubjectListParams) (*OrganizationSubjectListResponseHeaders, error)
 	// PersonRead invokes PersonRead operation.
 	//
 	// Чтение персоны пользователя.
@@ -199,6 +213,12 @@ type Invoker interface {
 	//
 	// GET /social-auths/{user_id}
 	SocialAuthList(ctx context.Context, params SocialAuthListParams) (SocialAuthListRes, error)
+	// SubjectList invokes SubjectList operation.
+	//
+	// Список тематик для организаций.
+	//
+	// GET /subjects
+	SubjectList(ctx context.Context, params SubjectListParams) (*SubjectListResponseHeaders, error)
 	// TeamContactValidate invokes TeamContactValidate operation.
 	//
 	// Валидация контактной ссылки.
@@ -4223,6 +4243,295 @@ func (c *Client) sendOrganizationList(ctx context.Context, params OrganizationLi
 	return result, nil
 }
 
+// OrganizationSubjectCreate invokes OrganizationSubjectCreate operation.
+//
+// > Запрос необходимо выполнять от ментора или
+// владельца организации,
+// > указываемой в свойстве `organization_id` тела запроса.
+//
+// POST /organization-subjects
+func (c *Client) OrganizationSubjectCreate(ctx context.Context, request *OrganizationSubjectBody) (OrganizationSubjectCreateRes, error) {
+	res, err := c.sendOrganizationSubjectCreate(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendOrganizationSubjectCreate(ctx context.Context, request *OrganizationSubjectBody) (res OrganizationSubjectCreateRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("OrganizationSubjectCreate"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/organization-subjects"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "OrganizationSubjectCreate",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/organization-subjects"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeOrganizationSubjectCreateRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, "OrganizationSubjectCreate", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeOrganizationSubjectCreateResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// OrganizationSubjectList invokes OrganizationSubjectList operation.
+//
+// Список связей организаций и тематик.
+//
+// GET /organization-subjects
+func (c *Client) OrganizationSubjectList(ctx context.Context, params OrganizationSubjectListParams) (*OrganizationSubjectListResponseHeaders, error) {
+	res, err := c.sendOrganizationSubjectList(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendOrganizationSubjectList(ctx context.Context, params OrganizationSubjectListParams) (res *OrganizationSubjectListResponseHeaders, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("OrganizationSubjectList"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/organization-subjects"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "OrganizationSubjectList",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/organization-subjects"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "id_offset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "id_offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IDOffset.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "offset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Offset.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "limit" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Limit.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "organization_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "organization_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.OrganizationID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.OrganizationID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "subject_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "subject_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.SubjectID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.SubjectID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeOrganizationSubjectListResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // PersonRead invokes PersonRead operation.
 //
 // Чтение персоны пользователя.
@@ -4513,6 +4822,133 @@ func (c *Client) sendSocialAuthList(ctx context.Context, params SocialAuthListPa
 
 	stage = "DecodeResponse"
 	result, err := decodeSocialAuthListResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// SubjectList invokes SubjectList operation.
+//
+// Список тематик для организаций.
+//
+// GET /subjects
+func (c *Client) SubjectList(ctx context.Context, params SubjectListParams) (*SubjectListResponseHeaders, error) {
+	res, err := c.sendSubjectList(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendSubjectList(ctx context.Context, params SubjectListParams) (res *SubjectListResponseHeaders, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("SubjectList"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/subjects"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "SubjectList",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/subjects"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "id_offset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "id_offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IDOffset.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "offset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Offset.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "limit" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Limit.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeSubjectListResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Talent API v2
-  version: '0.5'
+  version: '0.6'
   contact:
     email: talent@kruzhok.org
 servers:
@@ -9,6 +9,7 @@ servers:
     description: Production Server
   - url: https://talent.test.kruzhok.org/v2
     description: Development Server
+
 tags:
   - name: generic-files
     x-displayName: Файлы любого формата
@@ -33,6 +34,8 @@ tags:
     x-displayName: Настройки дипломов для мероприятий
   - name: organizations
     x-displayName: Операции организаций
+  - name: organization-subjects
+    x-displayName: Операции с тематиками организаций
   - name: persons
     x-displayName: Персоны пользователей
   - name: social-auths
@@ -71,6 +74,7 @@ tags:
       > за исключением вариантов `id_asc` и `id_desc`.
       > Для иных значений `order_by` будет возвращаться ответ `400 Bad Request`.
     x-traitTag: true
+
 x-tagGroups:
   - name: Общие свойства API
     tags:
@@ -85,6 +89,7 @@ x-tagGroups:
   - name: Организации
     tags:
       - organizations
+      - organization-subjects
   - name: Пользователи
     tags:
       - persons
@@ -96,6 +101,7 @@ x-tagGroups:
   - name: Файлы
     tags:
       - generic-files
+
 paths:
   /files:
     get:
@@ -810,6 +816,49 @@ paths:
           $ref: '#/components/responses/EventRouteListResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
+  /organization-subjects:
+    get:
+      operationId: OrganizationSubjectList
+      summary: Список связей организаций и тематик
+      tags: [organization-subjects]
+      parameters:
+        - $ref: '#/components/parameters/id_offset_32'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/organization_ids'
+        - $ref: '#/components/parameters/subject_ids'
+      responses:
+        '200':
+          $ref: '#/components/responses/OrganizationSubjectListResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+    post:
+      operationId: OrganizationSubjectCreate
+      summary: Добавление тематики для организации
+      description: |-
+        > Запрос необходимо выполнять от ментора или владельца организации,
+        > указываемой в свойстве `organization_id` тела запроса.
+      security: [TalentOAuth: []]
+      tags: [organization-subjects]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationSubjectBody'
+      responses:
+        '201':
+          description: Тематика добавлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationSubject'
+        '403':
+          description: Пользователь не имеет административных прав в организаци
+        '409':
+          description: Тематика уже добавлена в организацию
+        default:
+          $ref: '#/components/responses/ErrorResponse'
   /organizations:
     get:
       operationId: OrganizationList
@@ -826,7 +875,7 @@ paths:
           description: Критерий сортировки результатов.
           schema:
             type: string
-            default: 'id_desc'
+            default: 'id_asc'
             enum:
               - id_asc
               - id_desc
@@ -913,6 +962,20 @@ paths:
         schema:
           type: integer
           format: int32
+  /subjects:
+    get:
+      operationId: SubjectList
+      summary: Список тематик для организаций
+      tags: [organization-subjects]
+      parameters:
+        - $ref: '#/components/parameters/id_offset_32'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/limit'
+      responses:
+        '200':
+          $ref: '#/components/responses/SubjectListResponse'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
   /teams/{team_id}:
     get:
       operationId: TeamRead
@@ -1425,6 +1488,36 @@ components:
           nullable: true
         educational_category:
           $ref: '#/components/schemas/EducationalCategory'
+    OrganizationSubject:
+      allOf:
+        - type: object
+          required:
+            - id
+            - created_at
+            - organization_id
+            - subject_id
+          properties:
+            id:
+              type: integer
+              format: int32
+            created_at:
+              type: string
+              format: date-time
+        - $ref: '#/components/schemas/OrganizationSubjectBody'
+    OrganizationSubjectBody:
+      # Параметры OrganizationSubject заполняемые клиентом.
+      type: object
+      required:
+        - organization_id
+        - subject_id
+      properties:
+        organization_id:
+          type: integer
+          format: int32
+        subject_id:
+          type: integer
+          format: int32
+          description: ID [тематики](#tag/organization-subjects/operation/SubjectList)
     SocialAuth:
       type: object
       required:
@@ -1450,6 +1543,17 @@ components:
         - vkid
         - vk-oauth2
         - yandex
+    Subject:
+      type: object
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: integer
+          format: int32
+        title:
+          type: string
     Team:
       x-tags:
         - teams-schema
@@ -1776,34 +1880,6 @@ components:
             $ref: '#/components/schemas/EventEdge'
 
   responses:
-    ErrorResponse:
-      description: Error
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - error
-            properties:
-              error:
-                type: string
-    EventListResponse:
-      description: OK
-      headers:
-        X-Count:
-          $ref: '#/components/headers/X-Count'
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              allOf:
-                - $ref: '#/components/schemas/EventMeta'
-                - type: object
-                  required:
-                    - cover
-                  properties:
-                    cover: {$ref: '#/components/schemas/EventCover'}
     AddAchievementEventListResponse:
       description: OK
       headers:
@@ -1826,6 +1902,56 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/CalendarEvent'
+    ErrorResponse:
+      description: Error
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - error
+            properties:
+              error:
+                type: string
+    EventBrandListResponse:
+      description: OK
+      headers:
+        X-Count:
+          $ref: '#/components/headers/X-Count'
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/EventBrand'
+    EventListResponse:
+      description: OK
+      headers:
+        X-Count:
+          $ref: '#/components/headers/X-Count'
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/components/schemas/EventMeta'
+                - type: object
+                  required:
+                    - cover
+                  properties:
+                    cover: {$ref: '#/components/schemas/EventCover'}
+    EventRouteListResponse:
+      description: OK
+      headers:
+        X-Count:
+          $ref: '#/components/headers/X-Count'
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/EventRoute'
     OrganizationEventListResponse:
       description: OK
       headers:
@@ -1848,7 +1974,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/OrganizationMeta'
-    EventBrandListResponse:
+    OrganizationSubjectListResponse:
       description: OK
       headers:
         X-Count:
@@ -1858,8 +1984,8 @@ components:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/EventBrand'
-    EventRouteListResponse:
+              $ref: '#/components/schemas/OrganizationSubject'
+    SubjectListResponse:
       description: OK
       headers:
         X-Count:
@@ -1869,7 +1995,7 @@ components:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/EventRoute'
+              $ref: '#/components/schemas/Subject'
 
   parameters:
     id_offset_32:
@@ -2060,6 +2186,17 @@ components:
           format: int32
           minimum: 1
       description: Фильтр по массиву идентификаторов направлений.
+    subject_ids:
+      name: subject_id
+      in: query
+      explode: false
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int32
+          minimum: 1
+      description: Фильтр по массиву идентификаторов тематик.
 
   headers:
     X-Count:
@@ -2068,6 +2205,7 @@ components:
       schema:
         type: integer
         format: int64
+
   securitySchemes:
     TalentOAuth:
       type: http
