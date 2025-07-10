@@ -353,6 +353,7 @@ func (s *CalendarEventListResponseHeaders) SetResponse(val []CalendarEvent) {
 type ClientCredentials struct {
 	Username string
 	Password string
+	Roles    []string
 }
 
 // GetUsername returns the value of Username.
@@ -365,6 +366,11 @@ func (s *ClientCredentials) GetPassword() string {
 	return s.Password
 }
 
+// GetRoles returns the value of Roles.
+func (s *ClientCredentials) GetRoles() []string {
+	return s.Roles
+}
+
 // SetUsername sets the value of Username.
 func (s *ClientCredentials) SetUsername(val string) {
 	s.Username = val
@@ -373,6 +379,11 @@ func (s *ClientCredentials) SetUsername(val string) {
 // SetPassword sets the value of Password.
 func (s *ClientCredentials) SetPassword(val string) {
 	s.Password = val
+}
+
+// SetRoles sets the value of Roles.
+func (s *ClientCredentials) SetRoles(val []string) {
+	s.Roles = val
 }
 
 type ContentLength int32
@@ -2864,10 +2875,10 @@ func (o *NilDateTime) SetTo(v time.Time) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilDateTime) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilDateTime) SetToNull() {
 	o.Null = true
 	var v time.Time
@@ -2909,10 +2920,10 @@ func (o *NilEventCreatedByID) SetTo(v EventCreatedByID) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilEventCreatedByID) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilEventCreatedByID) SetToNull() {
 	o.Null = true
 	var v EventCreatedByID
@@ -2954,10 +2965,10 @@ func (o *NilEventEnd) SetTo(v EventEnd) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilEventEnd) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilEventEnd) SetToNull() {
 	o.Null = true
 	var v EventEnd
@@ -2999,10 +3010,10 @@ func (o *NilEventExpectedStart) SetTo(v EventExpectedStart) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilEventExpectedStart) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilEventExpectedStart) SetToNull() {
 	o.Null = true
 	var v EventExpectedStart
@@ -3044,10 +3055,10 @@ func (o *NilEventLimitDateEndRequest) SetTo(v EventLimitDateEndRequest) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilEventLimitDateEndRequest) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilEventLimitDateEndRequest) SetToNull() {
 	o.Null = true
 	var v EventLimitDateEndRequest
@@ -3089,10 +3100,10 @@ func (o *NilEventMaxUsers) SetTo(v EventMaxUsers) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilEventMaxUsers) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilEventMaxUsers) SetToNull() {
 	o.Null = true
 	var v EventMaxUsers
@@ -3134,10 +3145,10 @@ func (o *NilEventMetaEventID) SetTo(v EventMetaEventID) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilEventMetaEventID) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilEventMetaEventID) SetToNull() {
 	o.Null = true
 	var v EventMetaEventID
@@ -3179,10 +3190,10 @@ func (o *NilEventOrganizationID) SetTo(v EventOrganizationID) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilEventOrganizationID) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilEventOrganizationID) SetToNull() {
 	o.Null = true
 	var v EventOrganizationID
@@ -3224,10 +3235,10 @@ func (o *NilEventStart) SetTo(v EventStart) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilEventStart) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilEventStart) SetToNull() {
 	o.Null = true
 	var v EventStart
@@ -3269,10 +3280,10 @@ func (o *NilEventVenueID) SetTo(v EventVenueID) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilEventVenueID) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilEventVenueID) SetToNull() {
 	o.Null = true
 	var v EventVenueID
@@ -3314,10 +3325,10 @@ func (o *NilInt32) SetTo(v int32) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilInt32) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilInt32) SetToNull() {
 	o.Null = true
 	var v int32
@@ -4493,6 +4504,21 @@ func (s *OrganizationEventListResponseHeaders) SetResponse(val []OrganizationEve
 	s.Response = val
 }
 
+// OrganizationIsAdminForbidden is response for OrganizationIsAdmin operation.
+type OrganizationIsAdminForbidden struct{}
+
+func (*OrganizationIsAdminForbidden) organizationIsAdminRes() {}
+
+// OrganizationIsAdminNotFound is response for OrganizationIsAdmin operation.
+type OrganizationIsAdminNotFound struct{}
+
+func (*OrganizationIsAdminNotFound) organizationIsAdminRes() {}
+
+// OrganizationIsAdminOK is response for OrganizationIsAdmin operation.
+type OrganizationIsAdminOK struct{}
+
+func (*OrganizationIsAdminOK) organizationIsAdminRes() {}
+
 type OrganizationListOrderBy string
 
 const (
@@ -4987,6 +5013,7 @@ func (s *SubjectListResponseHeaders) SetResponse(val []Subject) {
 
 type TalentOAuth struct {
 	Token string
+	Roles []string
 }
 
 // GetToken returns the value of Token.
@@ -4994,9 +5021,19 @@ func (s *TalentOAuth) GetToken() string {
 	return s.Token
 }
 
+// GetRoles returns the value of Roles.
+func (s *TalentOAuth) GetRoles() []string {
+	return s.Roles
+}
+
 // SetToken sets the value of Token.
 func (s *TalentOAuth) SetToken(val string) {
 	s.Token = val
+}
+
+// SetRoles sets the value of Roles.
+func (s *TalentOAuth) SetRoles(val []string) {
+	s.Roles = val
 }
 
 // Ref: #/components/schemas/Team

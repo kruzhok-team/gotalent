@@ -266,6 +266,20 @@ type OrganizationEventListParams struct {
 	OrderBy OptOrganizationEventListOrderBy
 }
 
+// OrganizationIsAdminParams is parameters of OrganizationIsAdmin operation.
+type OrganizationIsAdminParams struct {
+	// ID организации.
+	OrganizationID int32
+	// Требование наличия или отсутствия статуса владельца
+	// организации.
+	// При указании значения, роль пользователя должна ему
+	// соответствовать;
+	// это значит что если указать `false`, а пользователь
+	// является владельцем,
+	// то ответ будет иметь статус `403`.
+	IsOwner OptBool
+}
+
 // OrganizationListParams is parameters of OrganizationList operation.
 type OrganizationListParams struct {
 	// Фильтр по массиву идентификаторов организаций.

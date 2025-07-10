@@ -49,6 +49,10 @@ type FileUploadRes interface {
 	fileUploadRes()
 }
 
+type OrganizationIsAdminRes interface {
+	organizationIsAdminRes()
+}
+
 type OrganizationSubjectCreateRes interface {
 	organizationSubjectCreateRes()
 }

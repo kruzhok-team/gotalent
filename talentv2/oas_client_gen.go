@@ -22,6 +22,11 @@ import (
 	"github.com/ogen-go/ogen/uri"
 )
 
+func trimTrailingSlashes(u *url.URL) {
+	u.Path = strings.TrimRight(u.Path, "/")
+	u.RawPath = strings.TrimRight(u.RawPath, "/")
+}
+
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
 	// AddAchievementEventList invokes AddAchievementEventList operation.
@@ -181,6 +186,12 @@ type Invoker interface {
 	//
 	// GET /events/organizations/{organization_id}
 	OrganizationEventList(ctx context.Context, params OrganizationEventListParams) (*OrganizationEventListResponseHeaders, error)
+	// OrganizationIsAdmin invokes OrganizationIsAdmin operation.
+	//
+	// Проверка наличия административных прав в организации.
+	//
+	// POST /organizations/{organization_id}/is-admin
+	OrganizationIsAdmin(ctx context.Context, params OrganizationIsAdminParams) (OrganizationIsAdminRes, error)
 	// OrganizationList invokes OrganizationList operation.
 	//
 	// Список организаций.
@@ -249,11 +260,6 @@ type Client struct {
 	baseClient
 }
 
-func trimTrailingSlashes(u *url.URL) {
-	u.Path = strings.TrimRight(u.Path, "/")
-	u.RawPath = strings.TrimRight(u.RawPath, "/")
-}
-
 // NewClient initializes new Client defined by OAS.
 func NewClient(serverURL string, sec SecuritySource, opts ...ClientOption) (*Client, error) {
 	u, err := url.Parse(serverURL)
@@ -311,14 +317,14 @@ func (c *Client) sendAddAchievementEventList(ctx context.Context, params AddAchi
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "AddAchievementEventList",
+	ctx, span := c.cfg.Tracer.Start(ctx, AddAchievementEventListOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -584,14 +590,14 @@ func (c *Client) sendCalendarEventList(ctx context.Context, params CalendarEvent
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "CalendarEventList",
+	ctx, span := c.cfg.Tracer.Start(ctx, CalendarEventListOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -711,14 +717,14 @@ func (c *Client) sendEventBrandList(ctx context.Context, params EventBrandListPa
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "EventBrandList",
+	ctx, span := c.cfg.Tracer.Start(ctx, EventBrandListOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -890,14 +896,14 @@ func (c *Client) sendEventCount(ctx context.Context, params EventCountParams) (r
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "EventCount",
+	ctx, span := c.cfg.Tracer.Start(ctx, EventCountOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1138,14 +1144,14 @@ func (c *Client) sendEventDiplomaRoleAdd(ctx context.Context, params EventDiplom
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "EventDiplomaRoleAdd",
+	ctx, span := c.cfg.Tracer.Start(ctx, EventDiplomaRoleAddOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1214,7 +1220,7 @@ func (c *Client) sendEventDiplomaRoleAdd(ctx context.Context, params EventDiplom
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "EventDiplomaRoleAdd", r); {
+			switch err := c.securityTalentOAuth(ctx, EventDiplomaRoleAddOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -1280,14 +1286,14 @@ func (c *Client) sendEventDiplomaRoleDelete(ctx context.Context, params EventDip
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "EventDiplomaRoleDelete",
+	ctx, span := c.cfg.Tracer.Start(ctx, EventDiplomaRoleDeleteOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1356,7 +1362,7 @@ func (c *Client) sendEventDiplomaRoleDelete(ctx context.Context, params EventDip
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "EventDiplomaRoleDelete", r); {
+			switch err := c.securityTalentOAuth(ctx, EventDiplomaRoleDeleteOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -1422,14 +1428,14 @@ func (c *Client) sendEventDiplomaSettingsCreate(ctx context.Context, request *Ev
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "EventDiplomaSettingsCreate",
+	ctx, span := c.cfg.Tracer.Start(ctx, EventDiplomaSettingsCreateOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1483,7 +1489,7 @@ func (c *Client) sendEventDiplomaSettingsCreate(ctx context.Context, request *Ev
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "EventDiplomaSettingsCreate", r); {
+			switch err := c.securityTalentOAuth(ctx, EventDiplomaSettingsCreateOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -1549,14 +1555,14 @@ func (c *Client) sendEventDiplomaSettingsList(ctx context.Context, params EventD
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "EventDiplomaSettingsList",
+	ctx, span := c.cfg.Tracer.Start(ctx, EventDiplomaSettingsListOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1669,7 +1675,7 @@ func (c *Client) sendEventDiplomaSettingsList(ctx context.Context, params EventD
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "EventDiplomaSettingsList", r); {
+			switch err := c.securityTalentOAuth(ctx, EventDiplomaSettingsListOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -1735,14 +1741,14 @@ func (c *Client) sendEventDiplomaSettingsRead(ctx context.Context, params EventD
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "EventDiplomaSettingsRead",
+	ctx, span := c.cfg.Tracer.Start(ctx, EventDiplomaSettingsReadOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1793,7 +1799,7 @@ func (c *Client) sendEventDiplomaSettingsRead(ctx context.Context, params EventD
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "EventDiplomaSettingsRead", r); {
+			switch err := c.securityTalentOAuth(ctx, EventDiplomaSettingsReadOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -1859,14 +1865,14 @@ func (c *Client) sendEventDiplomaSettingsUpdate(ctx context.Context, request *Ev
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "EventDiplomaSettingsUpdate",
+	ctx, span := c.cfg.Tracer.Start(ctx, EventDiplomaSettingsUpdateOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1920,7 +1926,7 @@ func (c *Client) sendEventDiplomaSettingsUpdate(ctx context.Context, request *Ev
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "EventDiplomaSettingsUpdate", r); {
+			switch err := c.securityTalentOAuth(ctx, EventDiplomaSettingsUpdateOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -1999,14 +2005,14 @@ func (c *Client) sendEventList(ctx context.Context, params EventListParams) (res
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "EventList",
+	ctx, span := c.cfg.Tracer.Start(ctx, EventListOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -2317,14 +2323,14 @@ func (c *Client) sendEventRetrieve(ctx context.Context, params EventRetrievePara
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "EventRetrieve",
+	ctx, span := c.cfg.Tracer.Start(ctx, EventRetrieveOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -2428,14 +2434,14 @@ func (c *Client) sendEventRouteList(ctx context.Context, params EventRouteListPa
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "EventRouteList",
+	ctx, span := c.cfg.Tracer.Start(ctx, EventRouteListOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -2607,14 +2613,14 @@ func (c *Client) sendFileConfirmUpload(ctx context.Context, params FileConfirmUp
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "FileConfirmUpload",
+	ctx, span := c.cfg.Tracer.Start(ctx, FileConfirmUploadOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -2665,7 +2671,7 @@ func (c *Client) sendFileConfirmUpload(ctx context.Context, params FileConfirmUp
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "FileConfirmUpload", r); {
+			switch err := c.securityTalentOAuth(ctx, FileConfirmUploadOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -2731,14 +2737,14 @@ func (c *Client) sendFileMetaCreate(ctx context.Context, request *FileMetaCreate
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "FileMetaCreate",
+	ctx, span := c.cfg.Tracer.Start(ctx, FileMetaCreateOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -2773,7 +2779,7 @@ func (c *Client) sendFileMetaCreate(ctx context.Context, request *FileMetaCreate
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "FileMetaCreate", r); {
+			switch err := c.securityTalentOAuth(ctx, FileMetaCreateOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -2839,14 +2845,14 @@ func (c *Client) sendFileMetaList(ctx context.Context, params FileMetaListParams
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "FileMetaList",
+	ctx, span := c.cfg.Tracer.Start(ctx, FileMetaListOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -2967,7 +2973,7 @@ func (c *Client) sendFileMetaList(ctx context.Context, params FileMetaListParams
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "FileMetaList", r); {
+			switch err := c.securityTalentOAuth(ctx, FileMetaListOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -3033,14 +3039,14 @@ func (c *Client) sendFileMetaRead(ctx context.Context, params FileMetaReadParams
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "FileMetaRead",
+	ctx, span := c.cfg.Tracer.Start(ctx, FileMetaReadOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -3091,7 +3097,7 @@ func (c *Client) sendFileMetaRead(ctx context.Context, params FileMetaReadParams
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "FileMetaRead", r); {
+			switch err := c.securityTalentOAuth(ctx, FileMetaReadOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -3158,14 +3164,14 @@ func (c *Client) sendFileMetaUpdate(ctx context.Context, request *FileMetaUpdate
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "FileMetaUpdate",
+	ctx, span := c.cfg.Tracer.Start(ctx, FileMetaUpdateOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -3219,7 +3225,7 @@ func (c *Client) sendFileMetaUpdate(ctx context.Context, request *FileMetaUpdate
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "FileMetaUpdate", r); {
+			switch err := c.securityTalentOAuth(ctx, FileMetaUpdateOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -3285,14 +3291,14 @@ func (c *Client) sendFileRead(ctx context.Context, params FileReadParams) (res F
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "FileRead",
+	ctx, span := c.cfg.Tracer.Start(ctx, FileReadOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -3342,7 +3348,7 @@ func (c *Client) sendFileRead(ctx context.Context, params FileReadParams) (res F
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "FileRead", r); {
+			switch err := c.securityTalentOAuth(ctx, FileReadOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -3409,14 +3415,14 @@ func (c *Client) sendFileReferenceCreate(ctx context.Context, params FileReferen
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "FileReferenceCreate",
+	ctx, span := c.cfg.Tracer.Start(ctx, FileReferenceCreateOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -3485,7 +3491,7 @@ func (c *Client) sendFileReferenceCreate(ctx context.Context, params FileReferen
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "FileReferenceCreate", r); {
+			switch err := c.securityTalentOAuth(ctx, FileReferenceCreateOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -3551,14 +3557,14 @@ func (c *Client) sendFileReferenceDelete(ctx context.Context, params FileReferen
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "FileReferenceDelete",
+	ctx, span := c.cfg.Tracer.Start(ctx, FileReferenceDeleteOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -3627,7 +3633,7 @@ func (c *Client) sendFileReferenceDelete(ctx context.Context, params FileReferen
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "FileReferenceDelete", r); {
+			switch err := c.securityTalentOAuth(ctx, FileReferenceDeleteOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -3696,14 +3702,14 @@ func (c *Client) sendFileUpload(ctx context.Context, request *FileUploadReq, par
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "FileUpload",
+	ctx, span := c.cfg.Tracer.Start(ctx, FileUploadOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -3756,7 +3762,7 @@ func (c *Client) sendFileUpload(ctx context.Context, request *FileUploadReq, par
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "FileUpload", r); {
+			switch err := c.securityTalentOAuth(ctx, FileUploadOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -3822,14 +3828,14 @@ func (c *Client) sendOrganizationEventList(ctx context.Context, params Organizat
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "OrganizationEventList",
+	ctx, span := c.cfg.Tracer.Start(ctx, OrganizationEventListOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -4056,6 +4062,151 @@ func (c *Client) sendOrganizationEventList(ctx context.Context, params Organizat
 	return result, nil
 }
 
+// OrganizationIsAdmin invokes OrganizationIsAdmin operation.
+//
+// Проверка наличия административных прав в организации.
+//
+// POST /organizations/{organization_id}/is-admin
+func (c *Client) OrganizationIsAdmin(ctx context.Context, params OrganizationIsAdminParams) (OrganizationIsAdminRes, error) {
+	res, err := c.sendOrganizationIsAdmin(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendOrganizationIsAdmin(ctx context.Context, params OrganizationIsAdminParams) (res OrganizationIsAdminRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("OrganizationIsAdmin"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/organizations/{organization_id}/is-admin"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, OrganizationIsAdminOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/organizations/"
+	{
+		// Encode "organization_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "organization_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.OrganizationID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/is-admin"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "is_owner" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "is_owner",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IsOwner.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, OrganizationIsAdminOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeOrganizationIsAdminResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // OrganizationList invokes OrganizationList operation.
 //
 // Список организаций.
@@ -4078,14 +4229,14 @@ func (c *Client) sendOrganizationList(ctx context.Context, params OrganizationLi
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "OrganizationList",
+	ctx, span := c.cfg.Tracer.Start(ctx, OrganizationListOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -4267,14 +4418,14 @@ func (c *Client) sendOrganizationSubjectCreate(ctx context.Context, request *Org
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "OrganizationSubjectCreate",
+	ctx, span := c.cfg.Tracer.Start(ctx, OrganizationSubjectCreateOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -4309,7 +4460,7 @@ func (c *Client) sendOrganizationSubjectCreate(ctx context.Context, request *Org
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "OrganizationSubjectCreate", r); {
+			switch err := c.securityTalentOAuth(ctx, OrganizationSubjectCreateOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -4375,14 +4526,14 @@ func (c *Client) sendOrganizationSubjectList(ctx context.Context, params Organiz
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "OrganizationSubjectList",
+	ctx, span := c.cfg.Tracer.Start(ctx, OrganizationSubjectListOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -4554,14 +4705,14 @@ func (c *Client) sendPersonRead(ctx context.Context, params PersonReadParams) (r
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "PersonRead",
+	ctx, span := c.cfg.Tracer.Start(ctx, PersonReadOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -4644,14 +4795,14 @@ func (c *Client) sendSocialAuthList(ctx context.Context, params SocialAuthListPa
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "SocialAuthList",
+	ctx, span := c.cfg.Tracer.Start(ctx, SocialAuthListOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -4773,7 +4924,7 @@ func (c *Client) sendSocialAuthList(ctx context.Context, params SocialAuthListPa
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "SocialAuthList", r); {
+			switch err := c.securityTalentOAuth(ctx, SocialAuthListOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -4784,7 +4935,7 @@ func (c *Client) sendSocialAuthList(ctx context.Context, params SocialAuthListPa
 		}
 		{
 			stage = "Security:ClientCredentials"
-			switch err := c.securityClientCredentials(ctx, "SocialAuthList", r); {
+			switch err := c.securityClientCredentials(ctx, SocialAuthListOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 1
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -4851,14 +5002,14 @@ func (c *Client) sendSubjectList(ctx context.Context, params SubjectListParams) 
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "SubjectList",
+	ctx, span := c.cfg.Tracer.Start(ctx, SubjectListOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -4978,14 +5129,14 @@ func (c *Client) sendTeamContactValidate(ctx context.Context, request TeamContac
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "TeamContactValidate",
+	ctx, span := c.cfg.Tracer.Start(ctx, TeamContactValidateOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -5055,14 +5206,14 @@ func (c *Client) sendTeamRead(ctx context.Context, params TeamReadParams) (res T
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "TeamRead",
+	ctx, span := c.cfg.Tracer.Start(ctx, TeamReadOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -5112,7 +5263,7 @@ func (c *Client) sendTeamRead(ctx context.Context, params TeamReadParams) (res T
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "TeamRead", r); {
+			switch err := c.securityTalentOAuth(ctx, TeamReadOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -5180,14 +5331,14 @@ func (c *Client) sendTeamUpdate(ctx context.Context, request *TeamUpdateReq, par
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "TeamUpdate",
+	ctx, span := c.cfg.Tracer.Start(ctx, TeamUpdateOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -5240,7 +5391,7 @@ func (c *Client) sendTeamUpdate(ctx context.Context, request *TeamUpdateReq, par
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, "TeamUpdate", r); {
+			switch err := c.securityTalentOAuth(ctx, TeamUpdateOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):

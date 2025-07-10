@@ -112,7 +112,7 @@ func decodeAddAchievementEventListResponse(resp *http.Response) (res *AddAchieve
 							return err
 						}
 					} else {
-						return validate.ErrFieldRequired
+						return err
 					}
 					return nil
 				}(); err != nil {
@@ -264,7 +264,7 @@ func decodeCalendarEventListResponse(resp *http.Response) (res *CalendarEventLis
 							return err
 						}
 					} else {
-						return validate.ErrFieldRequired
+						return err
 					}
 					return nil
 				}(); err != nil {
@@ -399,7 +399,7 @@ func decodeEventBrandListResponse(resp *http.Response) (res *EventBrandListRespo
 							return err
 						}
 					} else {
-						return validate.ErrFieldRequired
+						return err
 					}
 					return nil
 				}(); err != nil {
@@ -487,7 +487,7 @@ func decodeEventCountResponse(resp *http.Response) (res *EventCountOK, _ error) 
 						return err
 					}
 				} else {
-					return validate.ErrFieldRequired
+					return err
 				}
 				return nil
 			}(); err != nil {
@@ -909,7 +909,7 @@ func decodeEventDiplomaSettingsListResponse(resp *http.Response) (res *EventDipl
 							return err
 						}
 					} else {
-						return validate.ErrFieldRequired
+						return err
 					}
 					return nil
 				}(); err != nil {
@@ -1324,7 +1324,7 @@ func decodeEventListResponse(resp *http.Response) (res *EventListResponseHeaders
 							return err
 						}
 					} else {
-						return validate.ErrFieldRequired
+						return err
 					}
 					return nil
 				}(); err != nil {
@@ -1589,7 +1589,7 @@ func decodeEventRouteListResponse(resp *http.Response) (res *EventRouteListRespo
 							return err
 						}
 					} else {
-						return validate.ErrFieldRequired
+						return err
 					}
 					return nil
 				}(); err != nil {
@@ -2001,7 +2001,7 @@ func decodeFileMetaListResponse(resp *http.Response) (res *FileMetaListOKHeaders
 							return err
 						}
 					} else {
-						return validate.ErrFieldRequired
+						return err
 					}
 					return nil
 				}(); err != nil {
@@ -2425,7 +2425,7 @@ func decodeFileReadResponse(resp *http.Response) (res FileReadRes, _ error) {
 						return err
 					}
 				} else {
-					return validate.ErrFieldRequired
+					return err
 				}
 				return nil
 			}(); err != nil {
@@ -3142,7 +3142,7 @@ func decodeOrganizationEventListResponse(resp *http.Response) (res *Organization
 							return err
 						}
 					} else {
-						return validate.ErrFieldRequired
+						return err
 					}
 					return nil
 				}(); err != nil {
@@ -3153,6 +3153,63 @@ func decodeOrganizationEventListResponse(resp *http.Response) (res *Organization
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorResponseStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ErrorResponse
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorResponseStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeOrganizationIsAdminResponse(resp *http.Response) (res OrganizationIsAdminRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		return &OrganizationIsAdminOK{}, nil
+	case 403:
+		// Code 403.
+		return &OrganizationIsAdminForbidden{}, nil
+	case 404:
+		// Code 404.
+		return &OrganizationIsAdminNotFound{}, nil
 	}
 	// Convenient error response.
 	defRes, err := func() (res *ErrorResponseStatusCode, err error) {
@@ -3294,7 +3351,7 @@ func decodeOrganizationListResponse(resp *http.Response) (res *OrganizationListR
 							return err
 						}
 					} else {
-						return validate.ErrFieldRequired
+						return err
 					}
 					return nil
 				}(); err != nil {
@@ -3518,7 +3575,7 @@ func decodeOrganizationSubjectListResponse(resp *http.Response) (res *Organizati
 							return err
 						}
 					} else {
-						return validate.ErrFieldRequired
+						return err
 					}
 					return nil
 				}(); err != nil {
@@ -3791,7 +3848,7 @@ func decodeSocialAuthListResponse(resp *http.Response) (res SocialAuthListRes, _
 							return err
 						}
 					} else {
-						return validate.ErrFieldRequired
+						return err
 					}
 					return nil
 				}(); err != nil {
@@ -3964,7 +4021,7 @@ func decodeSubjectListResponse(resp *http.Response) (res *SubjectListResponseHea
 							return err
 						}
 					} else {
-						return validate.ErrFieldRequired
+						return err
 					}
 					return nil
 				}(); err != nil {

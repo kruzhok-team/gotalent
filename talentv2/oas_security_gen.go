@@ -13,13 +13,13 @@ import (
 type SecuritySource interface {
 	// ClientCredentials provides ClientCredentials security value.
 	// Аутентификация учетными данными OAuth2 клиента TalentOAuth.
-	ClientCredentials(ctx context.Context, operationName string) (ClientCredentials, error)
+	ClientCredentials(ctx context.Context, operationName OperationName) (ClientCredentials, error)
 	// TalentOAuth provides TalentOAuth security value.
 	// Аутентификация токеном TalentOAuth пользователем Таланта.
-	TalentOAuth(ctx context.Context, operationName string) (TalentOAuth, error)
+	TalentOAuth(ctx context.Context, operationName OperationName) (TalentOAuth, error)
 }
 
-func (s *Client) securityClientCredentials(ctx context.Context, operationName string, req *http.Request) error {
+func (s *Client) securityClientCredentials(ctx context.Context, operationName OperationName, req *http.Request) error {
 	t, err := s.sec.ClientCredentials(ctx, operationName)
 	if err != nil {
 		return errors.Wrap(err, "security source \"ClientCredentials\"")
@@ -27,7 +27,7 @@ func (s *Client) securityClientCredentials(ctx context.Context, operationName st
 	req.SetBasicAuth(t.Username, t.Password)
 	return nil
 }
-func (s *Client) securityTalentOAuth(ctx context.Context, operationName string, req *http.Request) error {
+func (s *Client) securityTalentOAuth(ctx context.Context, operationName OperationName, req *http.Request) error {
 	t, err := s.sec.TalentOAuth(ctx, operationName)
 	if err != nil {
 		return errors.Wrap(err, "security source \"TalentOAuth\"")

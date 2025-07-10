@@ -884,6 +884,34 @@ paths:
           $ref: '#/components/responses/OrganizationListResponse'
         default:
           $ref: '#/components/responses/ErrorResponse'
+  /organizations/{organization_id}/is-admin:
+    post:
+      operationId: OrganizationIsAdmin
+      summary: Проверка наличия административных прав в организации
+      security:
+        - TalentOAuth: []
+      tags: [organizations]
+      parameters:
+        - $ref: '#/components/parameters/organization_id'
+        - name: is_owner
+          in: query
+          description: |-
+            Требование наличия или отсутствия статуса владельца организации.
+
+            При указании значения, роль пользователя должна ему соответствовать;
+            это значит что если указать `false`, а пользователь является владельцем,
+            то ответ будет иметь статус `403`.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Права администратора имеются
+        '403':
+          description: Права отсутствуют
+        '404':
+          description: Организация не найдена
+        default:
+          $ref: '#/components/responses/ErrorResponse'
   /persons/{person_id}:
     get:
       operationId: PersonRead
