@@ -3,19 +3,7 @@
 package talentv2
 
 // setDefaults set default value of fields.
-func (s *EventDiplomaSettings) setDefaults() {
-	{
-		val := DiplomaTemplate("diploma")
-		s.Template = val
-	}
-	{
-		val := DiplomaIssueMode("none")
-		s.DiplomaIssueMode = val
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *EventDiplomaSettingsCreateReq) setDefaults() {
+func (s *CreateEventDiplomaSettingsReq) setDefaults() {
 	{
 		val := bool(false)
 		s.DiplomasDarkTheme.SetTo(val)
@@ -31,7 +19,27 @@ func (s *EventDiplomaSettingsCreateReq) setDefaults() {
 }
 
 // setDefaults set default value of fields.
-func (s *EventDiplomaSettingsUpdateReq) setDefaults() {
+func (s *CreateFileMetaReq) setDefaults() {
+	{
+		val := bool(false)
+		s.IsPublic.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *EventDiplomaSettings) setDefaults() {
+	{
+		val := DiplomaTemplate("diploma")
+		s.Template = val
+	}
+	{
+		val := DiplomaIssueMode("none")
+		s.DiplomaIssueMode = val
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *UpdateEventDiplomaSettingsReq) setDefaults() {
 	{
 		val := DiplomaTemplate("diploma")
 		s.Template.SetTo(val)
@@ -39,13 +47,5 @@ func (s *EventDiplomaSettingsUpdateReq) setDefaults() {
 	{
 		val := DiplomaIssueMode("none")
 		s.DiplomaIssueMode.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *FileMetaCreateReq) setDefaults() {
-	{
-		val := bool(false)
-		s.IsPublic.SetTo(val)
 	}
 }

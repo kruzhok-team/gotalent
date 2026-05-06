@@ -6,8 +6,186 @@ import (
 	"github.com/google/uuid"
 )
 
-// AddAchievementEventListParams is parameters of AddAchievementEventList operation.
-type AddAchievementEventListParams struct {
+// AddEventDiplomaRoleParams is parameters of AddEventDiplomaRole operation.
+type AddEventDiplomaRoleParams struct {
+	// ID мероприятия.
+	EventID int32
+	// ID роли достижения.
+	RoleID int32
+}
+
+// ArchiveEventRequestsFilesParams is parameters of ArchiveEventRequestsFiles operation.
+type ArchiveEventRequestsFilesParams struct {
+	FieldID   OptInt32
+	RequestID OptInt32
+	// ID мероприятия.
+	EventID int32
+}
+
+// CancelEventDeferredNotificationParams is parameters of CancelEventDeferredNotification operation.
+type CancelEventDeferredNotificationParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// CheckUserConsentParams is parameters of CheckUserConsent operation.
+type CheckUserConsentParams struct {
+	// ID пользователя.
+	UserID int32
+	Kind   UserConsentKind
+}
+
+// CompleteSocialAuthParams is parameters of CompleteSocialAuth operation.
+type CompleteSocialAuthParams struct {
+	Provider  string
+	State     string
+	CsrfState OptString
+}
+
+// ConfirmFileUploadParams is parameters of ConfirmFileUpload operation.
+type ConfirmFileUploadParams struct {
+	// ID файла.
+	FileID uuid.UUID
+}
+
+// ConfirmSignupEmailParams is parameters of ConfirmSignupEmail operation.
+type ConfirmSignupEmailParams struct {
+	UID   string
+	Token string
+}
+
+// CountEventsParams is parameters of CountEvents operation.
+type CountEventsParams struct {
+	// Фильтр по массиву идентификаторов мероприятий.
+	EventID []int32
+	// Фильтрация мероприятий по ID организации.
+	OrganizationID []int32
+	// Фильтрация мероприятий по ID мета-мероприятия.
+	MetaEventID []int32
+	// Фильтрация мероприятий по ID площадки их проведения.
+	VenueID []int32
+	// Мероприятия с датой начала ранее указанной.
+	StartBefore OptDateTime
+	// Мероприятия с датой завершения после указанной.
+	EndAfter OptDateTime
+	// Поиск по названию, ключевым словам и описанию.
+	Search OptString
+	// Фильтрация по формату мероприятий.
+	Format OptEventFormat
+}
+
+// CreateEventDeferredNotificationParams is parameters of CreateEventDeferredNotification operation.
+type CreateEventDeferredNotificationParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// CreateEventDiplomaSettingsParams is parameters of CreateEventDiplomaSettings operation.
+type CreateEventDiplomaSettingsParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// CreateEventLimitParams is parameters of CreateEventLimit operation.
+type CreateEventLimitParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// CreateFileReferenceParams is parameters of CreateFileReference operation.
+type CreateFileReferenceParams struct {
+	// ID файла.
+	FileID uuid.UUID
+	// ID связанного объекта.
+	ObjectID string
+}
+
+// CreateMutationLockParams is parameters of CreateMutationLock operation.
+type CreateMutationLockParams struct {
+	// Имя пространства имен, к которому относится
+	// зависимый объект.
+	ObjectNamespace string
+	// Ключ объекта зависящего от блокируемых файлов.
+	ObjectKey string
+}
+
+// DeleteEventDiplomaRoleParams is parameters of DeleteEventDiplomaRole operation.
+type DeleteEventDiplomaRoleParams struct {
+	// ID мероприятия.
+	EventID int32
+	// ID роли достижения.
+	RoleID int32
+}
+
+// DeleteEventLimitParams is parameters of DeleteEventLimit operation.
+type DeleteEventLimitParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// DeleteFileReferenceParams is parameters of DeleteFileReference operation.
+type DeleteFileReferenceParams struct {
+	// ID файла.
+	FileID uuid.UUID
+	// ID связанного объекта.
+	ObjectID string
+}
+
+// DeleteMutationLockParams is parameters of DeleteMutationLock operation.
+type DeleteMutationLockParams struct {
+	// Имя пространства имен, к которому относится
+	// зависимый объект.
+	ObjectNamespace string
+	// Ключ объекта зависящего от блокируемых файлов.
+	ObjectKey string
+}
+
+// DisconnectSocialAuthParams is parameters of DisconnectSocialAuth operation.
+type DisconnectSocialAuthParams struct {
+	Provider string
+	// Внешний идентификатор пользователя.
+	UID string
+}
+
+// EventDeferredNotificationTemplateIDParams is parameters of EventDeferredNotificationTemplateID operation.
+type EventDeferredNotificationTemplateIDParams struct {
+	Name string
+}
+
+// EventSignupParams is parameters of EventSignup operation.
+type EventSignupParams struct {
+	// Валидация запроса без создания заявки.
+	DryRun OptBool
+	// Отключение уведомления пользователя о регистрации.
+	SilenceNotification OptBool
+	AcceptLanguage      OptString
+	Utm                 OptString
+	// ID мероприятия.
+	EventID int32
+}
+
+// ExistsEventDeferredNotificationParams is parameters of ExistsEventDeferredNotification operation.
+type ExistsEventDeferredNotificationParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// IsOrganizationAdminParams is parameters of IsOrganizationAdmin operation.
+type IsOrganizationAdminParams struct {
+	// ID организации.
+	OrganizationID int32
+	// Требование наличия или отсутствия статуса владельца
+	// организации.
+	// При указании значения, роль пользователя должна ему
+	// соответствовать;
+	// это значит что если указать `false`, а пользователь
+	// является владельцем,
+	// то ответ будет иметь статус `403`.
+	IsOwner OptBool
+}
+
+// ListAddAchievementEventsParams is parameters of ListAddAchievementEvents operation.
+type ListAddAchievementEventsParams struct {
 	// Кол-во объектов выборки для пропуска.
 	Offset OptInt32
 	// Максимум объектов возвращаемых в теле ответа.
@@ -31,18 +209,18 @@ type AddAchievementEventListParams struct {
 	Region OptString
 }
 
-// CalendarEventListParams is parameters of CalendarEventList operation.
-type CalendarEventListParams struct {
+// ListCalendarEventsParams is parameters of ListCalendarEvents operation.
+type ListCalendarEventsParams struct {
 	// Кол-во объектов выборки для пропуска.
 	Offset OptInt32
 	// Максимум объектов возвращаемых в теле ответа.
 	Limit OptInt32
 	// Критерий сортировки результатов.
-	OrderBy OptCalendarEventListOrderBy
+	OrderBy OptListCalendarEventsOrderBy
 }
 
-// EventBrandListParams is parameters of EventBrandList operation.
-type EventBrandListParams struct {
+// ListEventBrandsParams is parameters of ListEventBrands operation.
+type ListEventBrandsParams struct {
 	// Фильтр по массиву идентификаторов мероприятий.
 	EventID []int32
 	// Фильтр по массиву идентификаторов брендов.
@@ -56,50 +234,8 @@ type EventBrandListParams struct {
 	Limit OptInt32
 }
 
-// EventCountParams is parameters of EventCount operation.
-type EventCountParams struct {
-	// Фильтр по массиву идентификаторов мероприятий.
-	EventID []int32
-	// Фильтрация мероприятий по ID организации.
-	OrganizationID []int32
-	// Фильтрация мероприятий по ID мета-мероприятия.
-	MetaEventID []int32
-	// Фильтрация мероприятий по ID площадки их проведения.
-	VenueID []int32
-	// Мероприятия с датой начала ранее указанной.
-	StartBefore OptDateTime
-	// Мероприятия с датой завершения после указанной.
-	EndAfter OptDateTime
-	// Поиск по названию, ключевым словам и описанию.
-	Search OptString
-	// Фильтрация по формату мероприятий.
-	Format OptEventFormat
-}
-
-// EventDiplomaRoleAddParams is parameters of EventDiplomaRoleAdd operation.
-type EventDiplomaRoleAddParams struct {
-	// ID мероприятия.
-	EventID int32
-	// ID роли достижения.
-	RoleID int32
-}
-
-// EventDiplomaRoleDeleteParams is parameters of EventDiplomaRoleDelete operation.
-type EventDiplomaRoleDeleteParams struct {
-	// ID мероприятия.
-	EventID int32
-	// ID роли достижения.
-	RoleID int32
-}
-
-// EventDiplomaSettingsCreateParams is parameters of EventDiplomaSettingsCreate operation.
-type EventDiplomaSettingsCreateParams struct {
-	// ID мероприятия.
-	EventID int32
-}
-
-// EventDiplomaSettingsListParams is parameters of EventDiplomaSettingsList operation.
-type EventDiplomaSettingsListParams struct {
+// ListEventDiplomaSettingsParams is parameters of ListEventDiplomaSettings operation.
+type ListEventDiplomaSettingsParams struct {
 	// Пропуск объектов с идентификатором равном или менее
 	// указанного.
 	IDOffset OptInt32
@@ -111,20 +247,29 @@ type EventDiplomaSettingsListParams struct {
 	EventIds []int32
 }
 
-// EventDiplomaSettingsReadParams is parameters of EventDiplomaSettingsRead operation.
-type EventDiplomaSettingsReadParams struct {
+// ListEventFieldsParams is parameters of ListEventFields operation.
+type ListEventFieldsParams struct {
 	// ID мероприятия.
 	EventID int32
 }
 
-// EventDiplomaSettingsUpdateParams is parameters of EventDiplomaSettingsUpdate operation.
-type EventDiplomaSettingsUpdateParams struct {
-	// ID мероприятия.
-	EventID int32
+// ListEventRoutesParams is parameters of ListEventRoutes operation.
+type ListEventRoutesParams struct {
+	// Фильтр по массиву идентификаторов мероприятий.
+	EventID []int32
+	// Фильтр по массиву идентификаторов направлений.
+	RouteID []int32
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
 }
 
-// EventListParams is parameters of EventList operation.
-type EventListParams struct {
+// ListEventsParams is parameters of ListEvents operation.
+type ListEventsParams struct {
 	// Фильтр по массиву идентификаторов мероприятий.
 	EventID []int32
 	// Фильтрация мероприятий по ID организации.
@@ -148,40 +293,14 @@ type EventListParams struct {
 	Offset OptInt32
 	// Максимум объектов возвращаемых в теле ответа.
 	Limit   OptInt32
-	OrderBy OptEventListOrderBy
+	OrderBy OptListEventsOrderBy
 }
 
-// EventRetrieveParams is parameters of EventRetrieve operation.
-type EventRetrieveParams struct {
-	// ID мероприятия.
-	EventID int32
-	// Вернуть в ответе полный набор свойств.
-	Extend OptBool
-}
-
-// EventRouteListParams is parameters of EventRouteList operation.
-type EventRouteListParams struct {
-	// Фильтр по массиву идентификаторов мероприятий.
-	EventID []int32
-	// Фильтр по массиву идентификаторов направлений.
-	RouteID []int32
-	// Пропуск объектов с идентификатором равном или менее
-	// указанного.
-	IDOffset OptInt32
-	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
-	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
-}
-
-// FileConfirmUploadParams is parameters of FileConfirmUpload operation.
-type FileConfirmUploadParams struct {
-	// ID файла.
-	FileID uuid.UUID
-}
-
-// FileMetaListParams is parameters of FileMetaList operation.
-type FileMetaListParams struct {
+// ListFileMetaParams is parameters of ListFileMeta operation.
+type ListFileMetaParams struct {
+	// Чтение метаинформации конкретных файлов. Значения
+	// указываются через запятую.
+	FileID []uuid.UUID
 	// Статус публичности файла.
 	IsPublic OptBool
 	// Пространство имен для объекта, где используется файл,
@@ -189,56 +308,23 @@ type FileMetaListParams struct {
 	// <сервис>/<таблица БД>/<поле со ссылкой на файл>
 	// (например, polls/questions/picture, venues/venue/cover, etc.).
 	Namespace OptString
+	// Фильтрация по префиксной подстроке в пространстве
+	// имен.
+	NamespaceStartswith OptString
+	// Фильтрация по подстроке в имени файла.
+	NameLike OptString
+	// Фильтрация по точному совпадению расширения.
+	Ext OptString
 	// Кол-во объектов выборки для пропуска.
 	Offset OptInt32
 	// Максимум объектов возвращаемых в теле ответа.
 	Limit OptInt32
 	// Поле, по которому будет отсортирован список файлов.
-	OrderBy OptFileMetaListOrderBy
+	OrderBy OptListFileMetaOrderBy
 }
 
-// FileMetaReadParams is parameters of FileMetaRead operation.
-type FileMetaReadParams struct {
-	// ID файла.
-	FileID uuid.UUID
-}
-
-// FileMetaUpdateParams is parameters of FileMetaUpdate operation.
-type FileMetaUpdateParams struct {
-	// ID файла.
-	FileID uuid.UUID
-}
-
-// FileReadParams is parameters of FileRead operation.
-type FileReadParams struct {
-	// ID файла.
-	FileID uuid.UUID
-}
-
-// FileReferenceCreateParams is parameters of FileReferenceCreate operation.
-type FileReferenceCreateParams struct {
-	// ID файла.
-	FileID uuid.UUID
-	// ID связанного объекта.
-	ObjectID string
-}
-
-// FileReferenceDeleteParams is parameters of FileReferenceDelete operation.
-type FileReferenceDeleteParams struct {
-	// ID файла.
-	FileID uuid.UUID
-	// ID связанного объекта.
-	ObjectID string
-}
-
-// FileUploadParams is parameters of FileUpload operation.
-type FileUploadParams struct {
-	// ID файла.
-	FileID uuid.UUID
-}
-
-// OrganizationEventListParams is parameters of OrganizationEventList operation.
-type OrganizationEventListParams struct {
+// ListOrganizationEventsParams is parameters of ListOrganizationEvents operation.
+type ListOrganizationEventsParams struct {
 	// ID организации.
 	OrganizationID int32
 	// Кол-во объектов выборки для пропуска.
@@ -263,42 +349,11 @@ type OrganizationEventListParams struct {
 	// релевантности,
 	// а потом в соответствии с указанным этим параметром
 	// критерием.
-	OrderBy OptOrganizationEventListOrderBy
+	OrderBy OptListOrganizationEventsOrderBy
 }
 
-// OrganizationIsAdminParams is parameters of OrganizationIsAdmin operation.
-type OrganizationIsAdminParams struct {
-	// ID организации.
-	OrganizationID int32
-	// Требование наличия или отсутствия статуса владельца
-	// организации.
-	// При указании значения, роль пользователя должна ему
-	// соответствовать;
-	// это значит что если указать `false`, а пользователь
-	// является владельцем,
-	// то ответ будет иметь статус `403`.
-	IsOwner OptBool
-}
-
-// OrganizationListParams is parameters of OrganizationList operation.
-type OrganizationListParams struct {
-	// Фильтр по массиву идентификаторов организаций.
-	OrganizationID []int32
-	// ID родительской организации.
-	ParentOrganizationID OptInt32
-	// Пропуск объектов с идентификатором равном или менее
-	// указанного.
-	IDOffset OptInt32
-	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
-	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
-	// Критерий сортировки результатов.
-	OrderBy OptOrganizationListOrderBy
-}
-
-// OrganizationSubjectListParams is parameters of OrganizationSubjectList operation.
-type OrganizationSubjectListParams struct {
+// ListOrganizationSubjectsParams is parameters of ListOrganizationSubjects operation.
+type ListOrganizationSubjectsParams struct {
 	// Пропуск объектов с идентификатором равном или менее
 	// указанного.
 	IDOffset OptInt32
@@ -312,14 +367,25 @@ type OrganizationSubjectListParams struct {
 	SubjectID []int32
 }
 
-// PersonReadParams is parameters of PersonRead operation.
-type PersonReadParams struct {
-	// ID персоны.
-	PersonID int32
+// ListOrganizationsParams is parameters of ListOrganizations operation.
+type ListOrganizationsParams struct {
+	// Фильтр по массиву идентификаторов организаций.
+	OrganizationID []int32
+	// ID родительской организации.
+	ParentOrganizationID OptInt32
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32
+	// Кол-во объектов выборки для пропуска.
+	Offset OptInt32
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32
+	// Критерий сортировки результатов.
+	OrderBy OptListOrganizationsOrderBy
 }
 
-// SocialAuthListParams is parameters of SocialAuthList operation.
-type SocialAuthListParams struct {
+// ListSocialAuthsParams is parameters of ListSocialAuths operation.
+type ListSocialAuthsParams struct {
 	// Фильтрация по провайдеру авторизации.
 	Provider OptSocialAuthProvider
 	// Пропуск объектов с идентификатором равном или менее
@@ -333,8 +399,8 @@ type SocialAuthListParams struct {
 	UserID int32
 }
 
-// SubjectListParams is parameters of SubjectList operation.
-type SubjectListParams struct {
+// ListSubjectsParams is parameters of ListSubjects operation.
+type ListSubjectsParams struct {
 	// Пропуск объектов с идентификатором равном или менее
 	// указанного.
 	IDOffset OptInt32
@@ -344,14 +410,139 @@ type SubjectListParams struct {
 	Limit OptInt32
 }
 
-// TeamReadParams is parameters of TeamRead operation.
-type TeamReadParams struct {
+// ListUserConsentsParams is parameters of ListUserConsents operation.
+type ListUserConsentsParams struct {
+	// ID пользователя.
+	UserID int32
+}
+
+// LoginSocialAuthParams is parameters of LoginSocialAuth operation.
+type LoginSocialAuthParams struct {
+	Provider string
+	Next     OptString
+	RegNext  OptString
+	ErrNext  OptString
+}
+
+// PatchMutationLockParams is parameters of PatchMutationLock operation.
+type PatchMutationLockParams struct {
+	// Имя пространства имен, к которому относится
+	// зависимый объект.
+	ObjectNamespace string
+	// Ключ объекта зависящего от блокируемых файлов.
+	ObjectKey string
+}
+
+// ReadEventParams is parameters of ReadEvent operation.
+type ReadEventParams struct {
+	// ID мероприятия.
+	EventID int32
+	// Вернуть в ответе полный набор свойств.
+	Extend OptBool
+}
+
+// ReadEventDeferredNotificationParams is parameters of ReadEventDeferredNotification operation.
+type ReadEventDeferredNotificationParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// ReadEventDiplomaSettingsParams is parameters of ReadEventDiplomaSettings operation.
+type ReadEventDiplomaSettingsParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// ReadEventLimitParams is parameters of ReadEventLimit operation.
+type ReadEventLimitParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// ReadFileParams is parameters of ReadFile operation.
+type ReadFileParams struct {
+	Noredir OptBool
+	// ID файла.
+	FileID uuid.UUID
+}
+
+// ReadFileMetaParams is parameters of ReadFileMeta operation.
+type ReadFileMetaParams struct {
+	// ID файла.
+	FileID uuid.UUID
+}
+
+// ReadPersonParams is parameters of ReadPerson operation.
+type ReadPersonParams struct {
+	// ID персоны.
+	PersonID int32
+}
+
+// ReadTeamParams is parameters of ReadTeam operation.
+type ReadTeamParams struct {
 	// ID команды.
 	TeamID int32
 }
 
-// TeamUpdateParams is parameters of TeamUpdate operation.
-type TeamUpdateParams struct {
+// SignupParams is parameters of Signup operation.
+type SignupParams struct {
+	PartialToken OptUUID
+	Utm          OptString
+}
+
+// SignupInitialDataParams is parameters of SignupInitialData operation.
+type SignupInitialDataParams struct {
+	PartialToken uuid.UUID
+}
+
+// SubmitUserConsentParams is parameters of SubmitUserConsent operation.
+type SubmitUserConsentParams struct {
+	// ID пользователя.
+	UserID int32
+	Kind   UserConsentKind
+}
+
+// UpdateEventDeferredNotificationParams is parameters of UpdateEventDeferredNotification operation.
+type UpdateEventDeferredNotificationParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// UpdateEventDiplomaSettingsParams is parameters of UpdateEventDiplomaSettings operation.
+type UpdateEventDiplomaSettingsParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// UpdateEventLimitParams is parameters of UpdateEventLimit operation.
+type UpdateEventLimitParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// UpdateFileMetaParams is parameters of UpdateFileMeta operation.
+type UpdateFileMetaParams struct {
+	// ID файла.
+	FileID uuid.UUID
+}
+
+// UpdateTeamParams is parameters of UpdateTeam operation.
+type UpdateTeamParams struct {
 	// ID команды.
 	TeamID int32
+}
+
+// UploadFileParams is parameters of UploadFile operation.
+type UploadFileParams struct {
+	// ID файла.
+	FileID uuid.UUID
+}
+
+// ValidateAuthorizationParams is parameters of ValidateAuthorization operation.
+type ValidateAuthorizationParams struct {
+	ResponseType string
+	RedirectURI  string
+	ClientID     string
+	Scope        OptString
+	AutoRenew    OptBool
 }

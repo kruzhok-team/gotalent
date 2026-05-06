@@ -7,12 +7,14 @@ import (
 	"net/http"
 
 	"github.com/go-faster/jx"
+	"github.com/google/uuid"
 
 	ht "github.com/ogen-go/ogen/http"
+	"github.com/ogen-go/ogen/json"
 )
 
-func encodeEventDiplomaSettingsCreateRequest(
-	req *EventDiplomaSettingsCreateReq,
+func encodeCreateEventRequest(
+	req *CreateEventReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -25,8 +27,8 @@ func encodeEventDiplomaSettingsCreateRequest(
 	return nil
 }
 
-func encodeEventDiplomaSettingsUpdateRequest(
-	req *EventDiplomaSettingsUpdateReq,
+func encodeCreateEventDeferredNotificationRequest(
+	req *CreateEventDeferredNotificationReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -39,8 +41,8 @@ func encodeEventDiplomaSettingsUpdateRequest(
 	return nil
 }
 
-func encodeFileMetaCreateRequest(
-	req *FileMetaCreateReq,
+func encodeCreateEventDiplomaSettingsRequest(
+	req *CreateEventDiplomaSettingsReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -53,8 +55,8 @@ func encodeFileMetaCreateRequest(
 	return nil
 }
 
-func encodeFileMetaUpdateRequest(
-	req *FileMetaUpdateReq,
+func encodeCreateEventLimitRequest(
+	req *CreateEventLimitReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -67,8 +69,8 @@ func encodeFileMetaUpdateRequest(
 	return nil
 }
 
-func encodeFileUploadRequest(
-	req *FileUploadReq,
+func encodeCreateFileMetaRequest(
+	req *CreateFileMetaReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -81,7 +83,25 @@ func encodeFileUploadRequest(
 	return nil
 }
 
-func encodeOrganizationSubjectCreateRequest(
+func encodeCreateMutationLockRequest(
+	req []uuid.UUID,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		e.ArrStart()
+		for _, elem := range req {
+			json.EncodeUUID(e, elem)
+		}
+		e.ArrEnd()
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeCreateOrganizationSubjectRequest(
 	req *OrganizationSubjectBody,
 	r *http.Request,
 ) error {
@@ -95,8 +115,8 @@ func encodeOrganizationSubjectCreateRequest(
 	return nil
 }
 
-func encodeTeamContactValidateRequest(
-	req TeamContactLink,
+func encodeEventSignupRequest(
+	req *EventSignup,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -109,8 +129,134 @@ func encodeTeamContactValidateRequest(
 	return nil
 }
 
-func encodeTeamUpdateRequest(
-	req *TeamUpdateReq,
+func encodePatchMutationLockRequest(
+	req *PatchMutationLockReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeSignupRequest(
+	req *Signup,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUpdateAuthenticatedUserRequest(
+	req *UserUpdate,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUpdateEventDeferredNotificationRequest(
+	req *UpdateEventDeferredNotificationReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUpdateEventDiplomaSettingsRequest(
+	req *UpdateEventDiplomaSettingsReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUpdateEventLimitRequest(
+	req *UpdateEventLimitReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUpdateFileMetaRequest(
+	req *UpdateFileMetaReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUpdateTeamRequest(
+	req *UpdateTeamReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUploadFileRequest(
+	req *UploadFileReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeValidateTeamContactRequest(
+	req TeamContactLink,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

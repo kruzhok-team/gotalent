@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/go-faster/errors"
+	"github.com/google/uuid"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
@@ -29,68 +30,236 @@ func trimTrailingSlashes(u *url.URL) {
 
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
-	// AddAchievementEventList invokes AddAchievementEventList operation.
+	// AddEventDiplomaRole invokes AddEventDiplomaRole operation.
+	//
+	// Добавление роли для диплома мероприятия.
+	//
+	// PUT /events/{event_id}/diploma-role/{role_id}
+	AddEventDiplomaRole(ctx context.Context, params AddEventDiplomaRoleParams) (AddEventDiplomaRoleRes, error)
+	// ArchiveEventRequestsFiles invokes ArchiveEventRequestsFiles operation.
+	//
+	// Обязательно нужно указать один из параметров: `field_id`
+	// или `request_id`.
+	//
+	// GET /events/{event_id}/requests-files
+	ArchiveEventRequestsFiles(ctx context.Context, params ArchiveEventRequestsFilesParams) (ArchiveEventRequestsFilesRes, error)
+	// AuthorizeClient invokes AuthorizeClient operation.
+	//
+	// Пользователь авторизует доступ клиента к ресурсам
+	// пользователя.
+	//
+	// POST /oauth/authorize
+	AuthorizeClient(ctx context.Context) (*AuthorizeClientFound, error)
+	// CancelEventDeferredNotification invokes CancelEventDeferredNotification operation.
+	//
+	// Перевод уведомления из статуса `pending` в статус `canceled`.
+	// Если уведомление в статусе `pending` не найдено, будет
+	// возвращен `404` ответ.
+	//
+	// DELETE /events/{event_id}/deferred-notification
+	CancelEventDeferredNotification(ctx context.Context, params CancelEventDeferredNotificationParams) (CancelEventDeferredNotificationRes, error)
+	// CheckUserConsent invokes CheckUserConsent operation.
+	//
+	// Проверка наличия согласия пользователя.
+	//
+	// HEAD /users/{user_id}/consents/{kind}
+	CheckUserConsent(ctx context.Context, params CheckUserConsentParams) (CheckUserConsentRes, error)
+	// CompleteSocialAuth invokes CompleteSocialAuth operation.
+	//
+	// Завершение авторизации.
+	//
+	// GET /auth/complete/{provider}
+	CompleteSocialAuth(ctx context.Context, params CompleteSocialAuthParams) (CompleteSocialAuthRes, error)
+	// ConfirmFileUpload invokes ConfirmFileUpload operation.
+	//
+	// Подтверждение загрузки файла.
+	//
+	// POST /files/{file_id}/confirm-upload
+	ConfirmFileUpload(ctx context.Context, params ConfirmFileUploadParams) (ConfirmFileUploadRes, error)
+	// ConfirmSignupEmail invokes ConfirmSignupEmail operation.
+	//
+	// Завершение регистрации пользователя подтверждением
+	// почты.
+	//
+	// POST /auth/confirm-email/{uid}/{token}
+	ConfirmSignupEmail(ctx context.Context, params ConfirmSignupEmailParams) (ConfirmSignupEmailRes, error)
+	// CountEvents invokes CountEvents operation.
+	//
+	// Счетчик мероприятий.
+	//
+	// HEAD /events
+	CountEvents(ctx context.Context, params CountEventsParams) (*CountEventsOK, error)
+	// CreateEvent invokes CreateEvent operation.
+	//
+	// При полном отсутствии в запросе массива `achievement_roles`,
+	// мероприятию назначаются роли достижений
+	// по-умолчанию.
+	// Пустой же массив приведет к созданию мероприятия без
+	// ролей.
+	//
+	// POST /events
+	CreateEvent(ctx context.Context, request *CreateEventReq) (CreateEventRes, error)
+	// CreateEventDeferredNotification invokes CreateEventDeferredNotification operation.
+	//
+	// Создание отложенного уведомления.
+	//
+	// POST /events/{event_id}/deferred-notification
+	CreateEventDeferredNotification(ctx context.Context, request *CreateEventDeferredNotificationReq, params CreateEventDeferredNotificationParams) (CreateEventDeferredNotificationRes, error)
+	// CreateEventDiplomaSettings invokes CreateEventDiplomaSettings operation.
+	//
+	// Создание настроек дипломов мероприятия.
+	//
+	// POST /events/{event_id}/diploma-settings
+	CreateEventDiplomaSettings(ctx context.Context, request *CreateEventDiplomaSettingsReq, params CreateEventDiplomaSettingsParams) (CreateEventDiplomaSettingsRes, error)
+	// CreateEventLimit invokes CreateEventLimit operation.
+	//
+	// Лимиты могут существовать только в единичном кол-ве
+	// на мероприятие.
+	// Попытка создать больше будет возвращать `409` ответ.
+	//
+	// POST /events/{event_id}/limit
+	CreateEventLimit(ctx context.Context, request *CreateEventLimitReq, params CreateEventLimitParams) (CreateEventLimitRes, error)
+	// CreateFileMeta invokes CreateFileMeta operation.
+	//
+	// Создание файла.
+	//
+	// POST /files
+	CreateFileMeta(ctx context.Context, request *CreateFileMetaReq) (CreateFileMetaRes, error)
+	// CreateFileReference invokes CreateFileReference operation.
+	//
+	// Добавление ссылки на файл.
+	//
+	// PUT /files/{file_id}/references/{object_id}
+	CreateFileReference(ctx context.Context, params CreateFileReferenceParams) (CreateFileReferenceRes, error)
+	// CreateMutationLock invokes CreateMutationLock operation.
+	//
+	// Блокировки создаются только для файлов,
+	// принадлежащих пользователю.
+	// Чужие файлы, несуществующие файлы, а так же файлы,
+	// для которых блокировки уже имеются,
+	// будут пропущены и не возвращены в теле `201` ответа.
+	//
+	// POST /mutation-locks/{object_namespace}/{object_key}
+	CreateMutationLock(ctx context.Context, request []uuid.UUID, params CreateMutationLockParams) (CreateMutationLockRes, error)
+	// CreateOrganizationSubject invokes CreateOrganizationSubject operation.
+	//
+	// > Запрос необходимо выполнять от ментора или
+	// владельца организации,
+	// > указываемой в свойстве `organization_id` тела запроса.
+	//
+	// POST /organization-subjects
+	CreateOrganizationSubject(ctx context.Context, request *OrganizationSubjectBody) (CreateOrganizationSubjectRes, error)
+	// DeleteEventDiplomaRole invokes DeleteEventDiplomaRole operation.
+	//
+	// Удаление роли для диплома мероприятия.
+	//
+	// DELETE /events/{event_id}/diploma-role/{role_id}
+	DeleteEventDiplomaRole(ctx context.Context, params DeleteEventDiplomaRoleParams) error
+	// DeleteEventLimit invokes DeleteEventLimit operation.
+	//
+	// Удаление лимитов мероприятия.
+	//
+	// DELETE /events/{event_id}/limit
+	DeleteEventLimit(ctx context.Context, params DeleteEventLimitParams) (DeleteEventLimitRes, error)
+	// DeleteFileReference invokes DeleteFileReference operation.
+	//
+	// Удаление ссылки на файл.
+	//
+	// DELETE /files/{file_id}/references/{object_id}
+	DeleteFileReference(ctx context.Context, params DeleteFileReferenceParams) (DeleteFileReferenceRes, error)
+	// DeleteMutationLock invokes DeleteMutationLock operation.
+	//
+	// Удаление блокировки.
+	//
+	// DELETE /mutation-locks/{object_namespace}/{object_key}
+	DeleteMutationLock(ctx context.Context, params DeleteMutationLockParams) (DeleteMutationLockRes, error)
+	// DisconnectSocialAuth invokes DisconnectSocialAuth operation.
+	//
+	// Удаление авторизации возможно только если это не
+	// единственный оставшийся у пользователя способ
+	// аутентификации под своей учетной записью.
+	// Не допускается параллельная обработка запросов на
+	// удаление, в случае появления такой гонки, будет
+	// возвращен 409 ответ.
+	//
+	// POST /auth/disconnect/{provider}/{uid}
+	DisconnectSocialAuth(ctx context.Context, params DisconnectSocialAuthParams) (DisconnectSocialAuthRes, error)
+	// EventDeferredNotificationTemplateID invokes EventDeferredNotificationTemplateID operation.
+	//
+	// Идентификатор шаблона отложенного уведомления.
+	//
+	// GET /event-deferred-notification-templates/{name}
+	EventDeferredNotificationTemplateID(ctx context.Context, params EventDeferredNotificationTemplateIDParams) (EventDeferredNotificationTemplateIDRes, error)
+	// EventSignup invokes EventSignup operation.
+	//
+	// #### Аутентификация
+	// При выполнении запроса с аутентификацией,
+	// заявка создается для пользователя, с которым связан
+	// токен.
+	// Параметры, используемые для создания пользователя,
+	// в аутентифицированном запросе будут использованы
+	// для его обновления.
+	// Параметр `email` недопускается в аутентифицированных
+	// запросах.
+	//
+	// POST /events/{event_id}/signup
+	EventSignup(ctx context.Context, request *EventSignup, params EventSignupParams) (EventSignupRes, error)
+	// ExistsEventDeferredNotification invokes ExistsEventDeferredNotification operation.
+	//
+	// Проверка наличия отложенного уведомления.
+	//
+	// HEAD /events/{event_id}/deferred-notification
+	ExistsEventDeferredNotification(ctx context.Context, params ExistsEventDeferredNotificationParams) (ExistsEventDeferredNotificationRes, error)
+	// IsOrganizationAdmin invokes IsOrganizationAdmin operation.
+	//
+	// Проверка наличия административных прав в организации.
+	//
+	// POST /organizations/{organization_id}/is-admin
+	IsOrganizationAdmin(ctx context.Context, params IsOrganizationAdminParams) (IsOrganizationAdminRes, error)
+	// IssueAccessToken invokes IssueAccessToken operation.
+	//
+	// Выдача токена доступа.
+	//
+	// POST /oauth/issue-token
+	IssueAccessToken(ctx context.Context) (IssueAccessTokenRes, error)
+	// ListAddAchievementEvents invokes ListAddAchievementEvents operation.
 	//
 	// Мероприятия, доступные для добавления достижения
 	// пользователем.
 	//
 	// GET /events/addachievement
-	AddAchievementEventList(ctx context.Context, params AddAchievementEventListParams) (*AddAchievementEventListResponseHeaders, error)
-	// CalendarEventList invokes CalendarEventList operation.
+	ListAddAchievementEvents(ctx context.Context, params ListAddAchievementEventsParams) (*ListAddAchievementEventsHeaders, error)
+	// ListCalendarEvents invokes ListCalendarEvents operation.
 	//
 	// Список мероприятий для календаря.
 	//
 	// GET /events/calendar
-	CalendarEventList(ctx context.Context, params CalendarEventListParams) (*CalendarEventListResponseHeaders, error)
-	// EventBrandList invokes EventBrandList operation.
+	ListCalendarEvents(ctx context.Context, params ListCalendarEventsParams) (*ListCalendarEventsHeaders, error)
+	// ListEventBrands invokes ListEventBrands operation.
 	//
 	// Список брендированных мероприятий.
 	//
 	// GET /event-brands
-	EventBrandList(ctx context.Context, params EventBrandListParams) (*EventBrandListResponseHeaders, error)
-	// EventCount invokes EventCount operation.
+	ListEventBrands(ctx context.Context, params ListEventBrandsParams) (*ListEventBrandsHeaders, error)
+	// ListEventDiplomaSettings invokes ListEventDiplomaSettings operation.
 	//
-	// Счетчик мероприятий.
-	//
-	// HEAD /events
-	EventCount(ctx context.Context, params EventCountParams) (*EventCountOK, error)
-	// EventDiplomaRoleAdd invokes EventDiplomaRoleAdd operation.
-	//
-	// Добавление роли для диплома мероприятия.
-	//
-	// PUT /events/{event_id}/diploma-role/{role_id}
-	EventDiplomaRoleAdd(ctx context.Context, params EventDiplomaRoleAddParams) (EventDiplomaRoleAddRes, error)
-	// EventDiplomaRoleDelete invokes EventDiplomaRoleDelete operation.
-	//
-	// Удаление роли для диплома мероприятия.
-	//
-	// DELETE /events/{event_id}/diploma-role/{role_id}
-	EventDiplomaRoleDelete(ctx context.Context, params EventDiplomaRoleDeleteParams) error
-	// EventDiplomaSettingsCreate invokes EventDiplomaSettingsCreate operation.
-	//
-	// Создание настроек дипломов мероприятия.
-	//
-	// POST /events/{event_id}/diploma-settings
-	EventDiplomaSettingsCreate(ctx context.Context, request *EventDiplomaSettingsCreateReq, params EventDiplomaSettingsCreateParams) (EventDiplomaSettingsCreateRes, error)
-	// EventDiplomaSettingsList invokes EventDiplomaSettingsList operation.
-	//
-	// Список настроек дипломов мероприятия.
+	// Список настроек дипломов мероприятий.
 	//
 	// GET /events/diploma-settings
-	EventDiplomaSettingsList(ctx context.Context, params EventDiplomaSettingsListParams) (*EventDiplomaSettingsListOKHeaders, error)
-	// EventDiplomaSettingsRead invokes EventDiplomaSettingsRead operation.
+	ListEventDiplomaSettings(ctx context.Context, params ListEventDiplomaSettingsParams) (*ListEventDiplomaSettingsOKHeaders, error)
+	// ListEventFields invokes ListEventFields operation.
 	//
-	// Чтение настроек дипломов мероприятия.
+	// Список полей анкеты мероприятия.
 	//
-	// GET /events/{event_id}/diploma-settings
-	EventDiplomaSettingsRead(ctx context.Context, params EventDiplomaSettingsReadParams) (EventDiplomaSettingsReadRes, error)
-	// EventDiplomaSettingsUpdate invokes EventDiplomaSettingsUpdate operation.
+	// GET /events/{event_id}/fields
+	ListEventFields(ctx context.Context, params ListEventFieldsParams) ([]EventFieldListed, error)
+	// ListEventRoutes invokes ListEventRoutes operation.
 	//
-	// Обновление настроек дипломов мероприятия.
+	// Список направлений мероприятий.
 	//
-	// PATCH /events/{event_id}/diploma-settings
-	EventDiplomaSettingsUpdate(ctx context.Context, request *EventDiplomaSettingsUpdateReq, params EventDiplomaSettingsUpdateParams) (EventDiplomaSettingsUpdateRes, error)
-	// EventList invokes EventList operation.
+	// GET /event-routes
+	ListEventRoutes(ctx context.Context, params ListEventRoutesParams) (*ListEventRoutesHeaders, error)
+	// ListEvents invokes ListEvents operation.
 	//
 	// Если не указан критерий сортировки результатов `order_by`,
 	// то он определяется в зависимости от указания других
@@ -108,70 +277,189 @@ type Invoker interface {
 	// параметра `search`.
 	//
 	// GET /events
-	EventList(ctx context.Context, params EventListParams) (*EventListResponseHeaders, error)
-	// EventRetrieve invokes EventRetrieve operation.
+	ListEvents(ctx context.Context, params ListEventsParams) (ListEventsRes, error)
+	// ListFileMeta invokes ListFileMeta operation.
+	//
+	// #### Неаутентифицированный запрос публичных файлов
+	// Допускается запрос без аутентификации при
+	// соблюдении условий:
+	// - присутствуют значения параметра `file_id`
+	// - параметр `is_public` отсутствует либо содержит `true`
+	// При несоблюдении какого-либо из условий,
+	// возвращается `401` ответ.
+	//
+	// GET /files
+	ListFileMeta(ctx context.Context, params ListFileMetaParams) (ListFileMetaRes, error)
+	// ListOrganizationEvents invokes ListOrganizationEvents operation.
+	//
+	// Список мероприятий организации.
+	//
+	// GET /events/organizations/{organization_id}
+	ListOrganizationEvents(ctx context.Context, params ListOrganizationEventsParams) (*ListOrganizationEventsHeaders, error)
+	// ListOrganizationSubjects invokes ListOrganizationSubjects operation.
+	//
+	// Список связей организаций и тематик.
+	//
+	// GET /organization-subjects
+	ListOrganizationSubjects(ctx context.Context, params ListOrganizationSubjectsParams) (*ListOrganizationSubjectsHeaders, error)
+	// ListOrganizations invokes ListOrganizations operation.
+	//
+	// Список организаций.
+	//
+	// GET /organizations
+	ListOrganizations(ctx context.Context, params ListOrganizationsParams) (ListOrganizationsRes, error)
+	// ListSocialAuths invokes ListSocialAuths operation.
+	//
+	// Список авторизаций пользователя в соц. сетях.
+	//
+	// GET /social-auths/{user_id}
+	ListSocialAuths(ctx context.Context, params ListSocialAuthsParams) (ListSocialAuthsRes, error)
+	// ListSubjects invokes ListSubjects operation.
+	//
+	// Список тематик для организаций.
+	//
+	// GET /subjects
+	ListSubjects(ctx context.Context, params ListSubjectsParams) (*ListSubjectsHeaders, error)
+	// ListUserConsents invokes ListUserConsents operation.
+	//
+	// Список согласий пользователя.
+	//
+	// GET /users/{user_id}/consents
+	ListUserConsents(ctx context.Context, params ListUserConsentsParams) (ListUserConsentsRes, error)
+	// LoginSocialAuth invokes LoginSocialAuth operation.
+	//
+	// Авторизация во внешнем провайдере.
+	//
+	// GET /auth/login/{provider}
+	LoginSocialAuth(ctx context.Context, params LoginSocialAuthParams) (LoginSocialAuthRes, error)
+	// PatchMutationLock invokes PatchMutationLock operation.
+	//
+	// Изначально блокировка создается в состоянии
+	// активной.
+	// После создания, состояние можно декактивировать и
+	// активировать обратно.
+	// > Неактивная блокировка равнозначна ее отсутствию.
+	//
+	// PATCH /mutation-locks/{object_namespace}/{object_key}
+	PatchMutationLock(ctx context.Context, request *PatchMutationLockReq, params PatchMutationLockParams) (PatchMutationLockRes, error)
+	// ReadEvent invokes ReadEvent operation.
 	//
 	// По умолчанию возвращаются только метаданные.
 	// Для получения полного набора свойств используйте
 	// параметр `extend`.
 	//
 	// GET /events/{event_id}
-	EventRetrieve(ctx context.Context, params EventRetrieveParams) (EventRetrieveRes, error)
-	// EventRouteList invokes EventRouteList operation.
+	ReadEvent(ctx context.Context, params ReadEventParams) (ReadEventRes, error)
+	// ReadEventDeferredNotification invokes ReadEventDeferredNotification operation.
 	//
-	// Список направлений мероприятий.
+	// Чтение отложенного уведомления.
 	//
-	// GET /event-routes
-	EventRouteList(ctx context.Context, params EventRouteListParams) (*EventRouteListResponseHeaders, error)
-	// FileConfirmUpload invokes FileConfirmUpload operation.
+	// GET /events/{event_id}/deferred-notification
+	ReadEventDeferredNotification(ctx context.Context, params ReadEventDeferredNotificationParams) (ReadEventDeferredNotificationRes, error)
+	// ReadEventDiplomaSettings invokes ReadEventDiplomaSettings operation.
 	//
-	// Подтверждение загрузки файла.
+	// Чтение настроек дипломов мероприятия.
 	//
-	// POST /files/{file_id}/confirm-upload
-	FileConfirmUpload(ctx context.Context, params FileConfirmUploadParams) (FileConfirmUploadRes, error)
-	// FileMetaCreate invokes FileMetaCreate operation.
+	// GET /events/{event_id}/diploma-settings
+	ReadEventDiplomaSettings(ctx context.Context, params ReadEventDiplomaSettingsParams) (ReadEventDiplomaSettingsRes, error)
+	// ReadEventLimit invokes ReadEventLimit operation.
 	//
-	// Создание файла.
+	// Чтение лимитов мероприятия.
 	//
-	// POST /files
-	FileMetaCreate(ctx context.Context, request *FileMetaCreateReq) (*FileMetaCreateCreated, error)
-	// FileMetaList invokes FileMetaList operation.
+	// GET /events/{event_id}/limit
+	ReadEventLimit(ctx context.Context, params ReadEventLimitParams) (ReadEventLimitRes, error)
+	// ReadFile invokes ReadFile operation.
 	//
-	// Список файлов.
+	// По-умолчанию возвращается в форме `307` ответа.
+	// С параметром `noredir=true` возвращается `200`.
+	// Чтение приватного файла требует прохождение
+	// авторизации.
+	// Аутентифицированный пользователь должен быть
+	// владельцем файла.
 	//
-	// GET /files
-	FileMetaList(ctx context.Context, params FileMetaListParams) (*FileMetaListOKHeaders, error)
-	// FileMetaRead invokes FileMetaRead operation.
+	// GET /files/{file_id}
+	ReadFile(ctx context.Context, params ReadFileParams) (ReadFileRes, error)
+	// ReadFileMeta invokes ReadFileMeta operation.
 	//
-	// Чтение информации о файле.
+	// Чтение приватного файла требует прохождение
+	// авторизации.
+	// Аутентифицированный пользователь должен быть
+	// владельцем файла.
 	//
 	// GET /files/{file_id}/meta
-	FileMetaRead(ctx context.Context, params FileMetaReadParams) (FileMetaReadRes, error)
-	// FileMetaUpdate invokes FileMetaUpdate operation.
+	ReadFileMeta(ctx context.Context, params ReadFileMetaParams) (ReadFileMetaRes, error)
+	// ReadPerson invokes ReadPerson operation.
+	//
+	// Чтение персоны пользователя.
+	//
+	// GET /persons/{person_id}
+	ReadPerson(ctx context.Context, params ReadPersonParams) (ReadPersonRes, error)
+	// ReadTeam invokes ReadTeam operation.
+	//
+	// Часть данных возвращается только при наличии
+	// аутентификации и определенных прав у пользователя,
+	// от лица которого выполняется запрос.
+	//
+	// GET /teams/{team_id}
+	ReadTeam(ctx context.Context, params ReadTeamParams) (ReadTeamRes, error)
+	// Signup invokes Signup operation.
+	//
+	// Регистрация пользователя.
+	//
+	// POST /auth/signup
+	Signup(ctx context.Context, request *Signup, params SignupParams) (SignupRes, error)
+	// SignupInitialData invokes SignupInitialData operation.
+	//
+	// Данные для предзаполнения формы регистрации.
+	//
+	// GET /auth/signup
+	SignupInitialData(ctx context.Context, params SignupInitialDataParams) (SignupInitialDataRes, error)
+	// SubmitUserConsent invokes SubmitUserConsent operation.
+	//
+	// Фиксация согласия пользователя.
+	//
+	// POST /users/{user_id}/consents/{kind}
+	SubmitUserConsent(ctx context.Context, params SubmitUserConsentParams) (SubmitUserConsentRes, error)
+	// UpdateAuthenticatedUser invokes UpdateAuthenticatedUser operation.
+	//
+	// > Операция еще не доступна.
+	//
+	// PATCH /users/me
+	UpdateAuthenticatedUser(ctx context.Context, request *UserUpdate) (UpdateAuthenticatedUserRes, error)
+	// UpdateEventDeferredNotification invokes UpdateEventDeferredNotification operation.
+	//
+	// Если уведомление уже существует и оно находится в
+	// статусе `canceled`,
+	// оно будет переведено в статус `pending`.
+	//
+	// PATCH /events/{event_id}/deferred-notification
+	UpdateEventDeferredNotification(ctx context.Context, request *UpdateEventDeferredNotificationReq, params UpdateEventDeferredNotificationParams) (UpdateEventDeferredNotificationRes, error)
+	// UpdateEventDiplomaSettings invokes UpdateEventDiplomaSettings operation.
+	//
+	// Обновление настроек дипломов мероприятия.
+	//
+	// PATCH /events/{event_id}/diploma-settings
+	UpdateEventDiplomaSettings(ctx context.Context, request *UpdateEventDiplomaSettingsReq, params UpdateEventDiplomaSettingsParams) (UpdateEventDiplomaSettingsRes, error)
+	// UpdateEventLimit invokes UpdateEventLimit operation.
+	//
+	// Обновление лимитов мероприятия.
+	//
+	// PATCH /events/{event_id}/limit
+	UpdateEventLimit(ctx context.Context, request *UpdateEventLimitReq, params UpdateEventLimitParams) (UpdateEventLimitRes, error)
+	// UpdateFileMeta invokes UpdateFileMeta operation.
 	//
 	// Обновление информации о файле.
 	//
 	// PATCH /files/{file_id}/meta
-	FileMetaUpdate(ctx context.Context, request *FileMetaUpdateReq, params FileMetaUpdateParams) (FileMetaUpdateRes, error)
-	// FileRead invokes FileRead operation.
+	UpdateFileMeta(ctx context.Context, request *UpdateFileMetaReq, params UpdateFileMetaParams) (UpdateFileMetaRes, error)
+	// UpdateTeam invokes UpdateTeam operation.
 	//
-	// Получение ссылки на файл.
+	// Доступно только для капитана команды и организатора
+	// мероприятия.
 	//
-	// GET /files/{file_id}
-	FileRead(ctx context.Context, params FileReadParams) (FileReadRes, error)
-	// FileReferenceCreate invokes FileReferenceCreate operation.
-	//
-	// Добавление ссылки на файл.
-	//
-	// PUT /files/{file_id}/references/{object_id}
-	FileReferenceCreate(ctx context.Context, params FileReferenceCreateParams) (FileReferenceCreateRes, error)
-	// FileReferenceDelete invokes FileReferenceDelete operation.
-	//
-	// Удаление ссылки на файл.
-	//
-	// DELETE /files/{file_id}/references/{object_id}
-	FileReferenceDelete(ctx context.Context, params FileReferenceDeleteParams) (FileReferenceDeleteRes, error)
-	// FileUpload invokes FileUpload operation.
+	// PATCH /teams/{team_id}
+	UpdateTeam(ctx context.Context, request *UpdateTeamReq, params UpdateTeamParams) (UpdateTeamRes, error)
+	// UploadFile invokes UploadFile operation.
 	//
 	// Позволяет повторно получить ссылку на загрузку того
 	// же файла или сформировать
@@ -179,78 +467,19 @@ type Invoker interface {
 	// но другого размера).
 	//
 	// PUT /files/{file_id}
-	FileUpload(ctx context.Context, request *FileUploadReq, params FileUploadParams) (FileUploadRes, error)
-	// OrganizationEventList invokes OrganizationEventList operation.
+	UploadFile(ctx context.Context, request *UploadFileReq, params UploadFileParams) (UploadFileRes, error)
+	// ValidateAuthorization invokes ValidateAuthorization operation.
 	//
-	// Список мероприятий организации.
+	// Валидация авторизационных параметров.
 	//
-	// GET /events/organizations/{organization_id}
-	OrganizationEventList(ctx context.Context, params OrganizationEventListParams) (*OrganizationEventListResponseHeaders, error)
-	// OrganizationIsAdmin invokes OrganizationIsAdmin operation.
-	//
-	// Проверка наличия административных прав в организации.
-	//
-	// POST /organizations/{organization_id}/is-admin
-	OrganizationIsAdmin(ctx context.Context, params OrganizationIsAdminParams) (OrganizationIsAdminRes, error)
-	// OrganizationList invokes OrganizationList operation.
-	//
-	// Список организаций.
-	//
-	// GET /organizations
-	OrganizationList(ctx context.Context, params OrganizationListParams) (*OrganizationListResponseHeaders, error)
-	// OrganizationSubjectCreate invokes OrganizationSubjectCreate operation.
-	//
-	// > Запрос необходимо выполнять от ментора или
-	// владельца организации,
-	// > указываемой в свойстве `organization_id` тела запроса.
-	//
-	// POST /organization-subjects
-	OrganizationSubjectCreate(ctx context.Context, request *OrganizationSubjectBody) (OrganizationSubjectCreateRes, error)
-	// OrganizationSubjectList invokes OrganizationSubjectList operation.
-	//
-	// Список связей организаций и тематик.
-	//
-	// GET /organization-subjects
-	OrganizationSubjectList(ctx context.Context, params OrganizationSubjectListParams) (*OrganizationSubjectListResponseHeaders, error)
-	// PersonRead invokes PersonRead operation.
-	//
-	// Чтение персоны пользователя.
-	//
-	// GET /persons/{person_id}
-	PersonRead(ctx context.Context, params PersonReadParams) (PersonReadRes, error)
-	// SocialAuthList invokes SocialAuthList operation.
-	//
-	// Список авторизаций пользователя в соц. сетях.
-	//
-	// GET /social-auths/{user_id}
-	SocialAuthList(ctx context.Context, params SocialAuthListParams) (SocialAuthListRes, error)
-	// SubjectList invokes SubjectList operation.
-	//
-	// Список тематик для организаций.
-	//
-	// GET /subjects
-	SubjectList(ctx context.Context, params SubjectListParams) (*SubjectListResponseHeaders, error)
-	// TeamContactValidate invokes TeamContactValidate operation.
+	// GET /oauth/authorize
+	ValidateAuthorization(ctx context.Context, params ValidateAuthorizationParams) error
+	// ValidateTeamContact invokes ValidateTeamContact operation.
 	//
 	// Валидация контактной ссылки.
 	//
 	// POST /teams/contact-validate
-	TeamContactValidate(ctx context.Context, request TeamContactLink) (TeamContactValidateRes, error)
-	// TeamRead invokes TeamRead operation.
-	//
-	// Часть данных возвращается только при наличии
-	// аутентификации и определенных прав у пользователя,
-	// от лица которого выполняется запрос.
-	//
-	// GET /teams/{team_id}
-	TeamRead(ctx context.Context, params TeamReadParams) (TeamReadRes, error)
-	// TeamUpdate invokes TeamUpdate operation.
-	//
-	// Доступно только для капитана команды и организатора
-	// мероприятия.
-	//
-	// PATCH /teams/{team_id}
-	TeamUpdate(ctx context.Context, request *TeamUpdateReq, params TeamUpdateParams) (TeamUpdateRes, error)
+	ValidateTeamContact(ctx context.Context, request TeamContactLink) (ValidateTeamContactRes, error)
 }
 
 // Client implements OAS client.
@@ -294,20 +523,3617 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 	return u
 }
 
-// AddAchievementEventList invokes AddAchievementEventList operation.
+// AddEventDiplomaRole invokes AddEventDiplomaRole operation.
+//
+// Добавление роли для диплома мероприятия.
+//
+// PUT /events/{event_id}/diploma-role/{role_id}
+func (c *Client) AddEventDiplomaRole(ctx context.Context, params AddEventDiplomaRoleParams) (AddEventDiplomaRoleRes, error) {
+	res, err := c.sendAddEventDiplomaRole(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendAddEventDiplomaRole(ctx context.Context, params AddEventDiplomaRoleParams) (res AddEventDiplomaRoleRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AddEventDiplomaRole"),
+		semconv.HTTPRequestMethodKey.String("PUT"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-role/{role_id}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, AddEventDiplomaRoleOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/diploma-role/"
+	{
+		// Encode "role_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "role_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.RoleID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PUT", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, AddEventDiplomaRoleOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeAddEventDiplomaRoleResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ArchiveEventRequestsFiles invokes ArchiveEventRequestsFiles operation.
+//
+// Обязательно нужно указать один из параметров: `field_id`
+// или `request_id`.
+//
+// GET /events/{event_id}/requests-files
+func (c *Client) ArchiveEventRequestsFiles(ctx context.Context, params ArchiveEventRequestsFilesParams) (ArchiveEventRequestsFilesRes, error) {
+	res, err := c.sendArchiveEventRequestsFiles(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendArchiveEventRequestsFiles(ctx context.Context, params ArchiveEventRequestsFilesParams) (res ArchiveEventRequestsFilesRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ArchiveEventRequestsFiles"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/requests-files"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ArchiveEventRequestsFilesOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/requests-files"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "field_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "field_id",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.FieldID.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "request_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "request_id",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.RequestID.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ArchiveEventRequestsFilesOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeArchiveEventRequestsFilesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// AuthorizeClient invokes AuthorizeClient operation.
+//
+// Пользователь авторизует доступ клиента к ресурсам
+// пользователя.
+//
+// POST /oauth/authorize
+func (c *Client) AuthorizeClient(ctx context.Context) (*AuthorizeClientFound, error) {
+	res, err := c.sendAuthorizeClient(ctx)
+	return res, err
+}
+
+func (c *Client) sendAuthorizeClient(ctx context.Context) (res *AuthorizeClientFound, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AuthorizeClient"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/oauth/authorize"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, AuthorizeClientOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/oauth/authorize"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, AuthorizeClientOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeAuthorizeClientResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CancelEventDeferredNotification invokes CancelEventDeferredNotification operation.
+//
+// Перевод уведомления из статуса `pending` в статус `canceled`.
+// Если уведомление в статусе `pending` не найдено, будет
+// возвращен `404` ответ.
+//
+// DELETE /events/{event_id}/deferred-notification
+func (c *Client) CancelEventDeferredNotification(ctx context.Context, params CancelEventDeferredNotificationParams) (CancelEventDeferredNotificationRes, error) {
+	res, err := c.sendCancelEventDeferredNotification(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendCancelEventDeferredNotification(ctx context.Context, params CancelEventDeferredNotificationParams) (res CancelEventDeferredNotificationRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CancelEventDeferredNotification"),
+		semconv.HTTPRequestMethodKey.String("DELETE"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/deferred-notification"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CancelEventDeferredNotificationOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/deferred-notification"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CancelEventDeferredNotificationOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCancelEventDeferredNotificationResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CheckUserConsent invokes CheckUserConsent operation.
+//
+// Проверка наличия согласия пользователя.
+//
+// HEAD /users/{user_id}/consents/{kind}
+func (c *Client) CheckUserConsent(ctx context.Context, params CheckUserConsentParams) (CheckUserConsentRes, error) {
+	res, err := c.sendCheckUserConsent(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendCheckUserConsent(ctx context.Context, params CheckUserConsentParams) (res CheckUserConsentRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CheckUserConsent"),
+		semconv.HTTPRequestMethodKey.String("HEAD"),
+		semconv.HTTPRouteKey.String("/users/{user_id}/consents/{kind}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CheckUserConsentOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/users/"
+	{
+		// Encode "user_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "user_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.UserID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/consents/"
+	{
+		// Encode "kind" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "kind",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(string(params.Kind)))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "HEAD", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CheckUserConsentOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCheckUserConsentResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CompleteSocialAuth invokes CompleteSocialAuth operation.
+//
+// Завершение авторизации.
+//
+// GET /auth/complete/{provider}
+func (c *Client) CompleteSocialAuth(ctx context.Context, params CompleteSocialAuthParams) (CompleteSocialAuthRes, error) {
+	res, err := c.sendCompleteSocialAuth(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendCompleteSocialAuth(ctx context.Context, params CompleteSocialAuthParams) (res CompleteSocialAuthRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CompleteSocialAuth"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/auth/complete/{provider}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CompleteSocialAuthOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/auth/complete/"
+	{
+		// Encode "provider" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "provider",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.Provider))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "state" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "state",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.State))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "EncodeCookieParams"
+	cookie := uri.NewCookieEncoder(r)
+	{
+		// Encode "csrf_state" parameter.
+		cfg := uri.CookieParameterEncodingConfig{
+			Name:    "csrf_state",
+			Explode: true,
+		}
+
+		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.CsrfState.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode cookie")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCompleteSocialAuthResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ConfirmFileUpload invokes ConfirmFileUpload operation.
+//
+// Подтверждение загрузки файла.
+//
+// POST /files/{file_id}/confirm-upload
+func (c *Client) ConfirmFileUpload(ctx context.Context, params ConfirmFileUploadParams) (ConfirmFileUploadRes, error) {
+	res, err := c.sendConfirmFileUpload(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendConfirmFileUpload(ctx context.Context, params ConfirmFileUploadParams) (res ConfirmFileUploadRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ConfirmFileUpload"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/files/{file_id}/confirm-upload"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ConfirmFileUploadOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/files/"
+	{
+		// Encode "file_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "file_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.FileID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/confirm-upload"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ConfirmFileUploadOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeConfirmFileUploadResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ConfirmSignupEmail invokes ConfirmSignupEmail operation.
+//
+// Завершение регистрации пользователя подтверждением
+// почты.
+//
+// POST /auth/confirm-email/{uid}/{token}
+func (c *Client) ConfirmSignupEmail(ctx context.Context, params ConfirmSignupEmailParams) (ConfirmSignupEmailRes, error) {
+	res, err := c.sendConfirmSignupEmail(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendConfirmSignupEmail(ctx context.Context, params ConfirmSignupEmailParams) (res ConfirmSignupEmailRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ConfirmSignupEmail"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/auth/confirm-email/{uid}/{token}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ConfirmSignupEmailOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/auth/confirm-email/"
+	{
+		// Encode "uid" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "uid",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.UID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/"
+	{
+		// Encode "token" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "token",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.Token))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeConfirmSignupEmailResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CountEvents invokes CountEvents operation.
+//
+// Счетчик мероприятий.
+//
+// HEAD /events
+func (c *Client) CountEvents(ctx context.Context, params CountEventsParams) (*CountEventsOK, error) {
+	res, err := c.sendCountEvents(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendCountEvents(ctx context.Context, params CountEventsParams) (res *CountEventsOK, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CountEvents"),
+		semconv.HTTPRequestMethodKey.String("HEAD"),
+		semconv.HTTPRouteKey.String("/events"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CountEventsOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/events"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "event_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "event_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.EventID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.EventID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "organization_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "organization_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.OrganizationID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.OrganizationID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "meta_event_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "meta_event_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.MetaEventID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.MetaEventID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "venue_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "venue_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.VenueID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.VenueID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "start_before" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "start_before",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.StartBefore.Get(); ok {
+				return e.EncodeValue(conv.DateTimeToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "end_after" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "end_after",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.EndAfter.Get(); ok {
+				return e.EncodeValue(conv.DateTimeToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "search" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "search",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Search.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "format" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "format",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Format.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "HEAD", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCountEventsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateEvent invokes CreateEvent operation.
+//
+// При полном отсутствии в запросе массива `achievement_roles`,
+// мероприятию назначаются роли достижений
+// по-умолчанию.
+// Пустой же массив приведет к созданию мероприятия без
+// ролей.
+//
+// POST /events
+func (c *Client) CreateEvent(ctx context.Context, request *CreateEventReq) (CreateEventRes, error) {
+	res, err := c.sendCreateEvent(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendCreateEvent(ctx context.Context, request *CreateEventReq) (res CreateEventRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CreateEvent"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/events"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateEventOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/events"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateEventRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CreateEventOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateEventResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateEventDeferredNotification invokes CreateEventDeferredNotification operation.
+//
+// Создание отложенного уведомления.
+//
+// POST /events/{event_id}/deferred-notification
+func (c *Client) CreateEventDeferredNotification(ctx context.Context, request *CreateEventDeferredNotificationReq, params CreateEventDeferredNotificationParams) (CreateEventDeferredNotificationRes, error) {
+	res, err := c.sendCreateEventDeferredNotification(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendCreateEventDeferredNotification(ctx context.Context, request *CreateEventDeferredNotificationReq, params CreateEventDeferredNotificationParams) (res CreateEventDeferredNotificationRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CreateEventDeferredNotification"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/deferred-notification"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateEventDeferredNotificationOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/deferred-notification"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateEventDeferredNotificationRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CreateEventDeferredNotificationOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateEventDeferredNotificationResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateEventDiplomaSettings invokes CreateEventDiplomaSettings operation.
+//
+// Создание настроек дипломов мероприятия.
+//
+// POST /events/{event_id}/diploma-settings
+func (c *Client) CreateEventDiplomaSettings(ctx context.Context, request *CreateEventDiplomaSettingsReq, params CreateEventDiplomaSettingsParams) (CreateEventDiplomaSettingsRes, error) {
+	res, err := c.sendCreateEventDiplomaSettings(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendCreateEventDiplomaSettings(ctx context.Context, request *CreateEventDiplomaSettingsReq, params CreateEventDiplomaSettingsParams) (res CreateEventDiplomaSettingsRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CreateEventDiplomaSettings"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-settings"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateEventDiplomaSettingsOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/diploma-settings"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateEventDiplomaSettingsRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CreateEventDiplomaSettingsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateEventDiplomaSettingsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateEventLimit invokes CreateEventLimit operation.
+//
+// Лимиты могут существовать только в единичном кол-ве
+// на мероприятие.
+// Попытка создать больше будет возвращать `409` ответ.
+//
+// POST /events/{event_id}/limit
+func (c *Client) CreateEventLimit(ctx context.Context, request *CreateEventLimitReq, params CreateEventLimitParams) (CreateEventLimitRes, error) {
+	res, err := c.sendCreateEventLimit(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendCreateEventLimit(ctx context.Context, request *CreateEventLimitReq, params CreateEventLimitParams) (res CreateEventLimitRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CreateEventLimit"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/limit"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateEventLimitOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/limit"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateEventLimitRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CreateEventLimitOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateEventLimitResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateFileMeta invokes CreateFileMeta operation.
+//
+// Создание файла.
+//
+// POST /files
+func (c *Client) CreateFileMeta(ctx context.Context, request *CreateFileMetaReq) (CreateFileMetaRes, error) {
+	res, err := c.sendCreateFileMeta(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendCreateFileMeta(ctx context.Context, request *CreateFileMetaReq) (res CreateFileMetaRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CreateFileMeta"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/files"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateFileMetaOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/files"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateFileMetaRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CreateFileMetaOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateFileMetaResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateFileReference invokes CreateFileReference operation.
+//
+// Добавление ссылки на файл.
+//
+// PUT /files/{file_id}/references/{object_id}
+func (c *Client) CreateFileReference(ctx context.Context, params CreateFileReferenceParams) (CreateFileReferenceRes, error) {
+	res, err := c.sendCreateFileReference(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendCreateFileReference(ctx context.Context, params CreateFileReferenceParams) (res CreateFileReferenceRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CreateFileReference"),
+		semconv.HTTPRequestMethodKey.String("PUT"),
+		semconv.HTTPRouteKey.String("/files/{file_id}/references/{object_id}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateFileReferenceOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/files/"
+	{
+		// Encode "file_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "file_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.FileID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/references/"
+	{
+		// Encode "object_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "object_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ObjectID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PUT", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CreateFileReferenceOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateFileReferenceResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateMutationLock invokes CreateMutationLock operation.
+//
+// Блокировки создаются только для файлов,
+// принадлежащих пользователю.
+// Чужие файлы, несуществующие файлы, а так же файлы,
+// для которых блокировки уже имеются,
+// будут пропущены и не возвращены в теле `201` ответа.
+//
+// POST /mutation-locks/{object_namespace}/{object_key}
+func (c *Client) CreateMutationLock(ctx context.Context, request []uuid.UUID, params CreateMutationLockParams) (CreateMutationLockRes, error) {
+	res, err := c.sendCreateMutationLock(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendCreateMutationLock(ctx context.Context, request []uuid.UUID, params CreateMutationLockParams) (res CreateMutationLockRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CreateMutationLock"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/mutation-locks/{object_namespace}/{object_key}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateMutationLockOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/mutation-locks/"
+	{
+		// Encode "object_namespace" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "object_namespace",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ObjectNamespace))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/"
+	{
+		// Encode "object_key" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "object_key",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ObjectKey))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateMutationLockRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CreateMutationLockOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateMutationLockResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateOrganizationSubject invokes CreateOrganizationSubject operation.
+//
+// > Запрос необходимо выполнять от ментора или
+// владельца организации,
+// > указываемой в свойстве `organization_id` тела запроса.
+//
+// POST /organization-subjects
+func (c *Client) CreateOrganizationSubject(ctx context.Context, request *OrganizationSubjectBody) (CreateOrganizationSubjectRes, error) {
+	res, err := c.sendCreateOrganizationSubject(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendCreateOrganizationSubject(ctx context.Context, request *OrganizationSubjectBody) (res CreateOrganizationSubjectRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CreateOrganizationSubject"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/organization-subjects"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateOrganizationSubjectOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/organization-subjects"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateOrganizationSubjectRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CreateOrganizationSubjectOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateOrganizationSubjectResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// DeleteEventDiplomaRole invokes DeleteEventDiplomaRole operation.
+//
+// Удаление роли для диплома мероприятия.
+//
+// DELETE /events/{event_id}/diploma-role/{role_id}
+func (c *Client) DeleteEventDiplomaRole(ctx context.Context, params DeleteEventDiplomaRoleParams) error {
+	_, err := c.sendDeleteEventDiplomaRole(ctx, params)
+	return err
+}
+
+func (c *Client) sendDeleteEventDiplomaRole(ctx context.Context, params DeleteEventDiplomaRoleParams) (res *DeleteEventDiplomaRoleNoContent, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("DeleteEventDiplomaRole"),
+		semconv.HTTPRequestMethodKey.String("DELETE"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-role/{role_id}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, DeleteEventDiplomaRoleOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/diploma-role/"
+	{
+		// Encode "role_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "role_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.RoleID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, DeleteEventDiplomaRoleOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeDeleteEventDiplomaRoleResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// DeleteEventLimit invokes DeleteEventLimit operation.
+//
+// Удаление лимитов мероприятия.
+//
+// DELETE /events/{event_id}/limit
+func (c *Client) DeleteEventLimit(ctx context.Context, params DeleteEventLimitParams) (DeleteEventLimitRes, error) {
+	res, err := c.sendDeleteEventLimit(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendDeleteEventLimit(ctx context.Context, params DeleteEventLimitParams) (res DeleteEventLimitRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("DeleteEventLimit"),
+		semconv.HTTPRequestMethodKey.String("DELETE"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/limit"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, DeleteEventLimitOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/limit"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, DeleteEventLimitOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeDeleteEventLimitResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// DeleteFileReference invokes DeleteFileReference operation.
+//
+// Удаление ссылки на файл.
+//
+// DELETE /files/{file_id}/references/{object_id}
+func (c *Client) DeleteFileReference(ctx context.Context, params DeleteFileReferenceParams) (DeleteFileReferenceRes, error) {
+	res, err := c.sendDeleteFileReference(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendDeleteFileReference(ctx context.Context, params DeleteFileReferenceParams) (res DeleteFileReferenceRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("DeleteFileReference"),
+		semconv.HTTPRequestMethodKey.String("DELETE"),
+		semconv.HTTPRouteKey.String("/files/{file_id}/references/{object_id}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, DeleteFileReferenceOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/files/"
+	{
+		// Encode "file_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "file_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.FileID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/references/"
+	{
+		// Encode "object_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "object_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ObjectID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, DeleteFileReferenceOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeDeleteFileReferenceResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// DeleteMutationLock invokes DeleteMutationLock operation.
+//
+// Удаление блокировки.
+//
+// DELETE /mutation-locks/{object_namespace}/{object_key}
+func (c *Client) DeleteMutationLock(ctx context.Context, params DeleteMutationLockParams) (DeleteMutationLockRes, error) {
+	res, err := c.sendDeleteMutationLock(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendDeleteMutationLock(ctx context.Context, params DeleteMutationLockParams) (res DeleteMutationLockRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("DeleteMutationLock"),
+		semconv.HTTPRequestMethodKey.String("DELETE"),
+		semconv.HTTPRouteKey.String("/mutation-locks/{object_namespace}/{object_key}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, DeleteMutationLockOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/mutation-locks/"
+	{
+		// Encode "object_namespace" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "object_namespace",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ObjectNamespace))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/"
+	{
+		// Encode "object_key" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "object_key",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ObjectKey))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:ClientCredentials"
+			switch err := c.securityClientCredentials(ctx, DeleteMutationLockOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"ClientCredentials\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeDeleteMutationLockResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// DisconnectSocialAuth invokes DisconnectSocialAuth operation.
+//
+// Удаление авторизации возможно только если это не
+// единственный оставшийся у пользователя способ
+// аутентификации под своей учетной записью.
+// Не допускается параллельная обработка запросов на
+// удаление, в случае появления такой гонки, будет
+// возвращен 409 ответ.
+//
+// POST /auth/disconnect/{provider}/{uid}
+func (c *Client) DisconnectSocialAuth(ctx context.Context, params DisconnectSocialAuthParams) (DisconnectSocialAuthRes, error) {
+	res, err := c.sendDisconnectSocialAuth(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendDisconnectSocialAuth(ctx context.Context, params DisconnectSocialAuthParams) (res DisconnectSocialAuthRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("DisconnectSocialAuth"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/auth/disconnect/{provider}/{uid}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, DisconnectSocialAuthOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/auth/disconnect/"
+	{
+		// Encode "provider" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "provider",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.Provider))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/"
+	{
+		// Encode "uid" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "uid",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.UID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, DisconnectSocialAuthOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeDisconnectSocialAuthResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// EventDeferredNotificationTemplateID invokes EventDeferredNotificationTemplateID operation.
+//
+// Идентификатор шаблона отложенного уведомления.
+//
+// GET /event-deferred-notification-templates/{name}
+func (c *Client) EventDeferredNotificationTemplateID(ctx context.Context, params EventDeferredNotificationTemplateIDParams) (EventDeferredNotificationTemplateIDRes, error) {
+	res, err := c.sendEventDeferredNotificationTemplateID(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendEventDeferredNotificationTemplateID(ctx context.Context, params EventDeferredNotificationTemplateIDParams) (res EventDeferredNotificationTemplateIDRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("EventDeferredNotificationTemplateID"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/event-deferred-notification-templates/{name}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, EventDeferredNotificationTemplateIDOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/event-deferred-notification-templates/"
+	{
+		// Encode "name" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "name",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.Name))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeEventDeferredNotificationTemplateIDResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// EventSignup invokes EventSignup operation.
+//
+// #### Аутентификация
+// При выполнении запроса с аутентификацией,
+// заявка создается для пользователя, с которым связан
+// токен.
+// Параметры, используемые для создания пользователя,
+// в аутентифицированном запросе будут использованы
+// для его обновления.
+// Параметр `email` недопускается в аутентифицированных
+// запросах.
+//
+// POST /events/{event_id}/signup
+func (c *Client) EventSignup(ctx context.Context, request *EventSignup, params EventSignupParams) (EventSignupRes, error) {
+	res, err := c.sendEventSignup(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendEventSignup(ctx context.Context, request *EventSignup, params EventSignupParams) (res EventSignupRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("EventSignup"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/signup"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, EventSignupOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/signup"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "dry_run" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "dry_run",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.DryRun.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "silence_notification" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "silence_notification",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.SilenceNotification.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeEventSignupRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "EncodeHeaderParams"
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept-Language",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.AcceptLanguage.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	stage = "EncodeCookieParams"
+	cookie := uri.NewCookieEncoder(r)
+	{
+		// Encode "utm" parameter.
+		cfg := uri.CookieParameterEncodingConfig{
+			Name:    "utm",
+			Explode: true,
+		}
+
+		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Utm.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode cookie")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, EventSignupOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeEventSignupResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ExistsEventDeferredNotification invokes ExistsEventDeferredNotification operation.
+//
+// Проверка наличия отложенного уведомления.
+//
+// HEAD /events/{event_id}/deferred-notification
+func (c *Client) ExistsEventDeferredNotification(ctx context.Context, params ExistsEventDeferredNotificationParams) (ExistsEventDeferredNotificationRes, error) {
+	res, err := c.sendExistsEventDeferredNotification(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendExistsEventDeferredNotification(ctx context.Context, params ExistsEventDeferredNotificationParams) (res ExistsEventDeferredNotificationRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ExistsEventDeferredNotification"),
+		semconv.HTTPRequestMethodKey.String("HEAD"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/deferred-notification"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ExistsEventDeferredNotificationOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/deferred-notification"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "HEAD", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeExistsEventDeferredNotificationResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// IsOrganizationAdmin invokes IsOrganizationAdmin operation.
+//
+// Проверка наличия административных прав в организации.
+//
+// POST /organizations/{organization_id}/is-admin
+func (c *Client) IsOrganizationAdmin(ctx context.Context, params IsOrganizationAdminParams) (IsOrganizationAdminRes, error) {
+	res, err := c.sendIsOrganizationAdmin(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendIsOrganizationAdmin(ctx context.Context, params IsOrganizationAdminParams) (res IsOrganizationAdminRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("IsOrganizationAdmin"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/organizations/{organization_id}/is-admin"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, IsOrganizationAdminOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/organizations/"
+	{
+		// Encode "organization_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "organization_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.OrganizationID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/is-admin"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "is_owner" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "is_owner",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IsOwner.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, IsOrganizationAdminOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeIsOrganizationAdminResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// IssueAccessToken invokes IssueAccessToken operation.
+//
+// Выдача токена доступа.
+//
+// POST /oauth/issue-token
+func (c *Client) IssueAccessToken(ctx context.Context) (IssueAccessTokenRes, error) {
+	res, err := c.sendIssueAccessToken(ctx)
+	return res, err
+}
+
+func (c *Client) sendIssueAccessToken(ctx context.Context) (res IssueAccessTokenRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("IssueAccessToken"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/oauth/issue-token"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, IssueAccessTokenOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/oauth/issue-token"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeIssueAccessTokenResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ListAddAchievementEvents invokes ListAddAchievementEvents operation.
 //
 // Мероприятия, доступные для добавления достижения
 // пользователем.
 //
 // GET /events/addachievement
-func (c *Client) AddAchievementEventList(ctx context.Context, params AddAchievementEventListParams) (*AddAchievementEventListResponseHeaders, error) {
-	res, err := c.sendAddAchievementEventList(ctx, params)
+func (c *Client) ListAddAchievementEvents(ctx context.Context, params ListAddAchievementEventsParams) (*ListAddAchievementEventsHeaders, error) {
+	res, err := c.sendListAddAchievementEvents(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendAddAchievementEventList(ctx context.Context, params AddAchievementEventListParams) (res *AddAchievementEventListResponseHeaders, err error) {
+func (c *Client) sendListAddAchievementEvents(ctx context.Context, params ListAddAchievementEventsParams) (res *ListAddAchievementEventsHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("AddAchievementEventList"),
+		otelogen.OperationID("ListAddAchievementEvents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/events/addachievement"),
 	}
@@ -324,7 +4150,7 @@ func (c *Client) sendAddAchievementEventList(ctx context.Context, params AddAchi
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, AddAchievementEventListOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListAddAchievementEventsOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -560,7 +4386,7 @@ func (c *Client) sendAddAchievementEventList(ctx context.Context, params AddAchi
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeAddAchievementEventListResponse(resp)
+	result, err := decodeListAddAchievementEventsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -568,19 +4394,19 @@ func (c *Client) sendAddAchievementEventList(ctx context.Context, params AddAchi
 	return result, nil
 }
 
-// CalendarEventList invokes CalendarEventList operation.
+// ListCalendarEvents invokes ListCalendarEvents operation.
 //
 // Список мероприятий для календаря.
 //
 // GET /events/calendar
-func (c *Client) CalendarEventList(ctx context.Context, params CalendarEventListParams) (*CalendarEventListResponseHeaders, error) {
-	res, err := c.sendCalendarEventList(ctx, params)
+func (c *Client) ListCalendarEvents(ctx context.Context, params ListCalendarEventsParams) (*ListCalendarEventsHeaders, error) {
+	res, err := c.sendListCalendarEvents(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendCalendarEventList(ctx context.Context, params CalendarEventListParams) (res *CalendarEventListResponseHeaders, err error) {
+func (c *Client) sendListCalendarEvents(ctx context.Context, params ListCalendarEventsParams) (res *ListCalendarEventsHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("CalendarEventList"),
+		otelogen.OperationID("ListCalendarEvents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/events/calendar"),
 	}
@@ -597,7 +4423,7 @@ func (c *Client) sendCalendarEventList(ctx context.Context, params CalendarEvent
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, CalendarEventListOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListCalendarEventsOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -687,7 +4513,7 @@ func (c *Client) sendCalendarEventList(ctx context.Context, params CalendarEvent
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeCalendarEventListResponse(resp)
+	result, err := decodeListCalendarEventsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -695,19 +4521,19 @@ func (c *Client) sendCalendarEventList(ctx context.Context, params CalendarEvent
 	return result, nil
 }
 
-// EventBrandList invokes EventBrandList operation.
+// ListEventBrands invokes ListEventBrands operation.
 //
 // Список брендированных мероприятий.
 //
 // GET /event-brands
-func (c *Client) EventBrandList(ctx context.Context, params EventBrandListParams) (*EventBrandListResponseHeaders, error) {
-	res, err := c.sendEventBrandList(ctx, params)
+func (c *Client) ListEventBrands(ctx context.Context, params ListEventBrandsParams) (*ListEventBrandsHeaders, error) {
+	res, err := c.sendListEventBrands(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendEventBrandList(ctx context.Context, params EventBrandListParams) (res *EventBrandListResponseHeaders, err error) {
+func (c *Client) sendListEventBrands(ctx context.Context, params ListEventBrandsParams) (res *ListEventBrandsHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("EventBrandList"),
+		otelogen.OperationID("ListEventBrands"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/event-brands"),
 	}
@@ -724,7 +4550,7 @@ func (c *Client) sendEventBrandList(ctx context.Context, params EventBrandListPa
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, EventBrandListOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListEventBrandsOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -866,7 +4692,7 @@ func (c *Client) sendEventBrandList(ctx context.Context, params EventBrandListPa
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeEventBrandListResponse(resp)
+	result, err := decodeListEventBrandsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -874,678 +4700,19 @@ func (c *Client) sendEventBrandList(ctx context.Context, params EventBrandListPa
 	return result, nil
 }
 
-// EventCount invokes EventCount operation.
+// ListEventDiplomaSettings invokes ListEventDiplomaSettings operation.
 //
-// Счетчик мероприятий.
-//
-// HEAD /events
-func (c *Client) EventCount(ctx context.Context, params EventCountParams) (*EventCountOK, error) {
-	res, err := c.sendEventCount(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendEventCount(ctx context.Context, params EventCountParams) (res *EventCountOK, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("EventCount"),
-		semconv.HTTPRequestMethodKey.String("HEAD"),
-		semconv.HTTPRouteKey.String("/events"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, EventCountOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/events"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeQueryParams"
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "event_id" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "event_id",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.EventID != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.EventID {
-						if err := func() error {
-							return e.EncodeValue(conv.Int32ToString(item))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "organization_id" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "organization_id",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.OrganizationID != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.OrganizationID {
-						if err := func() error {
-							return e.EncodeValue(conv.Int32ToString(item))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "meta_event_id" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "meta_event_id",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.MetaEventID != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.MetaEventID {
-						if err := func() error {
-							return e.EncodeValue(conv.Int32ToString(item))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "venue_id" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "venue_id",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.VenueID != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.VenueID {
-						if err := func() error {
-							return e.EncodeValue(conv.Int32ToString(item))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "start_before" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "start_before",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.StartBefore.Get(); ok {
-				return e.EncodeValue(conv.DateTimeToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "end_after" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "end_after",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.EndAfter.Get(); ok {
-				return e.EncodeValue(conv.DateTimeToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "search" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "search",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Search.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "format" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "format",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Format.Get(); ok {
-				return e.EncodeValue(conv.StringToString(string(val)))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "HEAD", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeEventCountResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// EventDiplomaRoleAdd invokes EventDiplomaRoleAdd operation.
-//
-// Добавление роли для диплома мероприятия.
-//
-// PUT /events/{event_id}/diploma-role/{role_id}
-func (c *Client) EventDiplomaRoleAdd(ctx context.Context, params EventDiplomaRoleAddParams) (EventDiplomaRoleAddRes, error) {
-	res, err := c.sendEventDiplomaRoleAdd(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendEventDiplomaRoleAdd(ctx context.Context, params EventDiplomaRoleAddParams) (res EventDiplomaRoleAddRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("EventDiplomaRoleAdd"),
-		semconv.HTTPRequestMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-role/{role_id}"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, EventDiplomaRoleAddOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [4]string
-	pathParts[0] = "/events/"
-	{
-		// Encode "event_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "event_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.EventID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/diploma-role/"
-	{
-		// Encode "role_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "role_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.RoleID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[3] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "PUT", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, EventDiplomaRoleAddOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeEventDiplomaRoleAddResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// EventDiplomaRoleDelete invokes EventDiplomaRoleDelete operation.
-//
-// Удаление роли для диплома мероприятия.
-//
-// DELETE /events/{event_id}/diploma-role/{role_id}
-func (c *Client) EventDiplomaRoleDelete(ctx context.Context, params EventDiplomaRoleDeleteParams) error {
-	_, err := c.sendEventDiplomaRoleDelete(ctx, params)
-	return err
-}
-
-func (c *Client) sendEventDiplomaRoleDelete(ctx context.Context, params EventDiplomaRoleDeleteParams) (res *EventDiplomaRoleDeleteNoContent, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("EventDiplomaRoleDelete"),
-		semconv.HTTPRequestMethodKey.String("DELETE"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-role/{role_id}"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, EventDiplomaRoleDeleteOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [4]string
-	pathParts[0] = "/events/"
-	{
-		// Encode "event_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "event_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.EventID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/diploma-role/"
-	{
-		// Encode "role_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "role_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.RoleID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[3] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "DELETE", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, EventDiplomaRoleDeleteOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeEventDiplomaRoleDeleteResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// EventDiplomaSettingsCreate invokes EventDiplomaSettingsCreate operation.
-//
-// Создание настроек дипломов мероприятия.
-//
-// POST /events/{event_id}/diploma-settings
-func (c *Client) EventDiplomaSettingsCreate(ctx context.Context, request *EventDiplomaSettingsCreateReq, params EventDiplomaSettingsCreateParams) (EventDiplomaSettingsCreateRes, error) {
-	res, err := c.sendEventDiplomaSettingsCreate(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendEventDiplomaSettingsCreate(ctx context.Context, request *EventDiplomaSettingsCreateReq, params EventDiplomaSettingsCreateParams) (res EventDiplomaSettingsCreateRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("EventDiplomaSettingsCreate"),
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-settings"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, EventDiplomaSettingsCreateOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/events/"
-	{
-		// Encode "event_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "event_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.EventID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/diploma-settings"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeEventDiplomaSettingsCreateRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, EventDiplomaSettingsCreateOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeEventDiplomaSettingsCreateResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// EventDiplomaSettingsList invokes EventDiplomaSettingsList operation.
-//
-// Список настроек дипломов мероприятия.
+// Список настроек дипломов мероприятий.
 //
 // GET /events/diploma-settings
-func (c *Client) EventDiplomaSettingsList(ctx context.Context, params EventDiplomaSettingsListParams) (*EventDiplomaSettingsListOKHeaders, error) {
-	res, err := c.sendEventDiplomaSettingsList(ctx, params)
+func (c *Client) ListEventDiplomaSettings(ctx context.Context, params ListEventDiplomaSettingsParams) (*ListEventDiplomaSettingsOKHeaders, error) {
+	res, err := c.sendListEventDiplomaSettings(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendEventDiplomaSettingsList(ctx context.Context, params EventDiplomaSettingsListParams) (res *EventDiplomaSettingsListOKHeaders, err error) {
+func (c *Client) sendListEventDiplomaSettings(ctx context.Context, params ListEventDiplomaSettingsParams) (res *ListEventDiplomaSettingsOKHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("EventDiplomaSettingsList"),
+		otelogen.OperationID("ListEventDiplomaSettings"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/events/diploma-settings"),
 	}
@@ -1562,7 +4729,7 @@ func (c *Client) sendEventDiplomaSettingsList(ctx context.Context, params EventD
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, EventDiplomaSettingsListOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListEventDiplomaSettingsOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1675,7 +4842,7 @@ func (c *Client) sendEventDiplomaSettingsList(ctx context.Context, params EventD
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, EventDiplomaSettingsListOperation, r); {
+			switch err := c.securityTalentOAuth(ctx, ListEventDiplomaSettingsOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -1711,7 +4878,7 @@ func (c *Client) sendEventDiplomaSettingsList(ctx context.Context, params EventD
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeEventDiplomaSettingsListResponse(resp)
+	result, err := decodeListEventDiplomaSettingsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1719,21 +4886,21 @@ func (c *Client) sendEventDiplomaSettingsList(ctx context.Context, params EventD
 	return result, nil
 }
 
-// EventDiplomaSettingsRead invokes EventDiplomaSettingsRead operation.
+// ListEventFields invokes ListEventFields operation.
 //
-// Чтение настроек дипломов мероприятия.
+// Список полей анкеты мероприятия.
 //
-// GET /events/{event_id}/diploma-settings
-func (c *Client) EventDiplomaSettingsRead(ctx context.Context, params EventDiplomaSettingsReadParams) (EventDiplomaSettingsReadRes, error) {
-	res, err := c.sendEventDiplomaSettingsRead(ctx, params)
+// GET /events/{event_id}/fields
+func (c *Client) ListEventFields(ctx context.Context, params ListEventFieldsParams) ([]EventFieldListed, error) {
+	res, err := c.sendListEventFields(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendEventDiplomaSettingsRead(ctx context.Context, params EventDiplomaSettingsReadParams) (res EventDiplomaSettingsReadRes, err error) {
+func (c *Client) sendListEventFields(ctx context.Context, params ListEventFieldsParams) (res []EventFieldListed, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("EventDiplomaSettingsRead"),
+		otelogen.OperationID("ListEventFields"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-settings"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/fields"),
 	}
 
 	// Run stopwatch.
@@ -1748,7 +4915,7 @@ func (c *Client) sendEventDiplomaSettingsRead(ctx context.Context, params EventD
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, EventDiplomaSettingsReadOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListEventFieldsOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1785,7 +4952,7 @@ func (c *Client) sendEventDiplomaSettingsRead(ctx context.Context, params EventD
 		}
 		pathParts[1] = encoded
 	}
-	pathParts[2] = "/diploma-settings"
+	pathParts[2] = "/fields"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
@@ -1794,39 +4961,6 @@ func (c *Client) sendEventDiplomaSettingsRead(ctx context.Context, params EventD
 		return res, errors.Wrap(err, "create request")
 	}
 
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, EventDiplomaSettingsReadOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -1835,7 +4969,7 @@ func (c *Client) sendEventDiplomaSettingsRead(ctx context.Context, params EventD
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeEventDiplomaSettingsReadResponse(resp)
+	result, err := decodeListEventFieldsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1843,588 +4977,19 @@ func (c *Client) sendEventDiplomaSettingsRead(ctx context.Context, params EventD
 	return result, nil
 }
 
-// EventDiplomaSettingsUpdate invokes EventDiplomaSettingsUpdate operation.
-//
-// Обновление настроек дипломов мероприятия.
-//
-// PATCH /events/{event_id}/diploma-settings
-func (c *Client) EventDiplomaSettingsUpdate(ctx context.Context, request *EventDiplomaSettingsUpdateReq, params EventDiplomaSettingsUpdateParams) (EventDiplomaSettingsUpdateRes, error) {
-	res, err := c.sendEventDiplomaSettingsUpdate(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendEventDiplomaSettingsUpdate(ctx context.Context, request *EventDiplomaSettingsUpdateReq, params EventDiplomaSettingsUpdateParams) (res EventDiplomaSettingsUpdateRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("EventDiplomaSettingsUpdate"),
-		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-settings"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, EventDiplomaSettingsUpdateOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/events/"
-	{
-		// Encode "event_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "event_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.EventID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/diploma-settings"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "PATCH", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeEventDiplomaSettingsUpdateRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, EventDiplomaSettingsUpdateOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeEventDiplomaSettingsUpdateResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// EventList invokes EventList operation.
-//
-// Если не указан критерий сортировки результатов `order_by`,
-// то он определяется в зависимости от указания других
-// параметров.
-// По-умолчанию результаты сортируются по
-// идентификаторам в порядке возрастания (`id_asc`).
-// Но если указан поисковый запрос и не используется
-// параметр `id_offset`,
-// то результаты сортируются по релевантности к
-// поисковому запросу (`relevant`).
-// При явном указании `order_by`, его значение должно
-// соответствовать требованиям:
-// - с параметром `id_offset` допускается только `order_by=id_asc`
-// - вариант `order_by=relevant` доступен только при указании
-// параметра `search`.
-//
-// GET /events
-func (c *Client) EventList(ctx context.Context, params EventListParams) (*EventListResponseHeaders, error) {
-	res, err := c.sendEventList(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendEventList(ctx context.Context, params EventListParams) (res *EventListResponseHeaders, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("EventList"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, EventListOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/events"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeQueryParams"
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "event_id" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "event_id",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.EventID != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.EventID {
-						if err := func() error {
-							return e.EncodeValue(conv.Int32ToString(item))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "organization_id" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "organization_id",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.OrganizationID != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.OrganizationID {
-						if err := func() error {
-							return e.EncodeValue(conv.Int32ToString(item))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "meta_event_id" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "meta_event_id",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.MetaEventID != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.MetaEventID {
-						if err := func() error {
-							return e.EncodeValue(conv.Int32ToString(item))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "venue_id" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "venue_id",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.VenueID != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.VenueID {
-						if err := func() error {
-							return e.EncodeValue(conv.Int32ToString(item))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "start_before" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "start_before",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.StartBefore.Get(); ok {
-				return e.EncodeValue(conv.DateTimeToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "end_after" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "end_after",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.EndAfter.Get(); ok {
-				return e.EncodeValue(conv.DateTimeToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "search" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "search",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Search.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "format" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "format",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Format.Get(); ok {
-				return e.EncodeValue(conv.StringToString(string(val)))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "id_offset" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "id_offset",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.IDOffset.Get(); ok {
-				return e.EncodeValue(conv.Int32ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "offset" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "offset",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Offset.Get(); ok {
-				return e.EncodeValue(conv.Int32ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "limit" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "limit",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Limit.Get(); ok {
-				return e.EncodeValue(conv.Int32ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "order_by" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "order_by",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.OrderBy.Get(); ok {
-				return e.EncodeValue(conv.StringToString(string(val)))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeEventListResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// EventRetrieve invokes EventRetrieve operation.
-//
-// По умолчанию возвращаются только метаданные.
-// Для получения полного набора свойств используйте
-// параметр `extend`.
-//
-// GET /events/{event_id}
-func (c *Client) EventRetrieve(ctx context.Context, params EventRetrieveParams) (EventRetrieveRes, error) {
-	res, err := c.sendEventRetrieve(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendEventRetrieve(ctx context.Context, params EventRetrieveParams) (res EventRetrieveRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("EventRetrieve"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events/{event_id}"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, EventRetrieveOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [2]string
-	pathParts[0] = "/events/"
-	{
-		// Encode "event_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "event_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.EventID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeQueryParams"
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "extend" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "extend",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Extend.Get(); ok {
-				return e.EncodeValue(conv.BoolToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeEventRetrieveResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// EventRouteList invokes EventRouteList operation.
+// ListEventRoutes invokes ListEventRoutes operation.
 //
 // Список направлений мероприятий.
 //
 // GET /event-routes
-func (c *Client) EventRouteList(ctx context.Context, params EventRouteListParams) (*EventRouteListResponseHeaders, error) {
-	res, err := c.sendEventRouteList(ctx, params)
+func (c *Client) ListEventRoutes(ctx context.Context, params ListEventRoutesParams) (*ListEventRoutesHeaders, error) {
+	res, err := c.sendListEventRoutes(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendEventRouteList(ctx context.Context, params EventRouteListParams) (res *EventRouteListResponseHeaders, err error) {
+func (c *Client) sendListEventRoutes(ctx context.Context, params ListEventRoutesParams) (res *ListEventRoutesHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("EventRouteList"),
+		otelogen.OperationID("ListEventRoutes"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/event-routes"),
 	}
@@ -2441,7 +5006,7 @@ func (c *Client) sendEventRouteList(ctx context.Context, params EventRouteListPa
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, EventRouteListOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListEventRoutesOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -2583,7 +5148,7 @@ func (c *Client) sendEventRouteList(ctx context.Context, params EventRouteListPa
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeEventRouteListResponse(resp)
+	result, err := decodeListEventRoutesResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -2591,21 +5156,34 @@ func (c *Client) sendEventRouteList(ctx context.Context, params EventRouteListPa
 	return result, nil
 }
 
-// FileConfirmUpload invokes FileConfirmUpload operation.
+// ListEvents invokes ListEvents operation.
 //
-// Подтверждение загрузки файла.
+// Если не указан критерий сортировки результатов `order_by`,
+// то он определяется в зависимости от указания других
+// параметров.
+// По-умолчанию результаты сортируются по
+// идентификаторам в порядке возрастания (`id_asc`).
+// Но если указан поисковый запрос и не используется
+// параметр `id_offset`,
+// то результаты сортируются по релевантности к
+// поисковому запросу (`relevant`).
+// При явном указании `order_by`, его значение должно
+// соответствовать требованиям:
+// - с параметром `id_offset` допускается только `order_by=id_asc`
+// - вариант `order_by=relevant` доступен только при указании
+// параметра `search`.
 //
-// POST /files/{file_id}/confirm-upload
-func (c *Client) FileConfirmUpload(ctx context.Context, params FileConfirmUploadParams) (FileConfirmUploadRes, error) {
-	res, err := c.sendFileConfirmUpload(ctx, params)
+// GET /events
+func (c *Client) ListEvents(ctx context.Context, params ListEventsParams) (ListEventsRes, error) {
+	res, err := c.sendListEvents(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendFileConfirmUpload(ctx context.Context, params FileConfirmUploadParams) (res FileConfirmUploadRes, err error) {
+func (c *Client) sendListEvents(ctx context.Context, params ListEventsParams) (res ListEventsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("FileConfirmUpload"),
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/files/{file_id}/confirm-upload"),
+		otelogen.OperationID("ListEvents"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/events"),
 	}
 
 	// Run stopwatch.
@@ -2620,131 +5198,7 @@ func (c *Client) sendFileConfirmUpload(ctx context.Context, params FileConfirmUp
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, FileConfirmUploadOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/files/"
-	{
-		// Encode "file_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "file_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.UUIDToString(params.FileID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/confirm-upload"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, FileConfirmUploadOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeFileConfirmUploadResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// FileMetaCreate invokes FileMetaCreate operation.
-//
-// Создание файла.
-//
-// POST /files
-func (c *Client) FileMetaCreate(ctx context.Context, request *FileMetaCreateReq) (*FileMetaCreateCreated, error) {
-	res, err := c.sendFileMetaCreate(ctx, request)
-	return res, err
-}
-
-func (c *Client) sendFileMetaCreate(ctx context.Context, request *FileMetaCreateReq) (res *FileMetaCreateCreated, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("FileMetaCreate"),
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/files"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, FileMetaCreateOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListEventsOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -2762,49 +5216,257 @@ func (c *Client) sendFileMetaCreate(ctx context.Context, request *FileMetaCreate
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/files"
+	pathParts[0] = "/events"
 	uri.AddPathParts(u, pathParts[:]...)
 
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "event_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "event_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.EventID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.EventID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "organization_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "organization_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.OrganizationID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.OrganizationID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "meta_event_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "meta_event_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.MetaEventID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.MetaEventID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "venue_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "venue_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.VenueID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.VenueID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "start_before" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "start_before",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.StartBefore.Get(); ok {
+				return e.EncodeValue(conv.DateTimeToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "end_after" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "end_after",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.EndAfter.Get(); ok {
+				return e.EncodeValue(conv.DateTimeToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "search" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "search",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Search.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "format" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "format",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Format.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "id_offset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "id_offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IDOffset.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "offset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Offset.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "limit" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Limit.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "order_by" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "order_by",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.OrderBy.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeFileMetaCreateRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, FileMetaCreateOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
 	}
 
 	stage = "SendRequest"
@@ -2815,7 +5477,7 @@ func (c *Client) sendFileMetaCreate(ctx context.Context, request *FileMetaCreate
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeFileMetaCreateResponse(resp)
+	result, err := decodeListEventsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -2823,19 +5485,25 @@ func (c *Client) sendFileMetaCreate(ctx context.Context, request *FileMetaCreate
 	return result, nil
 }
 
-// FileMetaList invokes FileMetaList operation.
+// ListFileMeta invokes ListFileMeta operation.
 //
-// Список файлов.
+// #### Неаутентифицированный запрос публичных файлов
+// Допускается запрос без аутентификации при
+// соблюдении условий:
+// - присутствуют значения параметра `file_id`
+// - параметр `is_public` отсутствует либо содержит `true`
+// При несоблюдении какого-либо из условий,
+// возвращается `401` ответ.
 //
 // GET /files
-func (c *Client) FileMetaList(ctx context.Context, params FileMetaListParams) (*FileMetaListOKHeaders, error) {
-	res, err := c.sendFileMetaList(ctx, params)
+func (c *Client) ListFileMeta(ctx context.Context, params ListFileMetaParams) (ListFileMetaRes, error) {
+	res, err := c.sendListFileMeta(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendFileMetaList(ctx context.Context, params FileMetaListParams) (res *FileMetaListOKHeaders, err error) {
+func (c *Client) sendListFileMeta(ctx context.Context, params ListFileMetaParams) (res ListFileMetaRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("FileMetaList"),
+		otelogen.OperationID("ListFileMeta"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/files"),
 	}
@@ -2852,7 +5520,7 @@ func (c *Client) sendFileMetaList(ctx context.Context, params FileMetaListParams
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, FileMetaListOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListFileMetaOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -2875,6 +5543,32 @@ func (c *Client) sendFileMetaList(ctx context.Context, params FileMetaListParams
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
+	{
+		// Encode "file_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "file_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.FileID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.FileID {
+						if err := func() error {
+							return e.EncodeValue(conv.UUIDToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
 	{
 		// Encode "is_public" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
@@ -2902,6 +5596,57 @@ func (c *Client) sendFileMetaList(ctx context.Context, params FileMetaListParams
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Namespace.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "namespace_startswith" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "namespace_startswith",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.NamespaceStartswith.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "name_like" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "name_like",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.NameLike.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "ext" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "ext",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Ext.Get(); ok {
 				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
@@ -2973,131 +5718,7 @@ func (c *Client) sendFileMetaList(ctx context.Context, params FileMetaListParams
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, FileMetaListOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeFileMetaListResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// FileMetaRead invokes FileMetaRead operation.
-//
-// Чтение информации о файле.
-//
-// GET /files/{file_id}/meta
-func (c *Client) FileMetaRead(ctx context.Context, params FileMetaReadParams) (FileMetaReadRes, error) {
-	res, err := c.sendFileMetaRead(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendFileMetaRead(ctx context.Context, params FileMetaReadParams) (res FileMetaReadRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("FileMetaRead"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/files/{file_id}/meta"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, FileMetaReadOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/files/"
-	{
-		// Encode "file_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "file_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.UUIDToString(params.FileID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/meta"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, FileMetaReadOperation, r); {
+			switch err := c.securityTalentOAuth(ctx, ListFileMetaOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -3134,7 +5755,7 @@ func (c *Client) sendFileMetaRead(ctx context.Context, params FileMetaReadParams
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeFileMetaReadResponse(resp)
+	result, err := decodeListFileMetaResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -3142,683 +5763,19 @@ func (c *Client) sendFileMetaRead(ctx context.Context, params FileMetaReadParams
 	return result, nil
 }
 
-// FileMetaUpdate invokes FileMetaUpdate operation.
-//
-// Обновление информации о файле.
-//
-// PATCH /files/{file_id}/meta
-func (c *Client) FileMetaUpdate(ctx context.Context, request *FileMetaUpdateReq, params FileMetaUpdateParams) (FileMetaUpdateRes, error) {
-	res, err := c.sendFileMetaUpdate(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendFileMetaUpdate(ctx context.Context, request *FileMetaUpdateReq, params FileMetaUpdateParams) (res FileMetaUpdateRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("FileMetaUpdate"),
-		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.HTTPRouteKey.String("/files/{file_id}/meta"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, FileMetaUpdateOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/files/"
-	{
-		// Encode "file_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "file_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.UUIDToString(params.FileID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/meta"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "PATCH", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeFileMetaUpdateRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, FileMetaUpdateOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeFileMetaUpdateResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// FileRead invokes FileRead operation.
-//
-// Получение ссылки на файл.
-//
-// GET /files/{file_id}
-func (c *Client) FileRead(ctx context.Context, params FileReadParams) (FileReadRes, error) {
-	res, err := c.sendFileRead(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendFileRead(ctx context.Context, params FileReadParams) (res FileReadRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("FileRead"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/files/{file_id}"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, FileReadOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [2]string
-	pathParts[0] = "/files/"
-	{
-		// Encode "file_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "file_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.UUIDToString(params.FileID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, FileReadOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-				{},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeFileReadResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// FileReferenceCreate invokes FileReferenceCreate operation.
-//
-// Добавление ссылки на файл.
-//
-// PUT /files/{file_id}/references/{object_id}
-func (c *Client) FileReferenceCreate(ctx context.Context, params FileReferenceCreateParams) (FileReferenceCreateRes, error) {
-	res, err := c.sendFileReferenceCreate(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendFileReferenceCreate(ctx context.Context, params FileReferenceCreateParams) (res FileReferenceCreateRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("FileReferenceCreate"),
-		semconv.HTTPRequestMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/files/{file_id}/references/{object_id}"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, FileReferenceCreateOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [4]string
-	pathParts[0] = "/files/"
-	{
-		// Encode "file_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "file_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.UUIDToString(params.FileID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/references/"
-	{
-		// Encode "object_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "object_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ObjectID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[3] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "PUT", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, FileReferenceCreateOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeFileReferenceCreateResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// FileReferenceDelete invokes FileReferenceDelete operation.
-//
-// Удаление ссылки на файл.
-//
-// DELETE /files/{file_id}/references/{object_id}
-func (c *Client) FileReferenceDelete(ctx context.Context, params FileReferenceDeleteParams) (FileReferenceDeleteRes, error) {
-	res, err := c.sendFileReferenceDelete(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendFileReferenceDelete(ctx context.Context, params FileReferenceDeleteParams) (res FileReferenceDeleteRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("FileReferenceDelete"),
-		semconv.HTTPRequestMethodKey.String("DELETE"),
-		semconv.HTTPRouteKey.String("/files/{file_id}/references/{object_id}"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, FileReferenceDeleteOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [4]string
-	pathParts[0] = "/files/"
-	{
-		// Encode "file_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "file_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.UUIDToString(params.FileID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/references/"
-	{
-		// Encode "object_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "object_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ObjectID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[3] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "DELETE", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, FileReferenceDeleteOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeFileReferenceDeleteResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// FileUpload invokes FileUpload operation.
-//
-// Позволяет повторно получить ссылку на загрузку того
-// же файла или сформировать
-// ссылку для загрузки новой версии файла (того же типа,
-// но другого размера).
-//
-// PUT /files/{file_id}
-func (c *Client) FileUpload(ctx context.Context, request *FileUploadReq, params FileUploadParams) (FileUploadRes, error) {
-	res, err := c.sendFileUpload(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendFileUpload(ctx context.Context, request *FileUploadReq, params FileUploadParams) (res FileUploadRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("FileUpload"),
-		semconv.HTTPRequestMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/files/{file_id}"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, FileUploadOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [2]string
-	pathParts[0] = "/files/"
-	{
-		// Encode "file_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "file_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.UUIDToString(params.FileID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "PUT", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeFileUploadRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, FileUploadOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeFileUploadResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// OrganizationEventList invokes OrganizationEventList operation.
+// ListOrganizationEvents invokes ListOrganizationEvents operation.
 //
 // Список мероприятий организации.
 //
 // GET /events/organizations/{organization_id}
-func (c *Client) OrganizationEventList(ctx context.Context, params OrganizationEventListParams) (*OrganizationEventListResponseHeaders, error) {
-	res, err := c.sendOrganizationEventList(ctx, params)
+func (c *Client) ListOrganizationEvents(ctx context.Context, params ListOrganizationEventsParams) (*ListOrganizationEventsHeaders, error) {
+	res, err := c.sendListOrganizationEvents(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendOrganizationEventList(ctx context.Context, params OrganizationEventListParams) (res *OrganizationEventListResponseHeaders, err error) {
+func (c *Client) sendListOrganizationEvents(ctx context.Context, params ListOrganizationEventsParams) (res *ListOrganizationEventsHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("OrganizationEventList"),
+		otelogen.OperationID("ListOrganizationEvents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/events/organizations/{organization_id}"),
 	}
@@ -3835,7 +5792,7 @@ func (c *Client) sendOrganizationEventList(ctx context.Context, params Organizat
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, OrganizationEventListOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListOrganizationEventsOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -4054,7 +6011,7 @@ func (c *Client) sendOrganizationEventList(ctx context.Context, params Organizat
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeOrganizationEventListResponse(resp)
+	result, err := decodeListOrganizationEventsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -4062,21 +6019,21 @@ func (c *Client) sendOrganizationEventList(ctx context.Context, params Organizat
 	return result, nil
 }
 
-// OrganizationIsAdmin invokes OrganizationIsAdmin operation.
+// ListOrganizationSubjects invokes ListOrganizationSubjects operation.
 //
-// Проверка наличия административных прав в организации.
+// Список связей организаций и тематик.
 //
-// POST /organizations/{organization_id}/is-admin
-func (c *Client) OrganizationIsAdmin(ctx context.Context, params OrganizationIsAdminParams) (OrganizationIsAdminRes, error) {
-	res, err := c.sendOrganizationIsAdmin(ctx, params)
+// GET /organization-subjects
+func (c *Client) ListOrganizationSubjects(ctx context.Context, params ListOrganizationSubjectsParams) (*ListOrganizationSubjectsHeaders, error) {
+	res, err := c.sendListOrganizationSubjects(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendOrganizationIsAdmin(ctx context.Context, params OrganizationIsAdminParams) (res OrganizationIsAdminRes, err error) {
+func (c *Client) sendListOrganizationSubjects(ctx context.Context, params ListOrganizationSubjectsParams) (res *ListOrganizationSubjectsHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("OrganizationIsAdmin"),
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/organizations/{organization_id}/is-admin"),
+		otelogen.OperationID("ListOrganizationSubjects"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/organization-subjects"),
 	}
 
 	// Run stopwatch.
@@ -4091,7 +6048,7 @@ func (c *Client) sendOrganizationIsAdmin(ctx context.Context, params Organizatio
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, OrganizationIsAdminOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListOrganizationSubjectsOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -4108,42 +6065,109 @@ func (c *Client) sendOrganizationIsAdmin(ctx context.Context, params Organizatio
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/organizations/"
-	{
-		// Encode "organization_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "organization_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.OrganizationID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/is-admin"
+	var pathParts [1]string
+	pathParts[0] = "/organization-subjects"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
 	{
-		// Encode "is_owner" parameter.
+		// Encode "id_offset" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "is_owner",
+			Name:    "id_offset",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.IsOwner.Get(); ok {
-				return e.EncodeValue(conv.BoolToString(val))
+			if val, ok := params.IDOffset.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "offset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Offset.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "limit" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Limit.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "organization_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "organization_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.OrganizationID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.OrganizationID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "subject_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "subject_id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.SubjectID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.SubjectID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
 			}
 			return nil
 		}); err != nil {
@@ -4153,42 +6177,9 @@ func (c *Client) sendOrganizationIsAdmin(ctx context.Context, params Organizatio
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, OrganizationIsAdminOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
 	}
 
 	stage = "SendRequest"
@@ -4199,7 +6190,7 @@ func (c *Client) sendOrganizationIsAdmin(ctx context.Context, params Organizatio
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeOrganizationIsAdminResponse(resp)
+	result, err := decodeListOrganizationSubjectsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -4207,19 +6198,19 @@ func (c *Client) sendOrganizationIsAdmin(ctx context.Context, params Organizatio
 	return result, nil
 }
 
-// OrganizationList invokes OrganizationList operation.
+// ListOrganizations invokes ListOrganizations operation.
 //
 // Список организаций.
 //
 // GET /organizations
-func (c *Client) OrganizationList(ctx context.Context, params OrganizationListParams) (*OrganizationListResponseHeaders, error) {
-	res, err := c.sendOrganizationList(ctx, params)
+func (c *Client) ListOrganizations(ctx context.Context, params ListOrganizationsParams) (ListOrganizationsRes, error) {
+	res, err := c.sendListOrganizations(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendOrganizationList(ctx context.Context, params OrganizationListParams) (res *OrganizationListResponseHeaders, err error) {
+func (c *Client) sendListOrganizations(ctx context.Context, params ListOrganizationsParams) (res ListOrganizationsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("OrganizationList"),
+		otelogen.OperationID("ListOrganizations"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/organizations"),
 	}
@@ -4236,7 +6227,7 @@ func (c *Client) sendOrganizationList(ctx context.Context, params OrganizationLi
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, OrganizationListOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListOrganizationsOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -4386,7 +6377,7 @@ func (c *Client) sendOrganizationList(ctx context.Context, params OrganizationLi
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeOrganizationListResponse(resp)
+	result, err := decodeListOrganizationsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -4394,398 +6385,19 @@ func (c *Client) sendOrganizationList(ctx context.Context, params OrganizationLi
 	return result, nil
 }
 
-// OrganizationSubjectCreate invokes OrganizationSubjectCreate operation.
-//
-// > Запрос необходимо выполнять от ментора или
-// владельца организации,
-// > указываемой в свойстве `organization_id` тела запроса.
-//
-// POST /organization-subjects
-func (c *Client) OrganizationSubjectCreate(ctx context.Context, request *OrganizationSubjectBody) (OrganizationSubjectCreateRes, error) {
-	res, err := c.sendOrganizationSubjectCreate(ctx, request)
-	return res, err
-}
-
-func (c *Client) sendOrganizationSubjectCreate(ctx context.Context, request *OrganizationSubjectBody) (res OrganizationSubjectCreateRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("OrganizationSubjectCreate"),
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/organization-subjects"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, OrganizationSubjectCreateOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/organization-subjects"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeOrganizationSubjectCreateRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, OrganizationSubjectCreateOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TalentOAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeOrganizationSubjectCreateResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// OrganizationSubjectList invokes OrganizationSubjectList operation.
-//
-// Список связей организаций и тематик.
-//
-// GET /organization-subjects
-func (c *Client) OrganizationSubjectList(ctx context.Context, params OrganizationSubjectListParams) (*OrganizationSubjectListResponseHeaders, error) {
-	res, err := c.sendOrganizationSubjectList(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendOrganizationSubjectList(ctx context.Context, params OrganizationSubjectListParams) (res *OrganizationSubjectListResponseHeaders, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("OrganizationSubjectList"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/organization-subjects"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, OrganizationSubjectListOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/organization-subjects"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeQueryParams"
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "id_offset" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "id_offset",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.IDOffset.Get(); ok {
-				return e.EncodeValue(conv.Int32ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "offset" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "offset",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Offset.Get(); ok {
-				return e.EncodeValue(conv.Int32ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "limit" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "limit",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Limit.Get(); ok {
-				return e.EncodeValue(conv.Int32ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "organization_id" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "organization_id",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.OrganizationID != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.OrganizationID {
-						if err := func() error {
-							return e.EncodeValue(conv.Int32ToString(item))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "subject_id" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "subject_id",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.SubjectID != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.SubjectID {
-						if err := func() error {
-							return e.EncodeValue(conv.Int32ToString(item))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeOrganizationSubjectListResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// PersonRead invokes PersonRead operation.
-//
-// Чтение персоны пользователя.
-//
-// GET /persons/{person_id}
-func (c *Client) PersonRead(ctx context.Context, params PersonReadParams) (PersonReadRes, error) {
-	res, err := c.sendPersonRead(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendPersonRead(ctx context.Context, params PersonReadParams) (res PersonReadRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("PersonRead"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/persons/{person_id}"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, PersonReadOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [2]string
-	pathParts[0] = "/persons/"
-	{
-		// Encode "person_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "person_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.PersonID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodePersonReadResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// SocialAuthList invokes SocialAuthList operation.
+// ListSocialAuths invokes ListSocialAuths operation.
 //
 // Список авторизаций пользователя в соц. сетях.
 //
 // GET /social-auths/{user_id}
-func (c *Client) SocialAuthList(ctx context.Context, params SocialAuthListParams) (SocialAuthListRes, error) {
-	res, err := c.sendSocialAuthList(ctx, params)
+func (c *Client) ListSocialAuths(ctx context.Context, params ListSocialAuthsParams) (ListSocialAuthsRes, error) {
+	res, err := c.sendListSocialAuths(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendSocialAuthList(ctx context.Context, params SocialAuthListParams) (res SocialAuthListRes, err error) {
+func (c *Client) sendListSocialAuths(ctx context.Context, params ListSocialAuthsParams) (res ListSocialAuthsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("SocialAuthList"),
+		otelogen.OperationID("ListSocialAuths"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/social-auths/{user_id}"),
 	}
@@ -4802,7 +6414,7 @@ func (c *Client) sendSocialAuthList(ctx context.Context, params SocialAuthListPa
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, SocialAuthListOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListSocialAuthsOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -4924,7 +6536,7 @@ func (c *Client) sendSocialAuthList(ctx context.Context, params SocialAuthListPa
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, SocialAuthListOperation, r); {
+			switch err := c.securityTalentOAuth(ctx, ListSocialAuthsOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -4935,7 +6547,7 @@ func (c *Client) sendSocialAuthList(ctx context.Context, params SocialAuthListPa
 		}
 		{
 			stage = "Security:ClientCredentials"
-			switch err := c.securityClientCredentials(ctx, SocialAuthListOperation, r); {
+			switch err := c.securityClientCredentials(ctx, ListSocialAuthsOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 1
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -4972,7 +6584,7 @@ func (c *Client) sendSocialAuthList(ctx context.Context, params SocialAuthListPa
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeSocialAuthListResponse(resp)
+	result, err := decodeListSocialAuthsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -4980,19 +6592,19 @@ func (c *Client) sendSocialAuthList(ctx context.Context, params SocialAuthListPa
 	return result, nil
 }
 
-// SubjectList invokes SubjectList operation.
+// ListSubjects invokes ListSubjects operation.
 //
 // Список тематик для организаций.
 //
 // GET /subjects
-func (c *Client) SubjectList(ctx context.Context, params SubjectListParams) (*SubjectListResponseHeaders, error) {
-	res, err := c.sendSubjectList(ctx, params)
+func (c *Client) ListSubjects(ctx context.Context, params ListSubjectsParams) (*ListSubjectsHeaders, error) {
+	res, err := c.sendListSubjects(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendSubjectList(ctx context.Context, params SubjectListParams) (res *SubjectListResponseHeaders, err error) {
+func (c *Client) sendListSubjects(ctx context.Context, params ListSubjectsParams) (res *ListSubjectsHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("SubjectList"),
+		otelogen.OperationID("ListSubjects"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/subjects"),
 	}
@@ -5009,7 +6621,7 @@ func (c *Client) sendSubjectList(ctx context.Context, params SubjectListParams) 
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, SubjectListOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListSubjectsOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -5099,7 +6711,7 @@ func (c *Client) sendSubjectList(ctx context.Context, params SubjectListParams) 
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeSubjectListResponse(resp)
+	result, err := decodeListSubjectsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -5107,21 +6719,21 @@ func (c *Client) sendSubjectList(ctx context.Context, params SubjectListParams) 
 	return result, nil
 }
 
-// TeamContactValidate invokes TeamContactValidate operation.
+// ListUserConsents invokes ListUserConsents operation.
 //
-// Валидация контактной ссылки.
+// Список согласий пользователя.
 //
-// POST /teams/contact-validate
-func (c *Client) TeamContactValidate(ctx context.Context, request TeamContactLink) (TeamContactValidateRes, error) {
-	res, err := c.sendTeamContactValidate(ctx, request)
+// GET /users/{user_id}/consents
+func (c *Client) ListUserConsents(ctx context.Context, params ListUserConsentsParams) (ListUserConsentsRes, error) {
+	res, err := c.sendListUserConsents(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendTeamContactValidate(ctx context.Context, request TeamContactLink) (res TeamContactValidateRes, err error) {
+func (c *Client) sendListUserConsents(ctx context.Context, params ListUserConsentsParams) (res ListUserConsentsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("TeamContactValidate"),
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/teams/contact-validate"),
+		otelogen.OperationID("ListUserConsents"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/users/{user_id}/consents"),
 	}
 
 	// Run stopwatch.
@@ -5136,7 +6748,7 @@ func (c *Client) sendTeamContactValidate(ctx context.Context, request TeamContac
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, TeamContactValidateOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ListUserConsentsOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -5153,17 +6765,66 @@ func (c *Client) sendTeamContactValidate(ctx context.Context, request TeamContac
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/teams/contact-validate"
+	var pathParts [3]string
+	pathParts[0] = "/users/"
+	{
+		// Encode "user_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "user_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.UserID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/consents"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeTeamContactValidateRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ListUserConsentsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
 	}
 
 	stage = "SendRequest"
@@ -5174,7 +6835,7 @@ func (c *Client) sendTeamContactValidate(ctx context.Context, request TeamContac
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeTeamContactValidateResponse(resp)
+	result, err := decodeListUserConsentsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -5182,21 +6843,1135 @@ func (c *Client) sendTeamContactValidate(ctx context.Context, request TeamContac
 	return result, nil
 }
 
-// TeamRead invokes TeamRead operation.
+// LoginSocialAuth invokes LoginSocialAuth operation.
+//
+// Авторизация во внешнем провайдере.
+//
+// GET /auth/login/{provider}
+func (c *Client) LoginSocialAuth(ctx context.Context, params LoginSocialAuthParams) (LoginSocialAuthRes, error) {
+	res, err := c.sendLoginSocialAuth(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendLoginSocialAuth(ctx context.Context, params LoginSocialAuthParams) (res LoginSocialAuthRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("LoginSocialAuth"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/auth/login/{provider}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, LoginSocialAuthOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/auth/login/"
+	{
+		// Encode "provider" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "provider",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.Provider))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "next" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "next",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Next.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "reg_next" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "reg_next",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.RegNext.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "err_next" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "err_next",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.ErrNext.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeLoginSocialAuthResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PatchMutationLock invokes PatchMutationLock operation.
+//
+// Изначально блокировка создается в состоянии
+// активной.
+// После создания, состояние можно декактивировать и
+// активировать обратно.
+// > Неактивная блокировка равнозначна ее отсутствию.
+//
+// PATCH /mutation-locks/{object_namespace}/{object_key}
+func (c *Client) PatchMutationLock(ctx context.Context, request *PatchMutationLockReq, params PatchMutationLockParams) (PatchMutationLockRes, error) {
+	res, err := c.sendPatchMutationLock(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPatchMutationLock(ctx context.Context, request *PatchMutationLockReq, params PatchMutationLockParams) (res PatchMutationLockRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PatchMutationLock"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.HTTPRouteKey.String("/mutation-locks/{object_namespace}/{object_key}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, PatchMutationLockOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/mutation-locks/"
+	{
+		// Encode "object_namespace" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "object_namespace",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ObjectNamespace))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/"
+	{
+		// Encode "object_key" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "object_key",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ObjectKey))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePatchMutationLockRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:ClientCredentials"
+			switch err := c.securityClientCredentials(ctx, PatchMutationLockOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"ClientCredentials\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodePatchMutationLockResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ReadEvent invokes ReadEvent operation.
+//
+// По умолчанию возвращаются только метаданные.
+// Для получения полного набора свойств используйте
+// параметр `extend`.
+//
+// GET /events/{event_id}
+func (c *Client) ReadEvent(ctx context.Context, params ReadEventParams) (ReadEventRes, error) {
+	res, err := c.sendReadEvent(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendReadEvent(ctx context.Context, params ReadEventParams) (res ReadEventRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ReadEvent"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/events/{event_id}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ReadEventOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "extend" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "extend",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Extend.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeReadEventResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ReadEventDeferredNotification invokes ReadEventDeferredNotification operation.
+//
+// Чтение отложенного уведомления.
+//
+// GET /events/{event_id}/deferred-notification
+func (c *Client) ReadEventDeferredNotification(ctx context.Context, params ReadEventDeferredNotificationParams) (ReadEventDeferredNotificationRes, error) {
+	res, err := c.sendReadEventDeferredNotification(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendReadEventDeferredNotification(ctx context.Context, params ReadEventDeferredNotificationParams) (res ReadEventDeferredNotificationRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ReadEventDeferredNotification"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/deferred-notification"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ReadEventDeferredNotificationOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/deferred-notification"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ReadEventDeferredNotificationOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeReadEventDeferredNotificationResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ReadEventDiplomaSettings invokes ReadEventDiplomaSettings operation.
+//
+// Чтение настроек дипломов мероприятия.
+//
+// GET /events/{event_id}/diploma-settings
+func (c *Client) ReadEventDiplomaSettings(ctx context.Context, params ReadEventDiplomaSettingsParams) (ReadEventDiplomaSettingsRes, error) {
+	res, err := c.sendReadEventDiplomaSettings(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendReadEventDiplomaSettings(ctx context.Context, params ReadEventDiplomaSettingsParams) (res ReadEventDiplomaSettingsRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ReadEventDiplomaSettings"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-settings"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ReadEventDiplomaSettingsOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/diploma-settings"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ReadEventDiplomaSettingsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeReadEventDiplomaSettingsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ReadEventLimit invokes ReadEventLimit operation.
+//
+// Чтение лимитов мероприятия.
+//
+// GET /events/{event_id}/limit
+func (c *Client) ReadEventLimit(ctx context.Context, params ReadEventLimitParams) (ReadEventLimitRes, error) {
+	res, err := c.sendReadEventLimit(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendReadEventLimit(ctx context.Context, params ReadEventLimitParams) (res ReadEventLimitRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ReadEventLimit"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/limit"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ReadEventLimitOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/limit"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeReadEventLimitResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ReadFile invokes ReadFile operation.
+//
+// По-умолчанию возвращается в форме `307` ответа.
+// С параметром `noredir=true` возвращается `200`.
+// Чтение приватного файла требует прохождение
+// авторизации.
+// Аутентифицированный пользователь должен быть
+// владельцем файла.
+//
+// GET /files/{file_id}
+func (c *Client) ReadFile(ctx context.Context, params ReadFileParams) (ReadFileRes, error) {
+	res, err := c.sendReadFile(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendReadFile(ctx context.Context, params ReadFileParams) (res ReadFileRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ReadFile"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/files/{file_id}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ReadFileOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/files/"
+	{
+		// Encode "file_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "file_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.FileID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "noredir" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "noredir",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Noredir.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ReadFileOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeReadFileResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ReadFileMeta invokes ReadFileMeta operation.
+//
+// Чтение приватного файла требует прохождение
+// авторизации.
+// Аутентифицированный пользователь должен быть
+// владельцем файла.
+//
+// GET /files/{file_id}/meta
+func (c *Client) ReadFileMeta(ctx context.Context, params ReadFileMetaParams) (ReadFileMetaRes, error) {
+	res, err := c.sendReadFileMeta(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendReadFileMeta(ctx context.Context, params ReadFileMetaParams) (res ReadFileMetaRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ReadFileMeta"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/files/{file_id}/meta"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ReadFileMetaOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/files/"
+	{
+		// Encode "file_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "file_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.FileID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/meta"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ReadFileMetaOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeReadFileMetaResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ReadPerson invokes ReadPerson operation.
+//
+// Чтение персоны пользователя.
+//
+// GET /persons/{person_id}
+func (c *Client) ReadPerson(ctx context.Context, params ReadPersonParams) (ReadPersonRes, error) {
+	res, err := c.sendReadPerson(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendReadPerson(ctx context.Context, params ReadPersonParams) (res ReadPersonRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ReadPerson"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/persons/{person_id}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ReadPersonOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/persons/"
+	{
+		// Encode "person_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "person_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.PersonID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeReadPersonResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ReadTeam invokes ReadTeam operation.
 //
 // Часть данных возвращается только при наличии
 // аутентификации и определенных прав у пользователя,
 // от лица которого выполняется запрос.
 //
 // GET /teams/{team_id}
-func (c *Client) TeamRead(ctx context.Context, params TeamReadParams) (TeamReadRes, error) {
-	res, err := c.sendTeamRead(ctx, params)
+func (c *Client) ReadTeam(ctx context.Context, params ReadTeamParams) (ReadTeamRes, error) {
+	res, err := c.sendReadTeam(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendTeamRead(ctx context.Context, params TeamReadParams) (res TeamReadRes, err error) {
+func (c *Client) sendReadTeam(ctx context.Context, params ReadTeamParams) (res ReadTeamRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("TeamRead"),
+		otelogen.OperationID("ReadTeam"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/teams/{team_id}"),
 	}
@@ -5213,7 +7988,7 @@ func (c *Client) sendTeamRead(ctx context.Context, params TeamReadParams) (res T
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, TeamReadOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, ReadTeamOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -5263,7 +8038,7 @@ func (c *Client) sendTeamRead(ctx context.Context, params TeamReadParams) (res T
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, TeamReadOperation, r); {
+			switch err := c.securityTalentOAuth(ctx, ReadTeamOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -5300,7 +8075,7 @@ func (c *Client) sendTeamRead(ctx context.Context, params TeamReadParams) (res T
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeTeamReadResponse(resp)
+	result, err := decodeReadTeamResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -5308,20 +8083,952 @@ func (c *Client) sendTeamRead(ctx context.Context, params TeamReadParams) (res T
 	return result, nil
 }
 
-// TeamUpdate invokes TeamUpdate operation.
+// Signup invokes Signup operation.
+//
+// Регистрация пользователя.
+//
+// POST /auth/signup
+func (c *Client) Signup(ctx context.Context, request *Signup, params SignupParams) (SignupRes, error) {
+	res, err := c.sendSignup(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendSignup(ctx context.Context, request *Signup, params SignupParams) (res SignupRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("Signup"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/auth/signup"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, SignupOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/auth/signup"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "partial_token" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "partial_token",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.PartialToken.Get(); ok {
+				return e.EncodeValue(conv.UUIDToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeSignupRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "EncodeCookieParams"
+	cookie := uri.NewCookieEncoder(r)
+	{
+		// Encode "utm" parameter.
+		cfg := uri.CookieParameterEncodingConfig{
+			Name:    "utm",
+			Explode: true,
+		}
+
+		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Utm.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode cookie")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeSignupResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// SignupInitialData invokes SignupInitialData operation.
+//
+// Данные для предзаполнения формы регистрации.
+//
+// GET /auth/signup
+func (c *Client) SignupInitialData(ctx context.Context, params SignupInitialDataParams) (SignupInitialDataRes, error) {
+	res, err := c.sendSignupInitialData(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendSignupInitialData(ctx context.Context, params SignupInitialDataParams) (res SignupInitialDataRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("SignupInitialData"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/auth/signup"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, SignupInitialDataOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/auth/signup"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "partial_token" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "partial_token",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.UUIDToString(params.PartialToken))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeSignupInitialDataResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// SubmitUserConsent invokes SubmitUserConsent operation.
+//
+// Фиксация согласия пользователя.
+//
+// POST /users/{user_id}/consents/{kind}
+func (c *Client) SubmitUserConsent(ctx context.Context, params SubmitUserConsentParams) (SubmitUserConsentRes, error) {
+	res, err := c.sendSubmitUserConsent(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendSubmitUserConsent(ctx context.Context, params SubmitUserConsentParams) (res SubmitUserConsentRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("SubmitUserConsent"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/users/{user_id}/consents/{kind}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, SubmitUserConsentOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/users/"
+	{
+		// Encode "user_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "user_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.UserID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/consents/"
+	{
+		// Encode "kind" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "kind",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(string(params.Kind)))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, SubmitUserConsentOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeSubmitUserConsentResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdateAuthenticatedUser invokes UpdateAuthenticatedUser operation.
+//
+// > Операция еще не доступна.
+//
+// PATCH /users/me
+func (c *Client) UpdateAuthenticatedUser(ctx context.Context, request *UserUpdate) (UpdateAuthenticatedUserRes, error) {
+	res, err := c.sendUpdateAuthenticatedUser(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendUpdateAuthenticatedUser(ctx context.Context, request *UserUpdate) (res UpdateAuthenticatedUserRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("UpdateAuthenticatedUser"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.HTTPRouteKey.String("/users/me"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateAuthenticatedUserOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/users/me"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdateAuthenticatedUserRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdateAuthenticatedUserResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdateEventDeferredNotification invokes UpdateEventDeferredNotification operation.
+//
+// Если уведомление уже существует и оно находится в
+// статусе `canceled`,
+// оно будет переведено в статус `pending`.
+//
+// PATCH /events/{event_id}/deferred-notification
+func (c *Client) UpdateEventDeferredNotification(ctx context.Context, request *UpdateEventDeferredNotificationReq, params UpdateEventDeferredNotificationParams) (UpdateEventDeferredNotificationRes, error) {
+	res, err := c.sendUpdateEventDeferredNotification(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUpdateEventDeferredNotification(ctx context.Context, request *UpdateEventDeferredNotificationReq, params UpdateEventDeferredNotificationParams) (res UpdateEventDeferredNotificationRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("UpdateEventDeferredNotification"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/deferred-notification"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateEventDeferredNotificationOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/deferred-notification"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdateEventDeferredNotificationRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, UpdateEventDeferredNotificationOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdateEventDeferredNotificationResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdateEventDiplomaSettings invokes UpdateEventDiplomaSettings operation.
+//
+// Обновление настроек дипломов мероприятия.
+//
+// PATCH /events/{event_id}/diploma-settings
+func (c *Client) UpdateEventDiplomaSettings(ctx context.Context, request *UpdateEventDiplomaSettingsReq, params UpdateEventDiplomaSettingsParams) (UpdateEventDiplomaSettingsRes, error) {
+	res, err := c.sendUpdateEventDiplomaSettings(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUpdateEventDiplomaSettings(ctx context.Context, request *UpdateEventDiplomaSettingsReq, params UpdateEventDiplomaSettingsParams) (res UpdateEventDiplomaSettingsRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("UpdateEventDiplomaSettings"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-settings"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateEventDiplomaSettingsOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/diploma-settings"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdateEventDiplomaSettingsRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, UpdateEventDiplomaSettingsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdateEventDiplomaSettingsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdateEventLimit invokes UpdateEventLimit operation.
+//
+// Обновление лимитов мероприятия.
+//
+// PATCH /events/{event_id}/limit
+func (c *Client) UpdateEventLimit(ctx context.Context, request *UpdateEventLimitReq, params UpdateEventLimitParams) (UpdateEventLimitRes, error) {
+	res, err := c.sendUpdateEventLimit(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUpdateEventLimit(ctx context.Context, request *UpdateEventLimitReq, params UpdateEventLimitParams) (res UpdateEventLimitRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("UpdateEventLimit"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.HTTPRouteKey.String("/events/{event_id}/limit"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateEventLimitOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/limit"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdateEventLimitRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, UpdateEventLimitOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdateEventLimitResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdateFileMeta invokes UpdateFileMeta operation.
+//
+// Обновление информации о файле.
+//
+// PATCH /files/{file_id}/meta
+func (c *Client) UpdateFileMeta(ctx context.Context, request *UpdateFileMetaReq, params UpdateFileMetaParams) (UpdateFileMetaRes, error) {
+	res, err := c.sendUpdateFileMeta(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUpdateFileMeta(ctx context.Context, request *UpdateFileMetaReq, params UpdateFileMetaParams) (res UpdateFileMetaRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("UpdateFileMeta"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.HTTPRouteKey.String("/files/{file_id}/meta"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateFileMetaOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/files/"
+	{
+		// Encode "file_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "file_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.FileID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/meta"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdateFileMetaRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, UpdateFileMetaOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdateFileMetaResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdateTeam invokes UpdateTeam operation.
 //
 // Доступно только для капитана команды и организатора
 // мероприятия.
 //
 // PATCH /teams/{team_id}
-func (c *Client) TeamUpdate(ctx context.Context, request *TeamUpdateReq, params TeamUpdateParams) (TeamUpdateRes, error) {
-	res, err := c.sendTeamUpdate(ctx, request, params)
+func (c *Client) UpdateTeam(ctx context.Context, request *UpdateTeamReq, params UpdateTeamParams) (UpdateTeamRes, error) {
+	res, err := c.sendUpdateTeam(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendTeamUpdate(ctx context.Context, request *TeamUpdateReq, params TeamUpdateParams) (res TeamUpdateRes, err error) {
+func (c *Client) sendUpdateTeam(ctx context.Context, request *UpdateTeamReq, params UpdateTeamParams) (res UpdateTeamRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("TeamUpdate"),
+		otelogen.OperationID("UpdateTeam"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
 		semconv.HTTPRouteKey.String("/teams/{team_id}"),
 	}
@@ -5338,7 +9045,7 @@ func (c *Client) sendTeamUpdate(ctx context.Context, request *TeamUpdateReq, par
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, TeamUpdateOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateTeamOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -5382,7 +9089,7 @@ func (c *Client) sendTeamUpdate(ctx context.Context, request *TeamUpdateReq, par
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeTeamUpdateRequest(request, r); err != nil {
+	if err := encodeUpdateTeamRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -5391,7 +9098,7 @@ func (c *Client) sendTeamUpdate(ctx context.Context, request *TeamUpdateReq, par
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, TeamUpdateOperation, r); {
+			switch err := c.securityTalentOAuth(ctx, UpdateTeamOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -5427,7 +9134,396 @@ func (c *Client) sendTeamUpdate(ctx context.Context, request *TeamUpdateReq, par
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeTeamUpdateResponse(resp)
+	result, err := decodeUpdateTeamResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UploadFile invokes UploadFile operation.
+//
+// Позволяет повторно получить ссылку на загрузку того
+// же файла или сформировать
+// ссылку для загрузки новой версии файла (того же типа,
+// но другого размера).
+//
+// PUT /files/{file_id}
+func (c *Client) UploadFile(ctx context.Context, request *UploadFileReq, params UploadFileParams) (UploadFileRes, error) {
+	res, err := c.sendUploadFile(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUploadFile(ctx context.Context, request *UploadFileReq, params UploadFileParams) (res UploadFileRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("UploadFile"),
+		semconv.HTTPRequestMethodKey.String("PUT"),
+		semconv.HTTPRouteKey.String("/files/{file_id}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UploadFileOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/files/"
+	{
+		// Encode "file_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "file_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.FileID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PUT", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUploadFileRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, UploadFileOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeUploadFileResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ValidateAuthorization invokes ValidateAuthorization operation.
+//
+// Валидация авторизационных параметров.
+//
+// GET /oauth/authorize
+func (c *Client) ValidateAuthorization(ctx context.Context, params ValidateAuthorizationParams) error {
+	_, err := c.sendValidateAuthorization(ctx, params)
+	return err
+}
+
+func (c *Client) sendValidateAuthorization(ctx context.Context, params ValidateAuthorizationParams) (res *ValidateAuthorizationOK, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ValidateAuthorization"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/oauth/authorize"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ValidateAuthorizationOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/oauth/authorize"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "response_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "response_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.ResponseType))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "redirect_uri" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "redirect_uri",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.RedirectURI))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "client_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "client_id",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.ClientID))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "scope" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "scope",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Scope.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "auto_renew" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "auto_renew",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.AutoRenew.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ValidateAuthorizationOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeValidateAuthorizationResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ValidateTeamContact invokes ValidateTeamContact operation.
+//
+// Валидация контактной ссылки.
+//
+// POST /teams/contact-validate
+func (c *Client) ValidateTeamContact(ctx context.Context, request TeamContactLink) (ValidateTeamContactRes, error) {
+	res, err := c.sendValidateTeamContact(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendValidateTeamContact(ctx context.Context, request TeamContactLink) (res ValidateTeamContactRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ValidateTeamContact"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/teams/contact-validate"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ValidateTeamContactOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/teams/contact-validate"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeValidateTeamContactRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeValidateTeamContactResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
