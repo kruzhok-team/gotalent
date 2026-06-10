@@ -1,0 +1,7 @@
+generator:
+  features:
+    disable:
+      - "paths/server"
+  filters:
+    path_regex: "/permissions/meta/{permission_key}|/permissions/{permission_id}/has"
+  convenient_errors: off

@@ -1,0 +1,688 @@
+openapi: 3.1.0
+info:
+  title: TalentRBAC
+  version: '0.2'
+  contact:
+    email: talent@kruzhok.org
+  description: |-
+    Сервис привилегий и ролей пользователей платформы Талант.
+
+    Клиентам, реализующим у себя проверку наличия у пользователя допуска,
+    нужно предварительно получить идентификтор привилегии по ее символьному ключу.
+    Эту операцию нужно выполнять на этапе инициализации клиента.
+
+    - [Операция получения идентификатора по символьному ключу](#tag/permissions/operation/PermissionMeta)
+    - [Операция проверки наличия привилегии](#tag/permissions/operation/HasPermission)
+servers:
+  - url: https://talent.kruzhok.org/rbac
+    description: Production Server
+  - url: https://talent.test.kruzhok.org/rbac
+    description: Development Server
+tags:
+  - name: permissions
+    x-displayName: Привилегии
+    description: |-
+      Привилегия определяет наличие определенного доступа.
+      Сервисы, выполняя проверку наличия у пользователя допуска на выполнение операции,
+      выполняют эту проверку в отношении привилегий.
+  - name: roles
+    x-displayName: Роли
+    description: |-
+      Роли назначаются пользователям. Роль объединяет под собой набор привилегий.
+  - name: rolepermissions
+    x-displayName: Привилегии ролей
+    description: |-
+      Привилегии входящие в состав определенных ролей.
+  - name: rolegrants
+    x-displayName: Назначенные роли
+    description: |-
+      Назначенные пользователям роли.
+  - name: admingrants
+    x-displayName: Администраторы
+paths:
+  /admin-grants/me:
+    get:
+      operationId: MyAdminGrant
+      summary: Административный статус пользователя
+      security: [TalentOAuth: []]
+      tags: [admingrants]
+      responses:
+        '200':
+          description: Пользователь имеет доступ к администрированию
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - access
+                properties:
+                  access:
+                    $ref: '#/components/schemas/AdminGrantAccess'
+        '403':
+          description: Пользователь не имеет доступа
+  /services/{service_name}/id:
+    get:
+      deprecated: true
+      operationId: GetServiceID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceID'
+    parameters:
+      - name: service_name
+        in: path
+        required: true
+        schema:
+          type: string
+  /permissions:
+    get:
+      operationId: ListPermissions
+      summary: Список привилегий
+      security: [TalentOAuth: []]
+      tags: [permissions]
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - name: order_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - id_asc
+              - id_desc
+              - key_asc
+              - key_desc
+      responses:
+        '200':
+          description: Ok
+          headers:
+            X-Count:
+              $ref: '#/components/headers/X-Count'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+    post:
+      operationId: CreatePermission
+      summary: Создание привилегии
+      security: [TalentOAuth: []]
+      tags: [permissions]
+      requestBody:
+        $ref: '#/components/requestBodies/CreatePermissionRequest'
+      responses:
+        '201':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        '409':
+          $ref: '#/components/responses/ConflictWithData'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+  /permissions/{permission_id}:
+    parameters:
+      - $ref: '#/components/parameters/permission_id'
+    get:
+      operationId: ReadPermission
+      summary: Чтение привилегии
+      security: [TalentOAuth: []]
+      tags: [permissions]
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/ObjectNotFound'
+    patch:
+      operationId: UpdatePermission
+      summary: Обновление привилегии
+      security: [TalentOAuth: []]
+      tags: [permissions]
+      requestBody:
+        $ref: '#/components/requestBodies/UpdatePermissionRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/ObjectNotFound'
+  /permissions/{permission_id}/has:
+    parameters:
+      - $ref: '#/components/parameters/permission_id'
+      - name: user_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+    post:
+      operationId: HasPermission
+      summary: Проверка наличия привилегии
+      description: Запрос в отношении пользователя, отличного от авторизованного всегда возвращает `403` ответ.
+      tags: [permissions]
+      responses:
+        '200':
+          description: Доступ предоставлен
+        '403':
+          description: Доступ не был предоставлен
+  /permissions/meta/{permission_key}:
+    parameters:
+      - name: permission_key
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: PermissionMeta
+      summary: Мета-данные привилегии
+      tags: [permissions]
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionMeta'
+        '404':
+          $ref: '#/components/responses/ObjectNotFound'
+  /roles:
+    get:
+      operationId: ListRoles
+      summary: Список ролей
+      security: [TalentOAuth: []]
+      tags: [roles]
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: Ok
+          headers:
+            X-Count:
+              $ref: '#/components/headers/X-Count'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+    post:
+      operationId: CreateRole
+      summary: Создание роли
+      security: [TalentOAuth: []]
+      tags: [roles]
+      requestBody:
+        $ref: '#/components/requestBodies/CreateRoleRequest'
+      responses:
+        '201':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '409':
+          $ref: '#/components/responses/ConflictWithData'
+  /roles/{role_id}:
+    parameters:
+      - $ref: '#/components/parameters/role_id'
+    get:
+      operationId: ReadRole
+      summary: Чтение роли
+      security: [TalentOAuth: []]
+      tags: [roles]
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/ObjectNotFound'
+    patch:
+      operationId: UpdateRole
+      summary: Обновление роли
+      security: [TalentOAuth: []]
+      tags: [roles]
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateRoleRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/ObjectNotFound'
+  /roles/{role_id}/grants:
+    parameters:
+      - $ref: '#/components/parameters/role_id'
+    post:
+      operationId: CreateRoleGrant
+      summary: Назначение роли
+      security: [TalentOAuth: []]
+      tags: [rolegrants]
+      requestBody:
+        $ref: '#/components/requestBodies/CreateRoleGrantRequest'
+      responses:
+        '201':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleGrant'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '409':
+          $ref: '#/components/responses/ConflictWithData'
+  /roles/{role_id}/grants/{grantee_id}:
+    parameters:
+      - $ref: '#/components/parameters/role_id'
+      - name: grantee_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+    get:
+      operationId: ReadRoleGrant
+      summary: Чтение назначения
+      security: [TalentOAuth: []]
+      tags: [rolegrants]
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleGrant'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/ObjectNotFound'
+    delete:
+      operationId: DeleteRoleGrant
+      summary: Удаление назначения
+      security: [TalentOAuth: []]
+      tags: [rolegrants]
+      responses:
+        '204':
+          description: Ok
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+  /roles/{role_id}/permissions:
+    parameters:
+      - $ref: '#/components/parameters/role_id'
+    get:
+      operationId: ListRolePermissions
+      summary: Список привелегий роли
+      security: [TalentOAuth: []]
+      tags: [rolepermissions]
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+    post:
+      operationId: CreateRolePermission
+      summary: Добавление привелегии в роль
+      security: [TalentOAuth: []]
+      tags: [rolepermissions]
+      requestBody:
+        $ref: '#/components/requestBodies/CreateRolePermissionRequest'
+      responses:
+        '201':
+          description: Ok
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '409':
+          $ref: '#/components/responses/ConflictWithData'
+  /roles/{role_id}/permissions/{permission_id}:
+    parameters:
+      - $ref: '#/components/parameters/role_id'
+      - $ref: '#/components/parameters/permission_id'
+    delete:
+      operationId: DeleteRolePermission
+      summary: Удаление привилегии из роли
+      security: [TalentOAuth: []]
+      tags: [rolepermissions]
+      responses:
+        '204':
+          description: Ok
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+  /role-grants:
+    get:
+      operationId: ListRoleGrants
+      summary: Список назначенных ролей
+      security: [TalentOAuth: []]
+      tags: [rolegrants]
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - name: grantor_id
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: grantee_id
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: role_id
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: order_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - created_at_asc
+              - created_at_desc
+      responses:
+        '200':
+          description: Ok
+          headers:
+            X-Count:
+              $ref: '#/components/headers/X-Count'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleGrant'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+  /permissions/assert-user/:
+    post:
+      deprecated: true
+      operationId: AssertUserPerimission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - talent_id
+                - service_id
+                - route
+              properties:
+                talent_id:
+                  type: integer
+                  format: int32
+                service_id:
+                  $ref: '#/components/schemas/ServiceID'
+                route:
+                  type: string
+                can_create:
+                  type: boolean
+                can_update:
+                  type: boolean
+                can_delete:
+                  type: boolean
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Permission does not exists
+
+components:
+  schemas:
+    AdminGrantAccess:
+      title: Уровень допуска
+      type: string
+      enum:
+        - view
+        - change_grants
+        - change_config
+      x-enumDescriptions:
+        view: Минимальный уровень. Допускается только чтение
+        change_grants: Чтение с возможностью изменения грантов.
+        change_config: Чтение с изменением грантов, ролей и привилегий.
+    PermissionMeta:
+      type: object
+      required:
+        - id
+        - created_at
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор привилегии.
+        created_at:
+          type: string
+          format: date-time
+          description: Дата создания.
+    PermissionInitial:
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          type: string
+          description: Символьный ключ допуска.
+    PermissionChangeable:
+      type: object
+      required:
+        - description
+      properties:
+        description:
+          type: string
+          description: Человеко-понятное описание допуска.
+    Permission:
+      title: Привилегия
+      x-tags: [permissions]
+      allOf:
+        - $ref: '#/components/schemas/PermissionMeta'
+        - $ref: '#/components/schemas/PermissionInitial'
+        - $ref: '#/components/schemas/PermissionChangeable'
+    RoleMeta:
+      type: object
+      required:
+        - id
+        - created_at
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Идентификатор роли.
+        created_at:
+          type: string
+          format: date-time
+          description: Дата создания.
+    RoleChangeable:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Название роли.
+        description:
+          type: string
+          description: Описание роли.
+    Role:
+      title: Роль
+      x-tags: [roles]
+      allOf:
+        - $ref: '#/components/schemas/RoleMeta'
+        - $ref: '#/components/schemas/RoleChangeable'
+        - required:
+          - name
+          - description
+    RoleGrantInitial:
+      type: object
+      required:
+        - grantee_id
+      properties:
+        grantee_id:
+          type: integer
+          format: int32
+    RoleGrant:
+      title: Назначенная роль
+      x-tags: [rolegrants]
+      allOf:
+        - type: object
+          required:
+            - created_at
+            - role_id
+            - grantor_id
+          properties:
+            created_at:
+              type: string
+              format: date-time
+            role_id:
+              type: integer
+              format: int32
+            grantor_id:
+              type: integer
+              format: int32
+        - $ref: '#/components/schemas/RoleGrantInitial'
+    ServiceID:
+      type: integer
+      format: int16
+
+  requestBodies:
+    CreatePermissionRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/PermissionInitial'
+              - $ref: '#/components/schemas/PermissionChangeable'
+    UpdatePermissionRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/PermissionChangeable'
+    CreateRoleRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/RoleChangeable'
+              - required:
+                - name
+                - description
+    CreateRoleGrantRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RoleGrantInitial'
+    UpdateRoleRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RoleChangeable'
+    CreateRolePermissionRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - permission_id
+            properties:
+              permission_id:
+                type: integer
+                format: int32
+
+  responses:
+    PermissionDenied:
+      description: Отсутствует доступ на выполнение операции
+    ConflictWithData:
+      description: Конфликт с уже существующими данными
+    ObjectNotFound:
+      description: Запрошенный объект не найден
+
+  headers:
+    X-Count:
+      required: true
+      description: Общее кол-во объектов, входящих в выборку без учета пагинации.
+      schema:
+        type: integer
+        format: int64
+
+  parameters:
+    offset:
+      name: offset
+      in: query
+      description: Кол-во объектов выборки для пропуска.
+      schema:
+        type: integer
+        format: int32
+        default: 0
+        minumum: 0
+        maximum: 200
+    limit:
+      name: limit
+      in: query
+      description: Максимум объектов возвращаемых в теле ответа.
+      schema:
+        type: integer
+        format: int32
+        default: 100
+        minimum: 1
+        maximum: 100
+    permission_id:
+      name: permission_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+    role_id:
+      name: role_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+
+  securitySchemes:
+    TalentOAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: TalentOAuth JWT
