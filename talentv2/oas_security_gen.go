@@ -19,6 +19,164 @@ type SecuritySource interface {
 	TalentOAuth(ctx context.Context, operationName OperationName) (TalentOAuth, error)
 }
 
+// operationRolesClientCredentials is a private map storing roles per operation.
+var operationRolesClientCredentials = map[string][]string{
+	DeleteMutationLockOperation: []string{},
+	ListSocialAuthsOperation:    []string{},
+	PatchMutationLockOperation:  []string{},
+}
+
+// GetRolesForClientCredentials returns the required roles for the given operation.
+//
+// This is useful for authorization scenarios where you need to know which roles
+// are required for an operation.
+//
+// Example:
+//
+//	requiredRoles := GetRolesForClientCredentials(AddPetOperation)
+//
+// Returns nil if the operation has no role requirements or if the operation is unknown.
+func GetRolesForClientCredentials(operation string) []string {
+	roles, ok := operationRolesClientCredentials[operation]
+	if !ok {
+		return nil
+	}
+	// Return a copy to prevent external modification
+	result := make([]string, len(roles))
+	copy(result, roles)
+	return result
+}
+
+// operationRolesTalentOAuth is a private map storing roles per operation.
+var operationRolesTalentOAuth = map[string][]string{
+	AddEventDiplomaRoleOperation: []string{
+		"events",
+	},
+	ArchiveEventRequestsFilesOperation: []string{
+		"events",
+	},
+	AuthorizeClientOperation: []string{},
+	CancelEventDeferredNotificationOperation: []string{
+		"events",
+	},
+	CheckUserConsentOperation: []string{
+		"user:read",
+	},
+	ConfirmFileUploadOperation: []string{
+		"files",
+	},
+	CreateEventOperation: []string{
+		"events",
+	},
+	CreateEventDeferredNotificationOperation: []string{
+		"events",
+	},
+	CreateEventDiplomaSettingsOperation: []string{
+		"events",
+	},
+	CreateEventLimitOperation: []string{
+		"events",
+	},
+	CreateFileMetaOperation: []string{
+		"files",
+	},
+	CreateFileReferenceOperation: []string{
+		"files",
+	},
+	CreateMutationLockOperation: []string{
+		"files",
+	},
+	CreateOrganizationSubjectOperation: []string{
+		"events",
+	},
+	DeleteEventDiplomaRoleOperation: []string{
+		"events",
+	},
+	DeleteEventLimitOperation: []string{
+		"events",
+	},
+	DeleteFileReferenceOperation: []string{
+		"files",
+	},
+	DisconnectSocialAuthOperation: []string{
+		"user",
+	},
+	EventSignupOperation: []string{
+		"event-requests",
+	},
+	IsOrganizationAdminOperation: []string{},
+	ListEventDiplomaSettingsOperation: []string{
+		"events:read",
+	},
+	ListFileMetaOperation: []string{
+		"files:read",
+	},
+	ListSocialAuthsOperation: []string{
+		"user:read",
+	},
+	ListUserConsentsOperation: []string{
+		"user:read",
+	},
+	ReadEventDeferredNotificationOperation: []string{
+		"events:read",
+	},
+	ReadEventDiplomaSettingsOperation: []string{
+		"events:read",
+	},
+	ReadFileOperation: []string{
+		"files:read",
+	},
+	ReadFileMetaOperation: []string{
+		"files:read",
+	},
+	ReadTeamOperation: []string{
+		"teams:read",
+	},
+	SubmitUserConsentOperation: []string{
+		"user",
+	},
+	UpdateEventDeferredNotificationOperation: []string{
+		"events",
+	},
+	UpdateEventDiplomaSettingsOperation: []string{
+		"events",
+	},
+	UpdateEventLimitOperation: []string{
+		"events",
+	},
+	UpdateFileMetaOperation: []string{
+		"files",
+	},
+	UpdateTeamOperation: []string{
+		"teams",
+	},
+	UploadFileOperation: []string{
+		"files",
+	},
+	ValidateAuthorizationOperation: []string{},
+}
+
+// GetRolesForTalentOAuth returns the required roles for the given operation.
+//
+// This is useful for authorization scenarios where you need to know which roles
+// are required for an operation.
+//
+// Example:
+//
+//	requiredRoles := GetRolesForTalentOAuth(AddPetOperation)
+//
+// Returns nil if the operation has no role requirements or if the operation is unknown.
+func GetRolesForTalentOAuth(operation string) []string {
+	roles, ok := operationRolesTalentOAuth[operation]
+	if !ok {
+		return nil
+	}
+	// Return a copy to prevent external modification
+	result := make([]string, len(roles))
+	copy(result, roles)
+	return result
+}
+
 func (s *Client) securityClientCredentials(ctx context.Context, operationName OperationName, req *http.Request) error {
 	t, err := s.sec.ClientCredentials(ctx, operationName)
 	if err != nil {

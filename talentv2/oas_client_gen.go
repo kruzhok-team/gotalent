@@ -10,17 +10,16 @@ import (
 
 	"github.com/go-faster/errors"
 	"github.com/google/uuid"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/metric"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
-	"go.opentelemetry.io/otel/trace"
-
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/ogenerrors"
 	"github.com/ogen-go/ogen/otelogen"
 	"github.com/ogen-go/ogen/uri"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/metric"
+	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func trimTrailingSlashes(u *url.URL) {
@@ -537,8 +536,9 @@ func (c *Client) sendAddEventDiplomaRole(ctx context.Context, params AddEventDip
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("AddEventDiplomaRole"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-role/{role_id}"),
+		semconv.URLTemplateKey.String("/events/{event_id}/diploma-role/{role_id}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -654,7 +654,8 @@ func (c *Client) sendAddEventDiplomaRole(ctx context.Context, params AddEventDip
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeAddEventDiplomaRoleResponse(resp)
@@ -680,8 +681,9 @@ func (c *Client) sendArchiveEventRequestsFiles(ctx context.Context, params Archi
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ArchiveEventRequestsFiles"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/requests-files"),
+		semconv.URLTemplateKey.String("/events/{event_id}/requests-files"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -817,7 +819,8 @@ func (c *Client) sendArchiveEventRequestsFiles(ctx context.Context, params Archi
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeArchiveEventRequestsFilesResponse(resp)
@@ -843,8 +846,9 @@ func (c *Client) sendAuthorizeClient(ctx context.Context) (res *AuthorizeClientF
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("AuthorizeClient"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/oauth/authorize"),
+		semconv.URLTemplateKey.String("/oauth/authorize"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -923,7 +927,8 @@ func (c *Client) sendAuthorizeClient(ctx context.Context) (res *AuthorizeClientF
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeAuthorizeClientResponse(resp)
@@ -950,8 +955,9 @@ func (c *Client) sendCancelEventDeferredNotification(ctx context.Context, params
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CancelEventDeferredNotification"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/deferred-notification"),
+		semconv.URLTemplateKey.String("/events/{event_id}/deferred-notification"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -1049,7 +1055,8 @@ func (c *Client) sendCancelEventDeferredNotification(ctx context.Context, params
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCancelEventDeferredNotificationResponse(resp)
@@ -1074,8 +1081,9 @@ func (c *Client) sendCheckUserConsent(ctx context.Context, params CheckUserConse
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CheckUserConsent"),
 		semconv.HTTPRequestMethodKey.String("HEAD"),
-		semconv.HTTPRouteKey.String("/users/{user_id}/consents/{kind}"),
+		semconv.URLTemplateKey.String("/users/{user_id}/consents/{kind}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -1191,7 +1199,8 @@ func (c *Client) sendCheckUserConsent(ctx context.Context, params CheckUserConse
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCheckUserConsentResponse(resp)
@@ -1216,8 +1225,9 @@ func (c *Client) sendCompleteSocialAuth(ctx context.Context, params CompleteSoci
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CompleteSocialAuth"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/auth/complete/{provider}"),
+		semconv.URLTemplateKey.String("/auth/complete/{provider}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -1318,7 +1328,8 @@ func (c *Client) sendCompleteSocialAuth(ctx context.Context, params CompleteSoci
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCompleteSocialAuthResponse(resp)
@@ -1343,8 +1354,9 @@ func (c *Client) sendConfirmFileUpload(ctx context.Context, params ConfirmFileUp
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ConfirmFileUpload"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/files/{file_id}/confirm-upload"),
+		semconv.URLTemplateKey.String("/files/{file_id}/confirm-upload"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -1442,7 +1454,8 @@ func (c *Client) sendConfirmFileUpload(ctx context.Context, params ConfirmFileUp
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeConfirmFileUploadResponse(resp)
@@ -1468,8 +1481,9 @@ func (c *Client) sendConfirmSignupEmail(ctx context.Context, params ConfirmSignu
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ConfirmSignupEmail"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/auth/confirm-email/{uid}/{token}"),
+		semconv.URLTemplateKey.String("/auth/confirm-email/{uid}/{token}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -1552,7 +1566,8 @@ func (c *Client) sendConfirmSignupEmail(ctx context.Context, params ConfirmSignu
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeConfirmSignupEmailResponse(resp)
@@ -1577,8 +1592,9 @@ func (c *Client) sendCountEvents(ctx context.Context, params CountEventsParams) 
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CountEvents"),
 		semconv.HTTPRequestMethodKey.String("HEAD"),
-		semconv.HTTPRouteKey.String("/events"),
+		semconv.URLTemplateKey.String("/events"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -1800,7 +1816,8 @@ func (c *Client) sendCountEvents(ctx context.Context, params CountEventsParams) 
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCountEventsResponse(resp)
@@ -1829,8 +1846,9 @@ func (c *Client) sendCreateEvent(ctx context.Context, request *CreateEventReq) (
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateEvent"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/events"),
+		semconv.URLTemplateKey.String("/events"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -1912,7 +1930,8 @@ func (c *Client) sendCreateEvent(ctx context.Context, request *CreateEventReq) (
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateEventResponse(resp)
@@ -1937,8 +1956,9 @@ func (c *Client) sendCreateEventDeferredNotification(ctx context.Context, reques
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateEventDeferredNotification"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/deferred-notification"),
+		semconv.URLTemplateKey.String("/events/{event_id}/deferred-notification"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -2039,7 +2059,8 @@ func (c *Client) sendCreateEventDeferredNotification(ctx context.Context, reques
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateEventDeferredNotificationResponse(resp)
@@ -2064,8 +2085,9 @@ func (c *Client) sendCreateEventDiplomaSettings(ctx context.Context, request *Cr
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateEventDiplomaSettings"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-settings"),
+		semconv.URLTemplateKey.String("/events/{event_id}/diploma-settings"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -2166,7 +2188,8 @@ func (c *Client) sendCreateEventDiplomaSettings(ctx context.Context, request *Cr
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateEventDiplomaSettingsResponse(resp)
@@ -2193,8 +2216,9 @@ func (c *Client) sendCreateEventLimit(ctx context.Context, request *CreateEventL
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateEventLimit"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/limit"),
+		semconv.URLTemplateKey.String("/events/{event_id}/limit"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -2295,7 +2319,8 @@ func (c *Client) sendCreateEventLimit(ctx context.Context, request *CreateEventL
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateEventLimitResponse(resp)
@@ -2320,8 +2345,9 @@ func (c *Client) sendCreateFileMeta(ctx context.Context, request *CreateFileMeta
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateFileMeta"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/files"),
+		semconv.URLTemplateKey.String("/files"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -2403,7 +2429,8 @@ func (c *Client) sendCreateFileMeta(ctx context.Context, request *CreateFileMeta
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateFileMetaResponse(resp)
@@ -2428,8 +2455,9 @@ func (c *Client) sendCreateFileReference(ctx context.Context, params CreateFileR
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateFileReference"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/files/{file_id}/references/{object_id}"),
+		semconv.URLTemplateKey.String("/files/{file_id}/references/{object_id}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -2545,7 +2573,8 @@ func (c *Client) sendCreateFileReference(ctx context.Context, params CreateFileR
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateFileReferenceResponse(resp)
@@ -2574,8 +2603,9 @@ func (c *Client) sendCreateMutationLock(ctx context.Context, request []uuid.UUID
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateMutationLock"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/mutation-locks/{object_namespace}/{object_key}"),
+		semconv.URLTemplateKey.String("/mutation-locks/{object_namespace}/{object_key}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -2694,7 +2724,8 @@ func (c *Client) sendCreateMutationLock(ctx context.Context, request []uuid.UUID
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateMutationLockResponse(resp)
@@ -2721,8 +2752,9 @@ func (c *Client) sendCreateOrganizationSubject(ctx context.Context, request *Org
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateOrganizationSubject"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/organization-subjects"),
+		semconv.URLTemplateKey.String("/organization-subjects"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -2804,7 +2836,8 @@ func (c *Client) sendCreateOrganizationSubject(ctx context.Context, request *Org
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateOrganizationSubjectResponse(resp)
@@ -2829,8 +2862,9 @@ func (c *Client) sendDeleteEventDiplomaRole(ctx context.Context, params DeleteEv
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("DeleteEventDiplomaRole"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-role/{role_id}"),
+		semconv.URLTemplateKey.String("/events/{event_id}/diploma-role/{role_id}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -2946,7 +2980,8 @@ func (c *Client) sendDeleteEventDiplomaRole(ctx context.Context, params DeleteEv
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeDeleteEventDiplomaRoleResponse(resp)
@@ -2971,8 +3006,9 @@ func (c *Client) sendDeleteEventLimit(ctx context.Context, params DeleteEventLim
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("DeleteEventLimit"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/limit"),
+		semconv.URLTemplateKey.String("/events/{event_id}/limit"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -3070,7 +3106,8 @@ func (c *Client) sendDeleteEventLimit(ctx context.Context, params DeleteEventLim
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeDeleteEventLimitResponse(resp)
@@ -3095,8 +3132,9 @@ func (c *Client) sendDeleteFileReference(ctx context.Context, params DeleteFileR
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("DeleteFileReference"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
-		semconv.HTTPRouteKey.String("/files/{file_id}/references/{object_id}"),
+		semconv.URLTemplateKey.String("/files/{file_id}/references/{object_id}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -3212,7 +3250,8 @@ func (c *Client) sendDeleteFileReference(ctx context.Context, params DeleteFileR
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeDeleteFileReferenceResponse(resp)
@@ -3237,8 +3276,9 @@ func (c *Client) sendDeleteMutationLock(ctx context.Context, params DeleteMutati
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("DeleteMutationLock"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
-		semconv.HTTPRouteKey.String("/mutation-locks/{object_namespace}/{object_key}"),
+		semconv.URLTemplateKey.String("/mutation-locks/{object_namespace}/{object_key}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -3354,7 +3394,8 @@ func (c *Client) sendDeleteMutationLock(ctx context.Context, params DeleteMutati
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeDeleteMutationLockResponse(resp)
@@ -3384,8 +3425,9 @@ func (c *Client) sendDisconnectSocialAuth(ctx context.Context, params Disconnect
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("DisconnectSocialAuth"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/auth/disconnect/{provider}/{uid}"),
+		semconv.URLTemplateKey.String("/auth/disconnect/{provider}/{uid}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -3501,7 +3543,8 @@ func (c *Client) sendDisconnectSocialAuth(ctx context.Context, params Disconnect
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeDisconnectSocialAuthResponse(resp)
@@ -3526,8 +3569,9 @@ func (c *Client) sendEventDeferredNotificationTemplateID(ctx context.Context, pa
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("EventDeferredNotificationTemplateID"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/event-deferred-notification-templates/{name}"),
+		semconv.URLTemplateKey.String("/event-deferred-notification-templates/{name}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -3591,7 +3635,8 @@ func (c *Client) sendEventDeferredNotificationTemplateID(ctx context.Context, pa
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeEventDeferredNotificationTemplateIDResponse(resp)
@@ -3624,8 +3669,9 @@ func (c *Client) sendEventSignup(ctx context.Context, request *EventSignup, para
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("EventSignup"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/signup"),
+		semconv.URLTemplateKey.String("/events/{event_id}/signup"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -3801,7 +3847,8 @@ func (c *Client) sendEventSignup(ctx context.Context, request *EventSignup, para
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeEventSignupResponse(resp)
@@ -3826,8 +3873,9 @@ func (c *Client) sendExistsEventDeferredNotification(ctx context.Context, params
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ExistsEventDeferredNotification"),
 		semconv.HTTPRequestMethodKey.String("HEAD"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/deferred-notification"),
+		semconv.URLTemplateKey.String("/events/{event_id}/deferred-notification"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -3892,7 +3940,8 @@ func (c *Client) sendExistsEventDeferredNotification(ctx context.Context, params
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeExistsEventDeferredNotificationResponse(resp)
@@ -3917,8 +3966,9 @@ func (c *Client) sendIsOrganizationAdmin(ctx context.Context, params IsOrganizat
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("IsOrganizationAdmin"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/organizations/{organization_id}/is-admin"),
+		semconv.URLTemplateKey.String("/organizations/{organization_id}/is-admin"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -4037,7 +4087,8 @@ func (c *Client) sendIsOrganizationAdmin(ctx context.Context, params IsOrganizat
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeIsOrganizationAdminResponse(resp)
@@ -4062,8 +4113,9 @@ func (c *Client) sendIssueAccessToken(ctx context.Context) (res IssueAccessToken
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("IssueAccessToken"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/oauth/issue-token"),
+		semconv.URLTemplateKey.String("/oauth/issue-token"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -4109,7 +4161,8 @@ func (c *Client) sendIssueAccessToken(ctx context.Context) (res IssueAccessToken
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeIssueAccessTokenResponse(resp)
@@ -4135,8 +4188,9 @@ func (c *Client) sendListAddAchievementEvents(ctx context.Context, params ListAd
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListAddAchievementEvents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events/addachievement"),
+		semconv.URLTemplateKey.String("/events/addachievement"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -4383,7 +4437,8 @@ func (c *Client) sendListAddAchievementEvents(ctx context.Context, params ListAd
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListAddAchievementEventsResponse(resp)
@@ -4408,8 +4463,9 @@ func (c *Client) sendListCalendarEvents(ctx context.Context, params ListCalendar
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListCalendarEvents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events/calendar"),
+		semconv.URLTemplateKey.String("/events/calendar"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -4510,7 +4566,8 @@ func (c *Client) sendListCalendarEvents(ctx context.Context, params ListCalendar
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListCalendarEventsResponse(resp)
@@ -4535,8 +4592,9 @@ func (c *Client) sendListEventBrands(ctx context.Context, params ListEventBrands
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListEventBrands"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/event-brands"),
+		semconv.URLTemplateKey.String("/event-brands"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -4689,7 +4747,8 @@ func (c *Client) sendListEventBrands(ctx context.Context, params ListEventBrands
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListEventBrandsResponse(resp)
@@ -4714,8 +4773,9 @@ func (c *Client) sendListEventDiplomaSettings(ctx context.Context, params ListEv
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListEventDiplomaSettings"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events/diploma-settings"),
+		semconv.URLTemplateKey.String("/events/diploma-settings"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -4875,7 +4935,8 @@ func (c *Client) sendListEventDiplomaSettings(ctx context.Context, params ListEv
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListEventDiplomaSettingsResponse(resp)
@@ -4900,8 +4961,9 @@ func (c *Client) sendListEventFields(ctx context.Context, params ListEventFields
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListEventFields"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/fields"),
+		semconv.URLTemplateKey.String("/events/{event_id}/fields"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -4966,7 +5028,8 @@ func (c *Client) sendListEventFields(ctx context.Context, params ListEventFields
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListEventFieldsResponse(resp)
@@ -4991,8 +5054,9 @@ func (c *Client) sendListEventRoutes(ctx context.Context, params ListEventRoutes
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListEventRoutes"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/event-routes"),
+		semconv.URLTemplateKey.String("/event-routes"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -5145,7 +5209,8 @@ func (c *Client) sendListEventRoutes(ctx context.Context, params ListEventRoutes
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListEventRoutesResponse(resp)
@@ -5183,8 +5248,9 @@ func (c *Client) sendListEvents(ctx context.Context, params ListEventsParams) (r
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListEvents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events"),
+		semconv.URLTemplateKey.String("/events"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -5474,7 +5540,8 @@ func (c *Client) sendListEvents(ctx context.Context, params ListEventsParams) (r
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListEventsResponse(resp)
@@ -5505,8 +5572,9 @@ func (c *Client) sendListFileMeta(ctx context.Context, params ListFileMetaParams
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListFileMeta"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/files"),
+		semconv.URLTemplateKey.String("/files"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -5752,7 +5820,8 @@ func (c *Client) sendListFileMeta(ctx context.Context, params ListFileMetaParams
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListFileMetaResponse(resp)
@@ -5777,8 +5846,9 @@ func (c *Client) sendListOrganizationEvents(ctx context.Context, params ListOrga
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListOrganizationEvents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events/organizations/{organization_id}"),
+		semconv.URLTemplateKey.String("/events/organizations/{organization_id}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -6008,7 +6078,8 @@ func (c *Client) sendListOrganizationEvents(ctx context.Context, params ListOrga
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListOrganizationEventsResponse(resp)
@@ -6033,8 +6104,9 @@ func (c *Client) sendListOrganizationSubjects(ctx context.Context, params ListOr
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListOrganizationSubjects"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/organization-subjects"),
+		semconv.URLTemplateKey.String("/organization-subjects"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -6187,7 +6259,8 @@ func (c *Client) sendListOrganizationSubjects(ctx context.Context, params ListOr
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListOrganizationSubjectsResponse(resp)
@@ -6212,8 +6285,9 @@ func (c *Client) sendListOrganizations(ctx context.Context, params ListOrganizat
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListOrganizations"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/organizations"),
+		semconv.URLTemplateKey.String("/organizations"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -6374,7 +6448,8 @@ func (c *Client) sendListOrganizations(ctx context.Context, params ListOrganizat
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListOrganizationsResponse(resp)
@@ -6399,8 +6474,9 @@ func (c *Client) sendListSocialAuths(ctx context.Context, params ListSocialAuths
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListSocialAuths"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/social-auths/{user_id}"),
+		semconv.URLTemplateKey.String("/social-auths/{user_id}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -6581,7 +6657,8 @@ func (c *Client) sendListSocialAuths(ctx context.Context, params ListSocialAuths
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListSocialAuthsResponse(resp)
@@ -6606,8 +6683,9 @@ func (c *Client) sendListSubjects(ctx context.Context, params ListSubjectsParams
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListSubjects"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/subjects"),
+		semconv.URLTemplateKey.String("/subjects"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -6708,7 +6786,8 @@ func (c *Client) sendListSubjects(ctx context.Context, params ListSubjectsParams
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListSubjectsResponse(resp)
@@ -6733,8 +6812,9 @@ func (c *Client) sendListUserConsents(ctx context.Context, params ListUserConsen
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListUserConsents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/users/{user_id}/consents"),
+		semconv.URLTemplateKey.String("/users/{user_id}/consents"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -6832,7 +6912,8 @@ func (c *Client) sendListUserConsents(ctx context.Context, params ListUserConsen
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListUserConsentsResponse(resp)
@@ -6857,8 +6938,9 @@ func (c *Client) sendLoginSocialAuth(ctx context.Context, params LoginSocialAuth
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("LoginSocialAuth"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/auth/login/{provider}"),
+		semconv.URLTemplateKey.String("/auth/login/{provider}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -6977,7 +7059,8 @@ func (c *Client) sendLoginSocialAuth(ctx context.Context, params LoginSocialAuth
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeLoginSocialAuthResponse(resp)
@@ -7006,8 +7089,9 @@ func (c *Client) sendPatchMutationLock(ctx context.Context, request *PatchMutati
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("PatchMutationLock"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.HTTPRouteKey.String("/mutation-locks/{object_namespace}/{object_key}"),
+		semconv.URLTemplateKey.String("/mutation-locks/{object_namespace}/{object_key}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -7126,7 +7210,8 @@ func (c *Client) sendPatchMutationLock(ctx context.Context, request *PatchMutati
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodePatchMutationLockResponse(resp)
@@ -7153,8 +7238,9 @@ func (c *Client) sendReadEvent(ctx context.Context, params ReadEventParams) (res
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadEvent"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events/{event_id}"),
+		semconv.URLTemplateKey.String("/events/{event_id}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -7239,7 +7325,8 @@ func (c *Client) sendReadEvent(ctx context.Context, params ReadEventParams) (res
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadEventResponse(resp)
@@ -7264,8 +7351,9 @@ func (c *Client) sendReadEventDeferredNotification(ctx context.Context, params R
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadEventDeferredNotification"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/deferred-notification"),
+		semconv.URLTemplateKey.String("/events/{event_id}/deferred-notification"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -7363,7 +7451,8 @@ func (c *Client) sendReadEventDeferredNotification(ctx context.Context, params R
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadEventDeferredNotificationResponse(resp)
@@ -7388,8 +7477,9 @@ func (c *Client) sendReadEventDiplomaSettings(ctx context.Context, params ReadEv
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadEventDiplomaSettings"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-settings"),
+		semconv.URLTemplateKey.String("/events/{event_id}/diploma-settings"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -7487,7 +7577,8 @@ func (c *Client) sendReadEventDiplomaSettings(ctx context.Context, params ReadEv
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadEventDiplomaSettingsResponse(resp)
@@ -7512,8 +7603,9 @@ func (c *Client) sendReadEventLimit(ctx context.Context, params ReadEventLimitPa
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadEventLimit"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/limit"),
+		semconv.URLTemplateKey.String("/events/{event_id}/limit"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -7578,7 +7670,8 @@ func (c *Client) sendReadEventLimit(ctx context.Context, params ReadEventLimitPa
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadEventLimitResponse(resp)
@@ -7608,8 +7701,9 @@ func (c *Client) sendReadFile(ctx context.Context, params ReadFileParams) (res R
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadFile"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/files/{file_id}"),
+		semconv.URLTemplateKey.String("/files/{file_id}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -7728,7 +7822,8 @@ func (c *Client) sendReadFile(ctx context.Context, params ReadFileParams) (res R
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadFileResponse(resp)
@@ -7756,8 +7851,9 @@ func (c *Client) sendReadFileMeta(ctx context.Context, params ReadFileMetaParams
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadFileMeta"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/files/{file_id}/meta"),
+		semconv.URLTemplateKey.String("/files/{file_id}/meta"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -7856,7 +7952,8 @@ func (c *Client) sendReadFileMeta(ctx context.Context, params ReadFileMetaParams
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadFileMetaResponse(resp)
@@ -7881,8 +7978,9 @@ func (c *Client) sendReadPerson(ctx context.Context, params ReadPersonParams) (r
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadPerson"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/persons/{person_id}"),
+		semconv.URLTemplateKey.String("/persons/{person_id}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -7946,7 +8044,8 @@ func (c *Client) sendReadPerson(ctx context.Context, params ReadPersonParams) (r
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadPersonResponse(resp)
@@ -7973,8 +8072,9 @@ func (c *Client) sendReadTeam(ctx context.Context, params ReadTeamParams) (res R
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadTeam"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/teams/{team_id}"),
+		semconv.URLTemplateKey.String("/teams/{team_id}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -8072,7 +8172,8 @@ func (c *Client) sendReadTeam(ctx context.Context, params ReadTeamParams) (res R
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadTeamResponse(resp)
@@ -8097,8 +8198,9 @@ func (c *Client) sendSignup(ctx context.Context, request *Signup, params SignupP
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("Signup"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/auth/signup"),
+		semconv.URLTemplateKey.String("/auth/signup"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -8187,7 +8289,8 @@ func (c *Client) sendSignup(ctx context.Context, request *Signup, params SignupP
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeSignupResponse(resp)
@@ -8212,8 +8315,9 @@ func (c *Client) sendSignupInitialData(ctx context.Context, params SignupInitial
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("SignupInitialData"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/auth/signup"),
+		semconv.URLTemplateKey.String("/auth/signup"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -8277,7 +8381,8 @@ func (c *Client) sendSignupInitialData(ctx context.Context, params SignupInitial
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeSignupInitialDataResponse(resp)
@@ -8302,8 +8407,9 @@ func (c *Client) sendSubmitUserConsent(ctx context.Context, params SubmitUserCon
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("SubmitUserConsent"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/users/{user_id}/consents/{kind}"),
+		semconv.URLTemplateKey.String("/users/{user_id}/consents/{kind}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -8419,7 +8525,8 @@ func (c *Client) sendSubmitUserConsent(ctx context.Context, params SubmitUserCon
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeSubmitUserConsentResponse(resp)
@@ -8444,8 +8551,9 @@ func (c *Client) sendUpdateAuthenticatedUser(ctx context.Context, request *UserU
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UpdateAuthenticatedUser"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.HTTPRouteKey.String("/users/me"),
+		semconv.URLTemplateKey.String("/users/me"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -8494,7 +8602,8 @@ func (c *Client) sendUpdateAuthenticatedUser(ctx context.Context, request *UserU
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeUpdateAuthenticatedUserResponse(resp)
@@ -8521,8 +8630,9 @@ func (c *Client) sendUpdateEventDeferredNotification(ctx context.Context, reques
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UpdateEventDeferredNotification"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/deferred-notification"),
+		semconv.URLTemplateKey.String("/events/{event_id}/deferred-notification"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -8623,7 +8733,8 @@ func (c *Client) sendUpdateEventDeferredNotification(ctx context.Context, reques
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeUpdateEventDeferredNotificationResponse(resp)
@@ -8648,8 +8759,9 @@ func (c *Client) sendUpdateEventDiplomaSettings(ctx context.Context, request *Up
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UpdateEventDiplomaSettings"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/diploma-settings"),
+		semconv.URLTemplateKey.String("/events/{event_id}/diploma-settings"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -8750,7 +8862,8 @@ func (c *Client) sendUpdateEventDiplomaSettings(ctx context.Context, request *Up
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeUpdateEventDiplomaSettingsResponse(resp)
@@ -8775,8 +8888,9 @@ func (c *Client) sendUpdateEventLimit(ctx context.Context, request *UpdateEventL
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UpdateEventLimit"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.HTTPRouteKey.String("/events/{event_id}/limit"),
+		semconv.URLTemplateKey.String("/events/{event_id}/limit"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -8877,7 +8991,8 @@ func (c *Client) sendUpdateEventLimit(ctx context.Context, request *UpdateEventL
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeUpdateEventLimitResponse(resp)
@@ -8902,8 +9017,9 @@ func (c *Client) sendUpdateFileMeta(ctx context.Context, request *UpdateFileMeta
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UpdateFileMeta"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.HTTPRouteKey.String("/files/{file_id}/meta"),
+		semconv.URLTemplateKey.String("/files/{file_id}/meta"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -9004,7 +9120,8 @@ func (c *Client) sendUpdateFileMeta(ctx context.Context, request *UpdateFileMeta
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeUpdateFileMetaResponse(resp)
@@ -9030,8 +9147,9 @@ func (c *Client) sendUpdateTeam(ctx context.Context, request *UpdateTeamReq, par
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UpdateTeam"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.HTTPRouteKey.String("/teams/{team_id}"),
+		semconv.URLTemplateKey.String("/teams/{team_id}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -9131,7 +9249,8 @@ func (c *Client) sendUpdateTeam(ctx context.Context, request *UpdateTeamReq, par
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeUpdateTeamResponse(resp)
@@ -9159,8 +9278,9 @@ func (c *Client) sendUploadFile(ctx context.Context, request *UploadFileReq, par
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UploadFile"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/files/{file_id}"),
+		semconv.URLTemplateKey.String("/files/{file_id}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -9260,7 +9380,8 @@ func (c *Client) sendUploadFile(ctx context.Context, request *UploadFileReq, par
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeUploadFileResponse(resp)
@@ -9285,8 +9406,9 @@ func (c *Client) sendValidateAuthorization(ctx context.Context, params ValidateA
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ValidateAuthorization"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/oauth/authorize"),
+		semconv.URLTemplateKey.String("/oauth/authorize"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -9445,7 +9567,8 @@ func (c *Client) sendValidateAuthorization(ctx context.Context, params ValidateA
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeValidateAuthorizationResponse(resp)
@@ -9470,8 +9593,9 @@ func (c *Client) sendValidateTeamContact(ctx context.Context, request TeamContac
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ValidateTeamContact"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/teams/contact-validate"),
+		semconv.URLTemplateKey.String("/teams/contact-validate"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -9520,7 +9644,8 @@ func (c *Client) sendValidateTeamContact(ctx context.Context, request TeamContac
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeValidateTeamContactResponse(resp)

@@ -3,7 +3,7 @@
 // Документация к API: http://talent.kruzhok.org/v2/docs/
 package talentv2
 
-//go:generate go run github.com/shagohead/gotools@v0.1.3 ogen -target ./ -package talentv2 -clean openapi.yaml
+//go:generate go tool gotools ogen -target ./ -package talentv2 -clean openapi.yaml
 
 const (
 	ProductionURL = "https://talent.kruzhok.org/v2"

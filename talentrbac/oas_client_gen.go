@@ -9,16 +9,15 @@ import (
 	"time"
 
 	"github.com/go-faster/errors"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/metric"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
-	"go.opentelemetry.io/otel/trace"
-
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/otelogen"
 	"github.com/ogen-go/ogen/uri"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/metric"
+	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func trimTrailingSlashes(u *url.URL) {
@@ -97,8 +96,9 @@ func (c *Client) sendHasPermission(ctx context.Context, params HasPermissionPara
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("HasPermission"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/permissions/{permission_id}/has"),
+		semconv.URLTemplateKey.String("/permissions/{permission_id}/has"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -181,7 +181,8 @@ func (c *Client) sendHasPermission(ctx context.Context, params HasPermissionPara
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeHasPermissionResponse(resp)
@@ -206,8 +207,9 @@ func (c *Client) sendPermissionMeta(ctx context.Context, params PermissionMetaPa
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("PermissionMeta"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/permissions/meta/{permission_key}"),
+		semconv.URLTemplateKey.String("/permissions/meta/{permission_key}"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -271,7 +273,8 @@ func (c *Client) sendPermissionMeta(ctx context.Context, params PermissionMetaPa
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodePermissionMetaResponse(resp)

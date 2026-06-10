@@ -1912,11 +1912,9 @@ components:
         phone:
           type: string
           title: Номер телефона
-          x-ogen-type: "gitlab.jetstyle.in/jetstyle/nti/talent-v2/pkg/auth/phonenumber.PhoneNumber"
         phone_unconfirmed:
           type: string
           title: Номер неподтвержденного телефона
-          x-ogen-type: "gitlab.jetstyle.in/jetstyle/nti/talent-v2/pkg/auth/phonenumber.PhoneNumber"
         session_token: {type: string, title: Токен подтверждения телефона}
         stepik_uid: {type: string, title: ID пользователя Stepik}
         github_uid: {type: string, title: ID пользователя GitHub}
@@ -2785,7 +2783,6 @@ components:
         phone:
           type: string
           title: Номер телефона
-          x-ogen-type: "gitlab.jetstyle.in/jetstyle/nti/talent-v2/pkg/auth/phonenumber.PhoneNumber"
         session_token: {type: string, title: Токен подтверждения телефона}
     UserUpdate:
       type: object
@@ -2802,7 +2799,6 @@ components:
         phone:
           type: string
           title: Номер телефона
-          x-ogen-type: "gitlab.jetstyle.in/jetstyle/nti/talent-v2/pkg/auth/phonenumber.PhoneNumber"
         session_token: {type: string, title: Токен подтверждения телефона}
         about: {type: string}
         status_text: {type: string}
@@ -3663,7 +3659,6 @@ components:
         type: string
         title: Символьный ключ провайдера внешней авторизации
         description: Допускаются значения поддерживаемых для выполнения авторизации провайдеров.
-        x-ogen-type: "gitlab.jetstyle.in/jetstyle/nti/talent-v2/pkg/auth/socialauth.Key"
     subject_ids:
       name: subject_id
       in: query

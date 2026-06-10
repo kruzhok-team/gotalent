@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
-
 	"github.com/ogen-go/ogen/ogenerrors"
 	"github.com/ogen-go/ogen/validate"
 )
@@ -23,7 +22,7 @@ func decodeHasPermissionResponse(resp *http.Response) (res HasPermissionRes, _ e
 		// Code 403.
 		return &HasPermissionForbidden{}, nil
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
 func decodePermissionMetaResponse(resp *http.Response) (res PermissionMetaRes, _ error) {
@@ -67,5 +66,5 @@ func decodePermissionMetaResponse(resp *http.Response) (res PermissionMetaRes, _
 		// Code 404.
 		return &ObjectNotFound{}, nil
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }

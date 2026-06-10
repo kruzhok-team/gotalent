@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-//go:generate go run github.com/shagohead/gotools@v0.1.3 ogen -target ./ -package talentrbac -clean openapi.yaml
+//go:generate go tool gotools ogen -target ./ -package talentrbac -clean openapi.yaml
 
 // Интерфейс клиента для проверок наличия доступа.
 type PermissionChecker interface {

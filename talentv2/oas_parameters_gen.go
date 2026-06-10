@@ -16,8 +16,8 @@ type AddEventDiplomaRoleParams struct {
 
 // ArchiveEventRequestsFilesParams is parameters of ArchiveEventRequestsFiles operation.
 type ArchiveEventRequestsFilesParams struct {
-	FieldID   OptInt32
-	RequestID OptInt32
+	FieldID   OptInt32 `json:",omitempty,omitzero"`
+	RequestID OptInt32 `json:",omitempty,omitzero"`
 	// ID мероприятия.
 	EventID int32
 }
@@ -39,7 +39,7 @@ type CheckUserConsentParams struct {
 type CompleteSocialAuthParams struct {
 	Provider  string
 	State     string
-	CsrfState OptString
+	CsrfState OptString `json:",omitempty,omitzero"`
 }
 
 // ConfirmFileUploadParams is parameters of ConfirmFileUpload operation.
@@ -57,21 +57,21 @@ type ConfirmSignupEmailParams struct {
 // CountEventsParams is parameters of CountEvents operation.
 type CountEventsParams struct {
 	// Фильтр по массиву идентификаторов мероприятий.
-	EventID []int32
+	EventID []int32 `json:",omitempty"`
 	// Фильтрация мероприятий по ID организации.
-	OrganizationID []int32
+	OrganizationID []int32 `json:",omitempty"`
 	// Фильтрация мероприятий по ID мета-мероприятия.
-	MetaEventID []int32
+	MetaEventID []int32 `json:",omitempty"`
 	// Фильтрация мероприятий по ID площадки их проведения.
-	VenueID []int32
+	VenueID []int32 `json:",omitempty"`
 	// Мероприятия с датой начала ранее указанной.
-	StartBefore OptDateTime
+	StartBefore OptDateTime `json:",omitempty,omitzero"`
 	// Мероприятия с датой завершения после указанной.
-	EndAfter OptDateTime
+	EndAfter OptDateTime `json:",omitempty,omitzero"`
 	// Поиск по названию, ключевым словам и описанию.
-	Search OptString
+	Search OptString `json:",omitempty,omitzero"`
 	// Фильтрация по формату мероприятий.
-	Format OptEventFormat
+	Format OptEventFormat `json:",omitempty,omitzero"`
 }
 
 // CreateEventDeferredNotificationParams is parameters of CreateEventDeferredNotification operation.
@@ -155,11 +155,11 @@ type EventDeferredNotificationTemplateIDParams struct {
 // EventSignupParams is parameters of EventSignup operation.
 type EventSignupParams struct {
 	// Валидация запроса без создания заявки.
-	DryRun OptBool
+	DryRun OptBool `json:",omitempty,omitzero"`
 	// Отключение уведомления пользователя о регистрации.
-	SilenceNotification OptBool
-	AcceptLanguage      OptString
-	Utm                 OptString
+	SilenceNotification OptBool   `json:",omitempty,omitzero"`
+	AcceptLanguage      OptString `json:",omitempty,omitzero"`
+	Utm                 OptString `json:",omitempty,omitzero"`
 	// ID мероприятия.
 	EventID int32
 }
@@ -181,70 +181,70 @@ type IsOrganizationAdminParams struct {
 	// это значит что если указать `false`, а пользователь
 	// является владельцем,
 	// то ответ будет иметь статус `403`.
-	IsOwner OptBool
+	IsOwner OptBool `json:",omitempty,omitzero"`
 }
 
 // ListAddAchievementEventsParams is parameters of ListAddAchievementEvents operation.
 type ListAddAchievementEventsParams struct {
 	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
 	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
+	Limit OptInt32 `json:",omitempty,omitzero"`
 	// Поиск по названию, ключевым словам и описанию.
-	Search OptString
+	Search OptString `json:",omitempty,omitzero"`
 	// Фильтр по массиву идентификаторов мероприятий.
-	EventID []int32
+	EventID []int32 `json:",omitempty"`
 	// Фильтрация по формату мероприятий.
-	Format OptEventFormat
+	Format OptEventFormat `json:",omitempty,omitzero"`
 	// Мероприятия с датой начала ранее указанной.
-	StartBefore OptDateTime
+	StartBefore OptDateTime `json:",omitempty,omitzero"`
 	// Мероприятия с датой завершения после указанной.
-	EndAfter OptDateTime
+	EndAfter OptDateTime `json:",omitempty,omitzero"`
 	// Фильтр по массиву идентификаторов брендов.
-	BrandID []int32
+	BrandID []int32 `json:",omitempty"`
 	// Фильтр по массиву идентификаторов компетенций
 	// Конкурса Талант.
-	CompetencyID []int32
+	CompetencyID []int32 `json:",omitempty"`
 	// Фильтрация по названию региона.
-	Region OptString
+	Region OptString `json:",omitempty,omitzero"`
 }
 
 // ListCalendarEventsParams is parameters of ListCalendarEvents operation.
 type ListCalendarEventsParams struct {
 	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
 	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
+	Limit OptInt32 `json:",omitempty,omitzero"`
 	// Критерий сортировки результатов.
-	OrderBy OptListCalendarEventsOrderBy
+	OrderBy OptListCalendarEventsOrderBy `json:",omitempty,omitzero"`
 }
 
 // ListEventBrandsParams is parameters of ListEventBrands operation.
 type ListEventBrandsParams struct {
 	// Фильтр по массиву идентификаторов мероприятий.
-	EventID []int32
+	EventID []int32 `json:",omitempty"`
 	// Фильтр по массиву идентификаторов брендов.
-	BrandID []int32
+	BrandID []int32 `json:",omitempty"`
 	// Пропуск объектов с идентификатором равном или менее
 	// указанного.
-	IDOffset OptInt32
+	IDOffset OptInt32 `json:",omitempty,omitzero"`
 	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
 	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
+	Limit OptInt32 `json:",omitempty,omitzero"`
 }
 
 // ListEventDiplomaSettingsParams is parameters of ListEventDiplomaSettings operation.
 type ListEventDiplomaSettingsParams struct {
 	// Пропуск объектов с идентификатором равном или менее
 	// указанного.
-	IDOffset OptInt32
+	IDOffset OptInt32 `json:",omitempty,omitzero"`
 	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
 	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
+	Limit OptInt32 `json:",omitempty,omitzero"`
 	// ID мероприятий, записывается в формате `?event_ids=1,2,3`.
-	EventIds []int32
+	EventIds []int32 `json:",omitempty"`
 }
 
 // ListEventFieldsParams is parameters of ListEventFields operation.
@@ -256,71 +256,71 @@ type ListEventFieldsParams struct {
 // ListEventRoutesParams is parameters of ListEventRoutes operation.
 type ListEventRoutesParams struct {
 	// Фильтр по массиву идентификаторов мероприятий.
-	EventID []int32
+	EventID []int32 `json:",omitempty"`
 	// Фильтр по массиву идентификаторов направлений.
-	RouteID []int32
+	RouteID []int32 `json:",omitempty"`
 	// Пропуск объектов с идентификатором равном или менее
 	// указанного.
-	IDOffset OptInt32
+	IDOffset OptInt32 `json:",omitempty,omitzero"`
 	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
 	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
+	Limit OptInt32 `json:",omitempty,omitzero"`
 }
 
 // ListEventsParams is parameters of ListEvents operation.
 type ListEventsParams struct {
 	// Фильтр по массиву идентификаторов мероприятий.
-	EventID []int32
+	EventID []int32 `json:",omitempty"`
 	// Фильтрация мероприятий по ID организации.
-	OrganizationID []int32
+	OrganizationID []int32 `json:",omitempty"`
 	// Фильтрация мероприятий по ID мета-мероприятия.
-	MetaEventID []int32
+	MetaEventID []int32 `json:",omitempty"`
 	// Фильтрация мероприятий по ID площадки их проведения.
-	VenueID []int32
+	VenueID []int32 `json:",omitempty"`
 	// Мероприятия с датой начала ранее указанной.
-	StartBefore OptDateTime
+	StartBefore OptDateTime `json:",omitempty,omitzero"`
 	// Мероприятия с датой завершения после указанной.
-	EndAfter OptDateTime
+	EndAfter OptDateTime `json:",omitempty,omitzero"`
 	// Поиск по названию, ключевым словам и описанию.
-	Search OptString
+	Search OptString `json:",omitempty,omitzero"`
 	// Фильтрация по формату мероприятий.
-	Format OptEventFormat
+	Format OptEventFormat `json:",omitempty,omitzero"`
 	// Пропуск объектов с идентификатором равном или менее
 	// указанного.
-	IDOffset OptInt32
+	IDOffset OptInt32 `json:",omitempty,omitzero"`
 	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
 	// Максимум объектов возвращаемых в теле ответа.
-	Limit   OptInt32
-	OrderBy OptListEventsOrderBy
+	Limit   OptInt32             `json:",omitempty,omitzero"`
+	OrderBy OptListEventsOrderBy `json:",omitempty,omitzero"`
 }
 
 // ListFileMetaParams is parameters of ListFileMeta operation.
 type ListFileMetaParams struct {
 	// Чтение метаинформации конкретных файлов. Значения
 	// указываются через запятую.
-	FileID []uuid.UUID
+	FileID []uuid.UUID `json:",omitempty"`
 	// Статус публичности файла.
-	IsPublic OptBool
+	IsPublic OptBool `json:",omitempty,omitzero"`
 	// Пространство имен для объекта, где используется файл,
 	// в формате
 	// <сервис>/<таблица БД>/<поле со ссылкой на файл>
 	// (например, polls/questions/picture, venues/venue/cover, etc.).
-	Namespace OptString
+	Namespace OptString `json:",omitempty,omitzero"`
 	// Фильтрация по префиксной подстроке в пространстве
 	// имен.
-	NamespaceStartswith OptString
+	NamespaceStartswith OptString `json:",omitempty,omitzero"`
 	// Фильтрация по подстроке в имени файла.
-	NameLike OptString
+	NameLike OptString `json:",omitempty,omitzero"`
 	// Фильтрация по точному совпадению расширения.
-	Ext OptString
+	Ext OptString `json:",omitempty,omitzero"`
 	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
 	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
+	Limit OptInt32 `json:",omitempty,omitzero"`
 	// Поле, по которому будет отсортирован список файлов.
-	OrderBy OptListFileMetaOrderBy
+	OrderBy OptListFileMetaOrderBy `json:",omitempty,omitzero"`
 }
 
 // ListOrganizationEventsParams is parameters of ListOrganizationEvents operation.
@@ -328,73 +328,73 @@ type ListOrganizationEventsParams struct {
 	// ID организации.
 	OrganizationID int32
 	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
 	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
+	Limit OptInt32 `json:",omitempty,omitzero"`
 	// Фильтр по массиву идентификаторов мероприятий.
-	EventID []int32
+	EventID []int32 `json:",omitempty"`
 	// Поиск по названию, ключевым словам и описанию.
-	Search OptString
+	Search OptString `json:",omitempty,omitzero"`
 	// Фильтрация по формату мероприятий.
-	Format OptEventFormat
+	Format OptEventFormat `json:",omitempty,omitzero"`
 	// Мероприятия с датой начала ранее указанной.
-	StartBefore OptDateTime
+	StartBefore OptDateTime `json:",omitempty,omitzero"`
 	// Мероприятия с датой завершения после указанной.
-	EndAfter OptDateTime
+	EndAfter OptDateTime `json:",omitempty,omitzero"`
 	// Фильтрация по названию города.
-	City OptString
+	City OptString `json:",omitempty,omitzero"`
 	// Критерий сортировки результатов.
 	// При использовании текстового поиска,
 	// результаты будут отсортированы сначала в порядке
 	// релевантности,
 	// а потом в соответствии с указанным этим параметром
 	// критерием.
-	OrderBy OptListOrganizationEventsOrderBy
+	OrderBy OptListOrganizationEventsOrderBy `json:",omitempty,omitzero"`
 }
 
 // ListOrganizationSubjectsParams is parameters of ListOrganizationSubjects operation.
 type ListOrganizationSubjectsParams struct {
 	// Пропуск объектов с идентификатором равном или менее
 	// указанного.
-	IDOffset OptInt32
+	IDOffset OptInt32 `json:",omitempty,omitzero"`
 	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
 	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
+	Limit OptInt32 `json:",omitempty,omitzero"`
 	// Фильтр по массиву идентификаторов организаций.
-	OrganizationID []int32
+	OrganizationID []int32 `json:",omitempty"`
 	// Фильтр по массиву идентификаторов тематик.
-	SubjectID []int32
+	SubjectID []int32 `json:",omitempty"`
 }
 
 // ListOrganizationsParams is parameters of ListOrganizations operation.
 type ListOrganizationsParams struct {
 	// Фильтр по массиву идентификаторов организаций.
-	OrganizationID []int32
+	OrganizationID []int32 `json:",omitempty"`
 	// ID родительской организации.
-	ParentOrganizationID OptInt32
+	ParentOrganizationID OptInt32 `json:",omitempty,omitzero"`
 	// Пропуск объектов с идентификатором равном или менее
 	// указанного.
-	IDOffset OptInt32
+	IDOffset OptInt32 `json:",omitempty,omitzero"`
 	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
 	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
+	Limit OptInt32 `json:",omitempty,omitzero"`
 	// Критерий сортировки результатов.
-	OrderBy OptListOrganizationsOrderBy
+	OrderBy OptListOrganizationsOrderBy `json:",omitempty,omitzero"`
 }
 
 // ListSocialAuthsParams is parameters of ListSocialAuths operation.
 type ListSocialAuthsParams struct {
 	// Фильтрация по провайдеру авторизации.
-	Provider OptSocialAuthProvider
+	Provider OptSocialAuthProvider `json:",omitempty,omitzero"`
 	// Пропуск объектов с идентификатором равном или менее
 	// указанного.
-	IDOffset OptInt32
+	IDOffset OptInt32 `json:",omitempty,omitzero"`
 	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
 	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
+	Limit OptInt32 `json:",omitempty,omitzero"`
 	// ID пользователя.
 	UserID int32
 }
@@ -403,11 +403,11 @@ type ListSocialAuthsParams struct {
 type ListSubjectsParams struct {
 	// Пропуск объектов с идентификатором равном или менее
 	// указанного.
-	IDOffset OptInt32
+	IDOffset OptInt32 `json:",omitempty,omitzero"`
 	// Кол-во объектов выборки для пропуска.
-	Offset OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
 	// Максимум объектов возвращаемых в теле ответа.
-	Limit OptInt32
+	Limit OptInt32 `json:",omitempty,omitzero"`
 }
 
 // ListUserConsentsParams is parameters of ListUserConsents operation.
@@ -419,9 +419,9 @@ type ListUserConsentsParams struct {
 // LoginSocialAuthParams is parameters of LoginSocialAuth operation.
 type LoginSocialAuthParams struct {
 	Provider string
-	Next     OptString
-	RegNext  OptString
-	ErrNext  OptString
+	Next     OptString `json:",omitempty,omitzero"`
+	RegNext  OptString `json:",omitempty,omitzero"`
+	ErrNext  OptString `json:",omitempty,omitzero"`
 }
 
 // PatchMutationLockParams is parameters of PatchMutationLock operation.
@@ -438,7 +438,7 @@ type ReadEventParams struct {
 	// ID мероприятия.
 	EventID int32
 	// Вернуть в ответе полный набор свойств.
-	Extend OptBool
+	Extend OptBool `json:",omitempty,omitzero"`
 }
 
 // ReadEventDeferredNotificationParams is parameters of ReadEventDeferredNotification operation.
@@ -461,7 +461,7 @@ type ReadEventLimitParams struct {
 
 // ReadFileParams is parameters of ReadFile operation.
 type ReadFileParams struct {
-	Noredir OptBool
+	Noredir OptBool `json:",omitempty,omitzero"`
 	// ID файла.
 	FileID uuid.UUID
 }
@@ -486,8 +486,8 @@ type ReadTeamParams struct {
 
 // SignupParams is parameters of Signup operation.
 type SignupParams struct {
-	PartialToken OptUUID
-	Utm          OptString
+	PartialToken OptUUID   `json:",omitempty,omitzero"`
+	Utm          OptString `json:",omitempty,omitzero"`
 }
 
 // SignupInitialDataParams is parameters of SignupInitialData operation.
@@ -543,6 +543,6 @@ type ValidateAuthorizationParams struct {
 	ResponseType string
 	RedirectURI  string
 	ClientID     string
-	Scope        OptString
-	AutoRenew    OptBool
+	Scope        OptString `json:",omitempty,omitzero"`
+	AutoRenew    OptBool   `json:",omitempty,omitzero"`
 }
