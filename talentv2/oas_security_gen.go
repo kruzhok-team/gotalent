@@ -77,6 +77,12 @@ var operationRolesTalentOAuth = map[string][]string{
 	CreateEventLimitOperation: []string{
 		"events",
 	},
+	CreateEventTeamOperation: []string{
+		"events",
+	},
+	CreateEventTeamPersonOperation: []string{
+		"events",
+	},
 	CreateFileMetaOperation: []string{
 		"files",
 	},
@@ -88,6 +94,12 @@ var operationRolesTalentOAuth = map[string][]string{
 	},
 	CreateOrganizationSubjectOperation: []string{
 		"events",
+	},
+	CreateUserTeamOperation: []string{
+		"teams",
+	},
+	CreateUserTeamPersonOperation: []string{
+		"teams",
 	},
 	DeleteEventDiplomaRoleOperation: []string{
 		"events",
@@ -105,6 +117,9 @@ var operationRolesTalentOAuth = map[string][]string{
 		"event-requests",
 	},
 	IsOrganizationAdminOperation: []string{},
+	IsTeamOwnerOperation: []string{
+		"teams:read",
+	},
 	ListEventDiplomaSettingsOperation: []string{
 		"events:read",
 	},
@@ -114,6 +129,7 @@ var operationRolesTalentOAuth = map[string][]string{
 	ListSocialAuthsOperation: []string{
 		"user:read",
 	},
+	ListTeamsOperation: []string{},
 	ListUserConsentsOperation: []string{
 		"user:read",
 	},
@@ -123,17 +139,23 @@ var operationRolesTalentOAuth = map[string][]string{
 	ReadEventDiplomaSettingsOperation: []string{
 		"events:read",
 	},
-	ReadFileOperation: []string{
-		"files:read",
+	ReadEventRequestOperation: []string{
+		"event-requests",
 	},
-	ReadFileMetaOperation: []string{
-		"files:read",
+	ReadEventTeamOperation: []string{
+		"events:read",
 	},
-	ReadTeamOperation: []string{
+	ReadFileOperation:     []string{},
+	ReadFileMetaOperation: []string{},
+	ReadTeamOperation:     []string{},
+	ReadUserTeamOperation: []string{
 		"teams:read",
 	},
 	SubmitUserConsentOperation: []string{
 		"user",
+	},
+	UpdateEventOperation: []string{
+		"events",
 	},
 	UpdateEventDeferredNotificationOperation: []string{
 		"events",
@@ -144,10 +166,25 @@ var operationRolesTalentOAuth = map[string][]string{
 	UpdateEventLimitOperation: []string{
 		"events",
 	},
+	UpdateEventRequestOperation: []string{
+		"event-requests",
+	},
+	UpdateEventTeamOperation: []string{
+		"events",
+	},
+	UpdateEventTeamPersonOperation: []string{
+		"teams",
+	},
 	UpdateFileMetaOperation: []string{
 		"files",
 	},
-	UpdateTeamOperation: []string{
+	UpdateOwnerTeamPersonOperation: []string{
+		"teams",
+	},
+	UpdateUserTeamOperation: []string{
+		"teams",
+	},
+	UpdateUserTeamPersonOperation: []string{
 		"teams",
 	},
 	UploadFileOperation: []string{

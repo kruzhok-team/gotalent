@@ -12,6 +12,26 @@ import (
 	"github.com/ogen-go/ogen/json"
 )
 
+func encodeConfirmEventSignupRequest(
+	req OptConfirmEventSignupReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	if !req.Set {
+		// Keep request with empty body if value is not set.
+		return nil
+	}
+	e := new(jx.Encoder)
+	{
+		if req.Set {
+			req.Encode(e)
+		}
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodeCreateEventRequest(
 	req *CreateEventReq,
 	r *http.Request,
@@ -55,7 +75,35 @@ func encodeCreateEventDiplomaSettingsRequest(
 }
 
 func encodeCreateEventLimitRequest(
-	req *CreateEventLimitReq,
+	req *EventLimitWrite,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeCreateEventTeamRequest(
+	req *OrganizationTeamCreate,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeCreateEventTeamPersonRequest(
+	req *CreateEventTeamPersonReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -114,6 +162,34 @@ func encodeCreateOrganizationSubjectRequest(
 	return nil
 }
 
+func encodeCreateUserTeamRequest(
+	req *OwnerTeamCreate,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeCreateUserTeamPersonRequest(
+	req CreateUserTeamPersonReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodeEventSignupRequest(
 	req *EventSignup,
 	r *http.Request,
@@ -156,8 +232,8 @@ func encodeSignupRequest(
 	return nil
 }
 
-func encodeUpdateAuthenticatedUserRequest(
-	req *UserUpdate,
+func encodeUpdateEventRequest(
+	req *UpdateEventReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -199,7 +275,49 @@ func encodeUpdateEventDiplomaSettingsRequest(
 }
 
 func encodeUpdateEventLimitRequest(
-	req *UpdateEventLimitReq,
+	req *EventLimitWrite,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUpdateEventRequestRequest(
+	req *EventSignupUpdate,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUpdateEventTeamRequest(
+	req *OrganizationTeamUpdate,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUpdateEventTeamPersonRequest(
+	req *OrganizationTeamPersonUpdate,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -226,8 +344,36 @@ func encodeUpdateFileMetaRequest(
 	return nil
 }
 
-func encodeUpdateTeamRequest(
-	req *UpdateTeamReq,
+func encodeUpdateOwnerTeamPersonRequest(
+	req *OwnerTeamPersonUpdate,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUpdateUserTeamRequest(
+	req *OwnerTeamUpdate,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUpdateUserTeamPersonRequest(
+	req *UserTeamPersonUpdate,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

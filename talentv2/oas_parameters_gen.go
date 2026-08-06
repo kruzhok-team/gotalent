@@ -31,8 +31,13 @@ type CancelEventDeferredNotificationParams struct {
 // CheckUserConsentParams is parameters of CheckUserConsent operation.
 type CheckUserConsentParams struct {
 	// ID пользователя.
-	UserID int32
-	Kind   UserConsentKind
+	TalentID int32
+	Kind     UserConsentKind
+}
+
+// CityNameParams is parameters of CityName operation.
+type CityNameParams struct {
+	Fias uuid.UUID
 }
 
 // CompleteSocialAuthParams is parameters of CompleteSocialAuth operation.
@@ -40,6 +45,14 @@ type CompleteSocialAuthParams struct {
 	Provider  string
 	State     string
 	CsrfState OptString `json:",omitempty,omitzero"`
+}
+
+// ConfirmEventSignupParams is parameters of ConfirmEventSignup operation.
+type ConfirmEventSignupParams struct {
+	// Валидация запроса без подтверждения заявки.
+	DryRun         OptBool `json:",omitempty,omitzero"`
+	EventRequestID string
+	Token          string
 }
 
 // ConfirmFileUploadParams is parameters of ConfirmFileUpload operation.
@@ -92,6 +105,20 @@ type CreateEventLimitParams struct {
 	EventID int32
 }
 
+// CreateEventTeamParams is parameters of CreateEventTeam operation.
+type CreateEventTeamParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// CreateEventTeamPersonParams is parameters of CreateEventTeamPerson operation.
+type CreateEventTeamPersonParams struct {
+	// ID мероприятия.
+	EventID int32
+	// ID команды.
+	TeamID int32
+}
+
 // CreateFileReferenceParams is parameters of CreateFileReference operation.
 type CreateFileReferenceParams struct {
 	// ID файла.
@@ -102,11 +129,17 @@ type CreateFileReferenceParams struct {
 
 // CreateMutationLockParams is parameters of CreateMutationLock operation.
 type CreateMutationLockParams struct {
-	// Имя пространства имен, к которому относится
-	// зависимый объект.
+	// Имя пространства имен, к которому относится зависимый
+	// объект.
 	ObjectNamespace string
 	// Ключ объекта зависящего от блокируемых файлов.
 	ObjectKey string
+}
+
+// CreateUserTeamPersonParams is parameters of CreateUserTeamPerson operation.
+type CreateUserTeamPersonParams struct {
+	// ID команды.
+	TeamID int32
 }
 
 // DeleteEventDiplomaRoleParams is parameters of DeleteEventDiplomaRole operation.
@@ -133,8 +166,8 @@ type DeleteFileReferenceParams struct {
 
 // DeleteMutationLockParams is parameters of DeleteMutationLock operation.
 type DeleteMutationLockParams struct {
-	// Имя пространства имен, к которому относится
-	// зависимый объект.
+	// Имя пространства имен, к которому относится зависимый
+	// объект.
 	ObjectNamespace string
 	// Ключ объекта зависящего от блокируемых файлов.
 	ObjectKey string
@@ -176,12 +209,18 @@ type IsOrganizationAdminParams struct {
 	OrganizationID int32
 	// Требование наличия или отсутствия статуса владельца
 	// организации.
+	//
 	// При указании значения, роль пользователя должна ему
-	// соответствовать;
-	// это значит что если указать `false`, а пользователь
-	// является владельцем,
-	// то ответ будет иметь статус `403`.
+	// соответствовать; это значит что если указать `false`, а
+	// пользователь является владельцем, то ответ будет
+	// иметь статус `403`.
 	IsOwner OptBool `json:",omitempty,omitzero"`
+}
+
+// IsTeamOwnerParams is parameters of IsTeamOwner operation.
+type IsTeamOwnerParams struct {
+	// ID команды.
+	TeamID int32
 }
 
 // ListAddAchievementEventsParams is parameters of ListAddAchievementEvents operation.
@@ -304,8 +343,7 @@ type ListFileMetaParams struct {
 	// Статус публичности файла.
 	IsPublic OptBool `json:",omitempty,omitzero"`
 	// Пространство имен для объекта, где используется файл,
-	// в формате
-	// <сервис>/<таблица БД>/<поле со ссылкой на файл>
+	// в формате <сервис>/<таблица БД>/<поле со ссылкой на файл>
 	// (например, polls/questions/picture, venues/venue/cover, etc.).
 	Namespace OptString `json:",omitempty,omitzero"`
 	// Фильтрация по префиксной подстроке в пространстве
@@ -344,10 +382,10 @@ type ListOrganizationEventsParams struct {
 	// Фильтрация по названию города.
 	City OptString `json:",omitempty,omitzero"`
 	// Критерий сортировки результатов.
-	// При использовании текстового поиска,
-	// результаты будут отсортированы сначала в порядке
-	// релевантности,
-	// а потом в соответствии с указанным этим параметром
+	//
+	// При использовании текстового поиска, результаты будут
+	// отсортированы сначала в порядке релевантности, а
+	// потом в соответствии с указанным этим параметром
 	// критерием.
 	OrderBy OptListOrganizationEventsOrderBy `json:",omitempty,omitzero"`
 }
@@ -396,7 +434,7 @@ type ListSocialAuthsParams struct {
 	// Максимум объектов возвращаемых в теле ответа.
 	Limit OptInt32 `json:",omitempty,omitzero"`
 	// ID пользователя.
-	UserID int32
+	TalentID int32
 }
 
 // ListSubjectsParams is parameters of ListSubjects operation.
@@ -410,10 +448,23 @@ type ListSubjectsParams struct {
 	Limit OptInt32 `json:",omitempty,omitzero"`
 }
 
+// ListTeamsParams is parameters of ListTeams operation.
+type ListTeamsParams struct {
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32 `json:",omitempty,omitzero"`
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32 `json:",omitempty,omitzero"`
+	// Фильтрация по массиву идентификаторов команд.
+	ID []int32 `json:",omitempty"`
+	// Критерий сортировки результатов.
+	OrderBy OptListTeamsOrderBy `json:",omitempty,omitzero"`
+}
+
 // ListUserConsentsParams is parameters of ListUserConsents operation.
 type ListUserConsentsParams struct {
 	// ID пользователя.
-	UserID int32
+	TalentID int32
 }
 
 // LoginSocialAuthParams is parameters of LoginSocialAuth operation.
@@ -426,8 +477,8 @@ type LoginSocialAuthParams struct {
 
 // PatchMutationLockParams is parameters of PatchMutationLock operation.
 type PatchMutationLockParams struct {
-	// Имя пространства имен, к которому относится
-	// зависимый объект.
+	// Имя пространства имен, к которому относится зависимый
+	// объект.
 	ObjectNamespace string
 	// Ключ объекта зависящего от блокируемых файлов.
 	ObjectKey string
@@ -435,10 +486,10 @@ type PatchMutationLockParams struct {
 
 // ReadEventParams is parameters of ReadEvent operation.
 type ReadEventParams struct {
-	// ID мероприятия.
-	EventID int32
 	// Вернуть в ответе полный набор свойств.
 	Extend OptBool `json:",omitempty,omitzero"`
+	// ID мероприятия.
+	EventID int32
 }
 
 // ReadEventDeferredNotificationParams is parameters of ReadEventDeferredNotification operation.
@@ -459,6 +510,20 @@ type ReadEventLimitParams struct {
 	EventID int32
 }
 
+// ReadEventRequestParams is parameters of ReadEventRequest operation.
+type ReadEventRequestParams struct {
+	EventRequestID int32
+	Fields         OptBool `json:",omitempty,omitzero"`
+}
+
+// ReadEventTeamParams is parameters of ReadEventTeam operation.
+type ReadEventTeamParams struct {
+	// ID мероприятия.
+	EventID int32
+	// ID команды.
+	TeamID int32
+}
+
 // ReadFileParams is parameters of ReadFile operation.
 type ReadFileParams struct {
 	Noredir OptBool `json:",omitempty,omitzero"`
@@ -472,6 +537,11 @@ type ReadFileMetaParams struct {
 	FileID uuid.UUID
 }
 
+// ReadGeoDataParams is parameters of ReadGeoData operation.
+type ReadGeoDataParams struct {
+	GeodataID int32
+}
+
 // ReadPersonParams is parameters of ReadPerson operation.
 type ReadPersonParams struct {
 	// ID персоны.
@@ -480,8 +550,21 @@ type ReadPersonParams struct {
 
 // ReadTeamParams is parameters of ReadTeam operation.
 type ReadTeamParams struct {
+	// Включить в ответ массив участников команды.
+	Persons OptBool `json:",omitempty,omitzero"`
 	// ID команды.
 	TeamID int32
+}
+
+// ReadUserTeamParams is parameters of ReadUserTeam operation.
+type ReadUserTeamParams struct {
+	// ID команды.
+	TeamID int32
+}
+
+// RegionNameParams is parameters of RegionName operation.
+type RegionNameParams struct {
+	Fias uuid.UUID
 }
 
 // SignupParams is parameters of Signup operation.
@@ -498,8 +581,20 @@ type SignupInitialDataParams struct {
 // SubmitUserConsentParams is parameters of SubmitUserConsent operation.
 type SubmitUserConsentParams struct {
 	// ID пользователя.
-	UserID int32
-	Kind   UserConsentKind
+	TalentID int32
+	Kind     UserConsentKind
+}
+
+// SuggestGeoFieldParams is parameters of SuggestGeoField operation.
+type SuggestGeoFieldParams struct {
+	Field SuggestGeoFieldField
+	Term  string
+}
+
+// UpdateEventParams is parameters of UpdateEvent operation.
+type UpdateEventParams struct {
+	// ID мероприятия.
+	EventID int32
 }
 
 // UpdateEventDeferredNotificationParams is parameters of UpdateEventDeferredNotification operation.
@@ -520,14 +615,52 @@ type UpdateEventLimitParams struct {
 	EventID int32
 }
 
+// UpdateEventRequestParams is parameters of UpdateEventRequest operation.
+type UpdateEventRequestParams struct {
+	EventRequestID int32
+	Fields         OptBool `json:",omitempty,omitzero"`
+}
+
+// UpdateEventTeamParams is parameters of UpdateEventTeam operation.
+type UpdateEventTeamParams struct {
+	// ID мероприятия.
+	EventID int32
+	// ID команды.
+	TeamID int32
+}
+
+// UpdateEventTeamPersonParams is parameters of UpdateEventTeamPerson operation.
+type UpdateEventTeamPersonParams struct {
+	// ID мероприятия.
+	EventID int32
+	// ID команды.
+	TeamID int32
+	// ID участника команды.
+	TeamPersonID int32
+}
+
 // UpdateFileMetaParams is parameters of UpdateFileMeta operation.
 type UpdateFileMetaParams struct {
 	// ID файла.
 	FileID uuid.UUID
 }
 
-// UpdateTeamParams is parameters of UpdateTeam operation.
-type UpdateTeamParams struct {
+// UpdateOwnerTeamPersonParams is parameters of UpdateOwnerTeamPerson operation.
+type UpdateOwnerTeamPersonParams struct {
+	// ID команды.
+	TeamID int32
+	// ID участника команды.
+	TeamPersonID int32
+}
+
+// UpdateUserTeamParams is parameters of UpdateUserTeam operation.
+type UpdateUserTeamParams struct {
+	// ID команды.
+	TeamID int32
+}
+
+// UpdateUserTeamPersonParams is parameters of UpdateUserTeamPerson operation.
+type UpdateUserTeamPersonParams struct {
 	// ID команды.
 	TeamID int32
 }

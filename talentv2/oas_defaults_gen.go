@@ -39,6 +39,70 @@ func (s *EventDiplomaSettings) setDefaults() {
 }
 
 // setDefaults set default value of fields.
+func (s *OrganizationTeamCreate) setDefaults() {
+	{
+		val := bool(true)
+		s.AssignmentParticipation.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *OrganizationTeamUpdate) setDefaults() {
+	{
+		val := bool(true)
+		s.AssignmentParticipation.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *OwnerTeamCreate) setDefaults() {
+	{
+		val := bool(true)
+		s.AssignmentParticipation.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *OwnerTeamUpdate) setDefaults() {
+	{
+		val := bool(true)
+		s.AssignmentParticipation.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *TeamPrivate) setDefaults() {
+	{
+		val := bool(true)
+		s.AssignmentParticipation = val
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *TeamPrivateWithPersons) setDefaults() {
+	{
+		val := bool(true)
+		s.AssignmentParticipation = val
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *TeamPublic) setDefaults() {
+	{
+		val := bool(true)
+		s.AssignmentParticipation = val
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *TeamPublicWithPersons) setDefaults() {
+	{
+		val := bool(true)
+		s.AssignmentParticipation = val
+	}
+}
+
+// setDefaults set default value of fields.
 func (s *UpdateEventDiplomaSettingsReq) setDefaults() {
 	{
 		val := DiplomaTemplate("diploma")

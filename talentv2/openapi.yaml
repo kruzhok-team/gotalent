@@ -1,7 +1,8 @@
+# vim: fdl=1
 openapi: 3.1.0
 info:
   title: Talent API v2
-  version: '0.11-minor'
+  version: '0.12-minor'
   contact:
     email: talent@kruzhok.org
 servers:
@@ -9,156 +10,6 @@ servers:
     description: Production Server
   - url: https://talent.test.kruzhok.org/v2
     description: Development Server
-
-tags:
-  - name: generic-files
-    x-displayName: Файлы любого формата
-    description: |-
-      Файлы пользователей могут быть как приватными так и публичными.
-      Публичные файлы доступны всем, в том числе и без аутентификации.
-      Запрос к приватному файлу может осуществляться только от его владельца.
-      Так же как и запросы на какое либо изменение файла.
-
-      Файлы могут быть загружены в хранилище и привязаны к объектам любого сервиса.
-      Как загрузить файл:
-      1. Выполнить запрос на создание файла с указанием пространства имен, где он будет использован. После
-      успешного добавления метаинформации о файле в ответе будет получена ссылка на загрузку файла и ID файла.
-      2. Загрузить файл в хранилище, используя полученный URL и заголовки.
-      3. После успешной загрузки файла сообщить об этом серверу с помощью запроса
-      [/files/{file_id}/confirm-upload](#tag/generic-files/operation/FileConfirmUpload) с указанием ID файла.
-      4. При необходимости можно повторно получить ссылку на загрузку того же или альтернативного файла, отправив
-      запрос на [/files/{file_id}](#tag/generic-files/operation/FileUpload) с указанием его размера.
-      5. Для добавления ссылки на объект (ID в пространстве имен), где файл используется, нужно выполнить запрос
-      [/files/{file_id}/references/{object_id}](#tag/generic-files/operation/FileReferenceCreate). К одному файлу
-      можно добавлять несколько связанных объектов.
-
-      #### Ограничения размера загружаемых файлов
-
-      Допустимый размер одного файла ограничен 10 мегабайтами. При его превышении возвращается 413 ответ.
-
-      Помимо этого, 413 ответ будет возвращен и когда достигается лимит суммы размера файлов пользователя.
-  - name: mutation-locks
-    x-displayName: Блокировки изменений
-    description: |-
-      После загрузки, файл может быть заблокирован от изменений.
-      Каждая блокировка относится к какому-то объекту в системе,
-      для которого файл становится зависимостью.
-      Таких объектов-блокировок на файл может быть назначено несколько.
-      И пока есть хотя бы одна активная блокировка, файл изменить нельзя.
-
-      Блокировка может быть снята только системой,
-      ответственной за объект, на который ссылается блок.
-      Для представления этой ссылки, блок имеет два свойства:
-
-        - `object_key` - символьное представление ключа зависимого объекта;
-        - `object_namespace` - пространство имен ключа, определяющее тип сущности, которую ключ идентифицирует.
-  - name: event-requests
-    x-displayName: Заявки на мероприятия
-  - name: events-read
-    x-displayName: Чтение мероприятий
-  - name: events-manage
-    x-displayName: Управление мероприятиями
-  - name: events-schema
-    x-displayName: Схемы для мероприятий
-  - name: events-deferred-notification
-    x-displayName: Отложенные уведомления
-    description: Отложенные уведомления для участников мероприятий.
-  - name: events-diploma-settings
-    x-displayName: Настройки дипломов для мероприятий
-  - name: oauth
-    x-displayName: OAuth2 провайдер
-    description: |-
-      Реализация авторизационного сервера OAuth2.
-      [RFC6749](https://tools.ietf.org/html/rfc6749)
-      [RFC7636](https://tools.ietf.org/html/rfc7636)
-  - name: organizations
-    x-displayName: Операции организаций
-  - name: organization-subjects
-    x-displayName: Операции с тематиками организаций
-  - name: persons
-    x-displayName: Персоны пользователей
-  - name: user-signup
-    x-displayName: Регистрация пользователя
-  - name: user-profile
-    x-displayName: Профиль пользователя
-  - name: social-auths
-    x-displayName: Внешние провайдеры авторизации
-  - name: teams
-    x-displayName: Команды пользователей
-  - name: teams-schema
-    x-displayName: Схемы для команд
-  - name: user-consents
-    x-displayName: Пользовательские согласия
-    description: |-
-      Параметр `user_id` в запросе должен содержать идентификатор аутентифицированного пользователя.
-  - name: auth
-    x-displayName: Аутентификация
-    description: |-
-      ## TalentOAuth
-
-      Аутентификация токеном TalentOAuth пользователем Таланта.
-      Передается в заголовке `Authorization: Bearer` в формате JWT.
-
-      При использовании этой аутентификации,
-      авторизация сервисом выполняется в отношении пользователя,
-      авторизовавшего переданный токен.
-
-      Для получения токена нужно воспользоваться [API OAuth2 провайдера](#tag/oauth).
-
-      ## ClientCredentials
-
-      Аутентификация учетными данными OAuth2 клиента TalentOAuth.
-      В качестве `username` используется `client_id`, а в `password` - `client_secret`.
-  - name: offset
-    x-displayName: Пагинация
-    description: |-
-      Пагинация может быть представлена как параметром `offset`, так и параметром `id_offset`.
-      Параметр `offset` позволяет указать кол-во объектов для пропуска из читаемой выборки.
-      В `id_offset` указывается идентификатор, до которого включительно будут пропущены объекты.
-
-      > Предпочтительно, когда есть возможность, использовать `id_offset`.
-      > Также надо учитывать, что допустимое значение для `offset` имеет ограничения.
-
-      > У `id_offset` тоже имеется ограничение - с ним не доступны варианты сортировки результатов,
-      > за исключением вариантов `id_asc` и `id_desc`.
-      > Для иных значений `order_by` будет возвращаться ответ `400 Bad Request`.
-    x-traitTag: true
-
-x-tagGroups:
-  - name: Общие свойства API
-    tags:
-      - auth
-      - offset
-  - name: Авторизация
-    tags:
-      - oauth
-  - name: Мероприятия
-    tags:
-      - events-schema
-      - events-read
-      - events-manage
-      - events-deferred-notification
-      - events-diploma-settings
-      - event-requests
-  - name: Организации
-    tags:
-      - organizations
-      - organization-subjects
-  - name: Пользователи
-    tags:
-      - persons
-      - social-auths
-      - user-signup
-      - user-profile
-      - user-consents
-  - name: Команды
-    tags:
-      - teams
-      - teams-schema
-  - name: Файлы
-    tags:
-      - generic-files
-      - mutation-locks
 
 paths:
   /auth/login/{provider}:
@@ -180,6 +31,7 @@ paths:
           type: string
           description: Адрес перенаправления при завершении авторизации ошибкой
     get:
+      # TODO: Cache-Control: no-store, no-cache, must-revalidate; Pragma: no-cache; Expires: 0
       operationId: LoginSocialAuth
       summary: Авторизация во внешнем провайдере
       tags: [social-auths]
@@ -199,7 +51,7 @@ paths:
         '403':
           $ref: '#/components/responses/SocialAuthForbidden'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
 
   /auth/complete/{provider}:
     parameters:
@@ -212,6 +64,7 @@ paths:
         in: cookie
         schema: {type: string}
     get:
+      # TODO: Cache-Control: no-store, no-cache, must-revalidate; Pragma: no-cache; Expires: 0
       operationId: CompleteSocialAuth
       summary: Завершение авторизации
       tags: [social-auths]
@@ -225,7 +78,7 @@ paths:
         '403':
           $ref: '#/components/responses/SocialAuthForbidden'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
 
   /auth/disconnect/{provider}/{uid}:
     parameters:
@@ -252,10 +105,11 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
 
   /auth/signup:
     get:
+      # TODO: Cache-Control: no-store, no-cache, must-revalidate; Pragma: no-cache; Expires: 0
       operationId: SignupInitialData
       summary: Данные для предзаполнения формы регистрации
       tags: [user-signup]
@@ -275,7 +129,7 @@ paths:
         '204':
           description: Данные отсутствуют
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     post:
       operationId: Signup
       summary: Регистрация пользователя
@@ -311,7 +165,7 @@ paths:
         '501':
           $ref: '#/components/responses/NotImplemented'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
 
   /auth/confirm-email/{uid}/{token}:
     parameters:
@@ -333,7 +187,7 @@ paths:
         '501':
           $ref: '#/components/responses/NotImplemented'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
 
   /files:
     get:
@@ -347,52 +201,37 @@ paths:
           - параметр `is_public` отсутствует либо содержит `true`
 
         При несоблюдении какого-либо из условий, возвращается `401` ответ.
-      tags:
-        - generic-files
-      security:
-        - TalentOAuth: [files:read]
-        - {}
+      tags: [generic-files]
+      security: [TalentOAuth: [files:read], {}]
       parameters:
         - name: file_id
           in: query
           description: Чтение метаинформации конкретных файлов. Значения указываются через запятую.
           explode: false
-          schema:
-            type: array
-            maxItems: 30
-            items:
-              type: string
-              format: uuid
+          schema: {type: array, maxItems: 30, items: {type: string, format: uuid}}
         - name: is_public
           in: query
           description: Статус публичности файла.
-          schema:
-            type: boolean
+          schema: {type: boolean}
         - name: namespace
           in: query
           description: |-
             Пространство имен для объекта, где используется файл, в формате
             <сервис>/<таблица БД>/<поле со ссылкой на файл>
             (например, polls/questions/picture, venues/venue/cover, etc.)
-          schema:
-            type: string
+          schema: {type: string}
         - name: namespace_startswith
           in: query
           description: Фильтрация по префиксной подстроке в пространстве имен.
-          schema:
-            type: string
-            minLength: 3
+          schema: {type: string, minLength: 3}
         - name: name_like
           in: query
           description: Фильтрация по подстроке в имени файла.
-          schema:
-            type: string
-            minLength: 3
+          schema: {type: string, minLength: 3}
         - name: ext
           in: query
           description: Фильтрация по точному совпадению расширения.
-          schema:
-            type: string
+          schema: {type: string}
         - $ref: '#/components/parameters/offset'
         - $ref: '#/components/parameters/limit'
         - name: order_by
@@ -411,25 +250,19 @@ paths:
         '200':
           description: OK
           headers:
-            X-Count:
-              $ref: '#/components/headers/X-Count'
+            X-Count: {$ref: '#/components/headers/X-Count'}
           content:
             application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FileMeta'
+              schema: {type: array, items: {$ref: '#/components/schemas/FileMeta'}}
         '401':
           $ref: '#/components/responses/Unauthorized'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     post:
       operationId: CreateFileMeta
       summary: Создание файла
-      tags:
-        - generic-files
-      security:
-        - TalentOAuth: [files]
+      tags: [generic-files]
+      security: [TalentOAuth: [files]]
       requestBody:
         required: true
         content:
@@ -460,10 +293,8 @@ paths:
                 content_type:
                   type: string
                   description: MIME-тип файла.
-                content_length:
-                  $ref: '#/components/schemas/ContentLength'
-                name:
-                  $ref: '#/components/schemas/FileMetaName'
+                content_length: {$ref: '#/components/schemas/ContentLength'}
+                name: {$ref: '#/components/schemas/FileMetaName'}
       responses:
         '201':
           description: Метаданные файла добавлены, ссылка на загрузку сформирована.
@@ -478,7 +309,8 @@ paths:
         '422':
           $ref: '#/components/responses/UnproccessableEntity'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
   /files/{file_id}:
     get:
       operationId: ReadFile
@@ -487,35 +319,26 @@ paths:
         По-умолчанию возвращается в форме `307` ответа.
         С параметром `noredir=true` возвращается `200`.
 
-        Чтение приватного файла требует прохождение авторизации.
+        Чтение приватного файла требует прохождения авторизации.
         Аутентифицированный пользователь должен быть владельцем файла.
-      tags:
-        - generic-files
-      security:
-        - TalentOAuth: [files:read] # Непонятно нужен ли скоуп
-        - {}
+        Токен должен иметь скоуп `files:read`.
+      tags: [generic-files]
+      security: [TalentOAuth: [], {}]
       parameters:
-        - name: noredir
-          in: query
-          schema:
-            type: boolean
+        - {name: noredir, in: query, schema: {type: boolean}}
       responses:
         '200':
           description: Ссылка на файл
           content:
             application/json:
-              schema:
-                type: string
-                format: uri
+              schema: {type: string, format: uri}
         '307':
           description: Перенаправление на файл в хранилище
           headers:
             Location:
               required: true
               description: URL файла в хранилище
-              schema:
-                type: string
-                format: uri
+              schema: {type: string, format: uri}
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -523,7 +346,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     put:
       operationId: UploadFile
       summary: Создание запроса на загрузку файла
@@ -561,7 +384,7 @@ paths:
         '422':
           description: Файл заблокирован и недоступен для изменения
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     parameters:
       - name: file_id
         in: path
@@ -570,17 +393,19 @@ paths:
         schema:
           type: string
           format: uuid
+
   /files/{file_id}/meta:
     get:
       operationId: ReadFileMeta
       summary: Чтение информации о файле
       description: |-
-        Чтение приватного файла требует прохождение авторизации.
+        Чтение приватного файла требует прохождения авторизации.
         Аутентифицированный пользователь должен быть владельцем файла.
+        Токен должен иметь скоуп `files:read`.
       tags:
         - generic-files
       security:
-        - TalentOAuth: [files:read] # Непонятно нужен ли скоуп
+        - TalentOAuth: []
         - {}
       responses:
         '200':
@@ -596,7 +421,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     patch:
       operationId: UpdateFileMeta
       summary: Обновление информации о файле
@@ -625,7 +450,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     parameters:
       - name: file_id
         in: path
@@ -634,6 +459,7 @@ paths:
         schema:
           type: string
           format: uuid
+
   /files/{file_id}/confirm-upload:
     post:
       operationId: ConfirmFileUpload
@@ -654,7 +480,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     parameters:
       - name: file_id
         in: path
@@ -663,6 +489,7 @@ paths:
         schema:
           type: string
           format: uuid
+
   /files/{file_id}/references/{object_id}:
     put:
       operationId: CreateFileReference
@@ -685,7 +512,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     delete:
       operationId: DeleteFileReference
       summary: Удаление ссылки на файл
@@ -701,7 +528,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     parameters:
       - name: file_id
         in: path
@@ -717,41 +544,7 @@ paths:
         schema:
           type: string
           maxLength: 36
-  /events/diploma-settings:
-    get:
-      operationId: ListEventDiplomaSettings
-      summary: Список настроек дипломов мероприятий
-      tags:
-        - events-diploma-settings
-      security:
-        - TalentOAuth: [events:read]
-      parameters:
-        - $ref: '#/components/parameters/id_offset_32'
-        - $ref: '#/components/parameters/offset'
-        - $ref: '#/components/parameters/limit'
-        - name: event_ids
-          in: query
-          explode: false
-          description: ID мероприятий, записывается в формате `?event_ids=1,2,3`
-          schema:
-            type: array
-            items:
-              type: integer
-              format: int32
-      responses:
-        '200':
-          description: OK
-          headers:
-            X-Count:
-              $ref: '#/components/headers/X-Count'
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EventDiplomaSettingsWithRoles'
-        default:
-          $ref: '#/components/responses/Default'
+
   /events:
     head:
       operationId: CountEvents
@@ -777,7 +570,7 @@ paths:
                 type: integer
                 format: int64
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     get:
       operationId: ListEvents
       summary: Список мероприятий
@@ -819,7 +612,7 @@ paths:
         '422':
           $ref: '#/components/responses/UnproccessableEntity'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     post:
       operationId: CreateEvent
       summary: Добавление нового мероприятия
@@ -842,7 +635,8 @@ paths:
         '422':
           $ref: '#/components/responses/ValidationErrors'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
   /events/addachievement:
     get:
       operationId: ListAddAchievementEvents
@@ -864,7 +658,8 @@ paths:
         '200':
           $ref: '#/components/responses/ListAddAchievementEvents'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
   /events/calendar:
     get:
       operationId: ListCalendarEvents
@@ -888,7 +683,8 @@ paths:
         '200':
           $ref: '#/components/responses/ListCalendarEvents'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
   /events/organizations/{organization_id}:
     get:
       operationId: ListOrganizationEvents
@@ -924,8 +720,11 @@ paths:
         '200':
           $ref: '#/components/responses/ListOrganizationEvents'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
   /events/{event_id}:
+    parameters:
+      - $ref: '#/components/parameters/event_id'
     get:
       operationId: ReadEvent
       summary: Чтение свойств мероприятия
@@ -933,6 +732,17 @@ paths:
       description: |-
         По умолчанию возвращаются только метаданные.
         Для получения полного набора свойств используйте параметр `extend`.
+
+        ### Причины 4xx ошибок
+
+        | Код | Описание |
+        | --- | -------- |
+        | <nobr>`404`</nobr> | Мероприятие не найдено |
+      parameters:
+        - name: extend
+          in: query
+          description: Вернуть в ответе полный набор свойств.
+          schema: {type: boolean, default: false}
       responses:
         '200':
           description: Ok
@@ -942,18 +752,26 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/EventMeta'
                   - $ref: '#/components/schemas/Event'
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: UpdateEvent
+      summary: Обновление свойств мероприятия
+      security: [TalentOAuth: [events]]
+      tags: [events-manage]
+      requestBody: {$ref: '#/components/requestBodies/EventUpdate'}
+      responses:
+        '200':
+          $ref: '#/components/responses/Event'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
         '404':
           $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationErrors'
         default:
-          $ref: '#/components/responses/Default'
-    parameters:
-      - $ref: '#/components/parameters/event_id'
-      - name: extend
-        in: query
-        description: Вернуть в ответе полный набор свойств.
-        schema:
-          type: boolean
-          default: false
+          $ref: '#/components/responses/Error'
+
   /events/{event_id}/deferred-notification:
     parameters:
       - $ref: '#/components/parameters/event_id'
@@ -967,7 +785,7 @@ paths:
         '204':
           description: Уведомление отсутствует
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     get:
       operationId: ReadEventDeferredNotification
       summary: Чтение отложенного уведомления
@@ -982,7 +800,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     post:
       operationId: CreateEventDeferredNotification
       summary: Создание отложенного уведомления
@@ -1001,7 +819,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     patch:
       operationId: UpdateEventDeferredNotification
       summary: Изменение отложенного уведомления
@@ -1023,7 +841,7 @@ paths:
         '409':
           $ref: '#/components/responses/EventDeferredNotificationLocked'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     delete:
       operationId: CancelEventDeferredNotification
       summary: Отмена запланированного уведомления
@@ -1044,7 +862,8 @@ paths:
         '409':
           $ref: '#/components/responses/EventDeferredNotificationLocked'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
   /events/{event_id}/diploma-role/{role_id}:
     put:
       operationId: AddEventDiplomaRole
@@ -1061,7 +880,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     delete:
       operationId: DeleteEventDiplomaRole
       summary: Удаление роли для диплома мероприятия
@@ -1073,7 +892,7 @@ paths:
         '204':
           description: Роль удалена или не существовала
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     parameters:
       - $ref: '#/components/parameters/event_id'
       - name: role_id
@@ -1083,6 +902,7 @@ paths:
         schema:
           type: integer
           format: int32
+
   /events/{event_id}/diploma-settings:
     get:
       operationId: ReadEventDiplomaSettings
@@ -1103,7 +923,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     post:
       operationId: CreateEventDiplomaSettings
       summary: Создание настроек дипломов мероприятия
@@ -1144,7 +964,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     patch:
       operationId: UpdateEventDiplomaSettings
       summary: Обновление настроек дипломов мероприятия
@@ -1180,9 +1000,10 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     parameters:
       - $ref: '#/components/parameters/event_id'
+
   /events/{event_id}/fields:
     parameters:
       - $ref: '#/components/parameters/event_id'
@@ -1200,7 +1021,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/EventFieldListed'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
   /events/{event_id}/limit:
     parameters:
       - $ref: '#/components/parameters/event_id'
@@ -1214,7 +1036,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     post:
       operationId: CreateEventLimit
       summary: Создание лимитов мероприятия
@@ -1236,7 +1058,7 @@ paths:
         '422':
           $ref: '#/components/responses/ValidationErrors'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     patch:
       operationId: UpdateEventLimit
       summary: Обновление лимитов мероприятия
@@ -1253,7 +1075,7 @@ paths:
         '422':
           $ref: '#/components/responses/ValidationErrors'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     delete:
       operationId: DeleteEventLimit
       summary: Удаление лимитов мероприятия
@@ -1267,56 +1089,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
-
-  /events/{event_id}/signup:
-    parameters:
-      - $ref: '#/components/parameters/event_id'
-    post:
-      operationId: EventSignup
-      summary: Создание заявки на мероприятие
-      description: |-
-        #### Аутентификация
-
-        При выполнении запроса с аутентификацией,
-        заявка создается для пользователя, с которым связан токен.
-
-        Параметры, используемые для создания пользователя,
-        в аутентифицированном запросе будут использованы для его обновления.
-
-        Параметр `email` недопускается в аутентифицированных запросах.
-      security: [TalentOAuth: [event-requests], {}]
-      tags: [event-requests]
-      parameters:
-        - name: dry_run
-          in: query
-          description: Валидация запроса без создания заявки
-          schema:
-            type: boolean
-        - name: silence_notification
-          in: query
-          description: Отключение уведомления пользователя о регистрации
-          schema:
-            type: boolean
-        - name: Accept-Language
-          in: header
-          schema:
-            type: string
-        - {name: utm, in: cookie, schema: {type: string}}
-      requestBody: {$ref: '#/components/requestBodies/EventSignup'}
-      responses:
-        '201':
-          description: Заявка успешно создана
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/PermissionDenied'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '422':
-          $ref: '#/components/responses/ValidationErrors'
-        default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
 
   /events/{event_id}/requests-files:
     parameters:
@@ -1349,7 +1122,336 @@ paths:
         '422':
           $ref: '#/components/responses/UnproccessableEntity'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
+  /events/{event_id}/signup:
+    parameters:
+      - $ref: '#/components/parameters/event_id'
+    post:
+      operationId: EventSignup
+      summary: Создание заявки на мероприятие
+      description: |-
+        #### Аутентификация
+
+        При выполнении запроса с аутентификацией,
+        заявка создается для пользователя, с которым связан токен.
+
+        Параметры, используемые для создания пользователя,
+        в аутентифицированном запросе будут использованы для его обновления.
+
+        Параметр `email` недопускается в аутентифицированных запросах.
+      security: [TalentOAuth: [event-requests], {}]
+      tags: [event-requests]
+      parameters:
+        - {name: dry_run, in: query, schema: {type: boolean},
+          description: Валидация запроса без создания заявки}
+        - {name: silence_notification, in: query, schema: {type: boolean},
+          description: Отключение уведомления пользователя о регистрации}
+        - {name: Accept-Language, in: header, schema: {type: string}}
+        - {name: utm, in: cookie, schema: {type: string}}
+      requestBody: {$ref: '#/components/requestBodies/EventSignup'}
+      responses:
+        '201':
+          description: Заявка успешно создана
+          content:
+            application/json:
+              schema: {type: integer, format: int32}
+        '204':
+          description: Данные dry_run запроса успешно прошли валидацию
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationErrors'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /events/{event_id}/teams:
+    parameters:
+      - $ref: '#/components/parameters/event_id'
+    post:
+      operationId: CreateEventTeam
+      summary: Создание команды
+      description: |-
+        Администратор организации создает команду на мероприятие.
+        В качестве капитана команды и участников указываются пользователи, имеющие заявку на это мероприятие.
+      security: [TalentOAuth: [events]]
+      tags: [teams-organization]
+      requestBody:
+        required: true
+        content:
+          application/json: {schema: {$ref: '#/components/schemas/OrganizationTeamCreate'}}
+      responses:
+        '201':
+          $ref: '#/components/responses/TeamPrivate'
+        '422':
+          $ref: '#/components/responses/ValidationErrors'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /events/{event_id}/teams/{team_id}:
+    parameters:
+      - $ref: '#/components/parameters/event_id'
+      - $ref: '#/components/parameters/team_id'
+    get:
+      operationId: ReadEventTeam
+      summary: Чтение команды с участниками
+      description: |-
+        Команда на мероприятие для администратора его организации.
+        Включает проверку наличия актуального соглашения с организацией.
+
+        ### Причины 4xx ошибок
+
+        | Код | Описание |
+        | --- | -------- |
+        | <nobr>`403`</nobr> | Пользователь не является администратором организации |
+        | <nobr>`404`</nobr> | Мероприятие не найдено |
+        | <nobr>`404`</nobr> | Команда не найдена |
+      security: [TalentOAuth: [events:read]]
+      tags: [teams-organization]
+      responses:
+        '200':
+          $ref: '#/components/responses/TeamPrivateWithPersons'
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: UpdateEventTeam
+      summary: Обновление команды
+      description: |-
+        Обновление свойств команды администратором организатора мероприятия.
+
+        ### Причины 4xx ошибок
+
+        | Код | Описание |
+        | --- | -------- |
+        | <nobr>`403`</nobr> | Пользователь не является администратором организации |
+        | <nobr>`404`</nobr> | Мероприятие не найдено |
+        | <nobr>`404`</nobr> | Команда не найдена |
+        | <nobr>`409`</nobr> | У назначаемого капитаном пользователя уже имеется команда на мероприятии |
+        | <nobr>`409`</nobr> | Команда с таким названием уже имеется на мероприятии |
+      security: [TalentOAuth: [events]]
+      tags: [teams-organization]
+      requestBody:
+        required: true
+        content:
+          application/json: {schema: {$ref: '#/components/schemas/OrganizationTeamUpdate'}}
+      responses:
+        '200':
+          $ref: '#/components/responses/TeamPrivate'
+        '422':
+          $ref: '#/components/responses/ValidationErrors'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /events/{event_id}/teams/{team_id}/persons:
+    parameters:
+      - $ref: '#/components/parameters/event_id'
+      - $ref: '#/components/parameters/team_id'
+    post:
+      operationId: CreateEventTeamPerson
+      summary: Добавление участника в команду
+      description: |-
+        Добавление в команду участника мероприятия администратором организации.
+
+        ### Причины 4xx ошибок
+
+        | Код | Описание |
+        | --- | -------- |
+        | <nobr>`403`</nobr> | Пользователь не является администратором организации |
+        | <nobr>`404`</nobr> | Мероприятие не найдено |
+        | <nobr>`404`</nobr> | Команда не найдена |
+        | <nobr>`409`</nobr> | У добавляемого пользователя уже имеется команда на мероприятии |
+        | <nobr>`422`</nobr> | Невалидный идентификатор пользователя |
+      security: [TalentOAuth: [events]]
+      tags: [teams-organization]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id]
+              properties: {user_id: {type: integer, format: int32}}
+      responses:
+        '201':
+          $ref: '#/components/responses/TeamPerson'
+        '422':
+          $ref: '#/components/responses/ValidationErrors'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /events/{event_id}/teams/{team_id}/persons/{team_person_id}:
+    parameters:
+      - $ref: '#/components/parameters/event_id'
+      - $ref: '#/components/parameters/team_id'
+      - $ref: '#/components/parameters/team_person_id'
+    patch:
+      operationId: UpdateEventTeamPerson
+      summary: Обновление участника команды
+      description: |-
+        Изменение статуса участника команды администратором организации мероприятия.
+
+        ### Причины 4xx ошибок
+
+        | Код | Описание |
+        | --- | -------- |
+        | <nobr>`403`</nobr> | Пользователь не является администратором организации |
+        | <nobr>`404`</nobr> | Мероприятие не найдено |
+        | <nobr>`404`</nobr> | Команда не найдена |
+        | <nobr>`404`</nobr> | Участник команды не найден |
+        | <nobr>`409`</nobr> | У подтверждаемого пользователя уже имеется команда на мероприятии |
+      security: [TalentOAuth: [teams]]
+      tags: [teams-organization]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/OrganizationTeamPersonUpdate'}
+      responses:
+        '200':
+          $ref: '#/components/responses/TeamPerson'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /events/confirm-signup/{event_request_id}/{token}:
+    parameters:
+      - {name: event_request_id, in: path, required: true, schema: {type: string}}
+      - {name: token, in: path, required: true, schema: {type: string}}
+    post:
+      operationId: ConfirmEventSignup
+      summary: Подтверждение заявки на мероприятие
+      description: |-
+        Для предварительной валидации запроса, без подтверждения заявки,
+        нужно указать параметр `dry_run=true`.
+
+        `4xx` ответы:
+
+          * `404` - если не найдена подтверждаемая заявка;
+          * `422` - если токен не валиден.
+      tags: [event-requests]
+      parameters:
+        - {name: dry_run, in: query, schema: {type: boolean},
+          description: Валидация запроса без подтверждения заявки}
+      requestBody:
+        required: false
+        description: |-
+          Тело запроса необходимо указывать при подтверждении заявки с созданием пользователя.
+
+          Об этой необходимости сообщает `202` ответ `dry_run` запроса.
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [new_password1, new_password2]
+              properties:
+                new_password1: {type: string}
+                new_password2: {type: string}
+      responses:
+        '200':
+          description: Заявка подтверждена
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/EventSignupConfirmed'}
+        '201':
+          description: Заявка подтверждена. Создан новый пользователь
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/EventSignupConfirmed'}
+        '202':
+          x-summary: Запрос валидный. Необходимо задать пароль для создания пользователя
+          description: Возвращается при `dry_run` запросе.
+        '204':
+          x-summary: Запрос валидный. Найден уже существующий пользователь
+          description: Возвращается при `dry_run` запросе.
+        '208':
+          description: Пользователь уже зарегистрирован на мероприятие
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationErrors'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /events/diploma-settings:
+    get:
+      operationId: ListEventDiplomaSettings
+      summary: Список настроек дипломов мероприятий
+      tags:
+        - events-diploma-settings
+      security:
+        - TalentOAuth: [events:read]
+      parameters:
+        - $ref: '#/components/parameters/id_offset_32'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/limit'
+        - name: event_ids
+          in: query
+          explode: false
+          description: ID мероприятий, записывается в формате `?event_ids=1,2,3`
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int32
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Count:
+              $ref: '#/components/headers/X-Count'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventDiplomaSettingsWithRoles'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /events/requests/{event_request_id}:
+    parameters:
+      - {name: event_request_id, in: path, required: true, schema: {type: integer, format: int32}}
+      - {name: fields, in: query, schema: {type: boolean}}
+    get:
+      operationId: ReadEventRequest
+      summary: Чтение заявки на мероприятие
+      security: [TalentOAuth: [event-requests]]
+      tags: [event-requests]
+      description: Ответ дополняется значениями заполненных в заявке полей при указании параметра `fields=true`.
+      responses:
+        '200':
+          $ref: '#/components/responses/EventRequest'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: UpdateEventRequest
+      summary: Обновление заявки на мероприятие
+      description: Ответ дополняется значениями заполненных в заявке полей при указании параметра `fields=true`.
+      security: [TalentOAuth: [event-requests]]
+      tags: [event-requests]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/EventSignupUpdate'}
+      responses:
+        '200':
+          $ref: '#/components/responses/EventRequest'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationErrors'
+        default:
+          $ref: '#/components/responses/Error'
 
   /event-brands:
     get:
@@ -1366,7 +1468,8 @@ paths:
         '200':
           $ref: '#/components/responses/ListEventBrands'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
   /event-deferred-notification-templates/{name}:
     parameters:
       - name: name
@@ -1389,7 +1492,8 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
   /event-routes:
     get:
       operationId: ListEventRoutes
@@ -1403,9 +1507,100 @@ paths:
         - $ref: '#/components/parameters/limit'
       responses:
         '200':
-          $ref: '#/components/responses/ListEventRoutes'
+          description: OK
+          headers:
+            X-Count: {$ref: '#/components/headers/X-Count'}
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: '#/components/schemas/EventRoute'}}
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
+  /geo/{geodata_id}:
+    parameters:
+      - {name: geodata_id, in: path, required: true, schema: {type: integer, format: int32}}
+    get:
+      operationId: ReadGeoData
+      summary: Чтение геоданных по идентификатору
+      description: |-
+        Все свойства, кроме отмеченных как `nullable`,
+        могут содержать пустые строки в значениях.
+      tags: [geodata]
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json: {schema: {$ref: '#/components/schemas/GeoData'}}
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /geo/fias/city/{fias}:
+    parameters:
+      - {name: fias, in: path, required: true, schema: {type: string, format: uuid}}
+    get:
+      operationId: CityName
+      summary: Название города по ФИАС ID
+      tags: [geodata]
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [name, region_fias]
+                properties:
+                  name: {type: string}
+                  region_fias: {type: string, format: uuid}
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /geo/fias/region/{fias}:
+    parameters:
+      - {name: fias, in: path, required: true, schema: {type: string, format: uuid}}
+    get:
+      operationId: RegionName
+      summary: Название региона по ФИАС ID
+      tags: [geodata]
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [name]
+                properties: {name: {type: string}}
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /geo/suggest/{field}:
+    get:
+      operationId: SuggestGeoField
+      summary: Подсказки по геоданным
+      tags: [geodata]
+      parameters:
+        - {name: field, in: path, required: true, schema: {
+          type: string, enum: [region_with_type, city]}}
+        - {name: term, in: query, required: true, schema: {
+          type: string, minLength: 3}}
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema: {type: array, items: {type: object, required: [name], properties: {
+                name: {type: string},
+                fias: {type: string, format: uuid}}}}
+        default:
+          $ref: '#/components/responses/Error'
+
   /mutation-locks/{object_namespace}/{object_key}:
     parameters:
       - $ref: '#/components/parameters/mutation_lock_object_namespace'
@@ -1433,7 +1628,7 @@ paths:
         '422':
           description: Указан невалидный object_namespace.
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     patch:
       operationId: PatchMutationLock
       summary: Изменение состояния блокировки
@@ -1454,7 +1649,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     delete:
       operationId: DeleteMutationLock
       summary: Удаление блокировки
@@ -1469,10 +1664,11 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
 
   /oauth/authorize:
     get:
+      # TODO: Cache-Control: no-store, no-cache, must-revalidate; Pragma: no-cache; Expires: 0
       operationId: ValidateAuthorization
       summary: Валидация авторизационных параметров
       security: [TalentOAuth: []]
@@ -1487,8 +1683,7 @@ paths:
         '200':
           description: Ok
         default:
-          $ref: '#/components/responses/Default'
-
+          $ref: '#/components/responses/Error'
     post:
       operationId: AuthorizeClient
       summary: Авторизация клиента
@@ -1501,7 +1696,7 @@ paths:
           headers:
             Location: {required: true, schema: {type: string}}
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
 
   /oauth/issue-token:
     post:
@@ -1512,7 +1707,7 @@ paths:
         '200': {$ref: '#/components/responses/IssueTokenSuccess'}
         '400': {$ref: '#/components/responses/IssueTokenError'}
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
 
   /organization-subjects:
     get:
@@ -1529,7 +1724,7 @@ paths:
         '200':
           $ref: '#/components/responses/ListOrganizationSubjects'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
     post:
       operationId: CreateOrganizationSubject
       summary: Добавление тематики для организации
@@ -1556,7 +1751,8 @@ paths:
         '409':
           description: Тематика уже добавлена в организацию
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
   /organizations:
     get:
       operationId: ListOrganizations
@@ -1583,13 +1779,13 @@ paths:
         '422':
           $ref: '#/components/responses/UnproccessableEntity'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
   /organizations/{organization_id}/is-admin:
     post:
       operationId: IsOrganizationAdmin
       summary: Проверка наличия административных прав в организации
-      security:
-        - TalentOAuth: []
+      security: [TalentOAuth: []]
       tags: [organizations]
       parameters:
         - $ref: '#/components/parameters/organization_id'
@@ -1611,13 +1807,27 @@ paths:
         '404':
           description: Организация не найдена
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
   /persons/{person_id}:
+    parameters:
+      - name: person_id
+        in: path
+        required: true
+        description: ID персоны.
+        schema: {type: integer, format: int32}
     get:
       operationId: ReadPerson
-      summary: Чтение персоны пользователя
-      tags:
-        - persons
+      summary: Чтение персоны
+      description: |-
+        Чтение персоны, опционально ассоциированной с пользователем.
+
+        ### Причины 4xx ошибок
+
+        | Код | Описание |
+        | --- | -------- |
+        | <nobr>`404`</nobr> | Персона не найдена |
+      tags: [persons]
       responses:
         '200':
           description: OK
@@ -1625,41 +1835,32 @@ paths:
             application/json:
               schema:
                 type: object
-                required:
-                  - user_id
+                required: [user_id]
                 properties:
                   user_id:
                     type: integer
                     format: int32
+                    nullable: true
                     description: TalentID пользователя, которому принадлежит персона.
-        '404':
-          $ref: '#/components/responses/NotFound'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
+  /social-auths/{talent_id}:
     parameters:
-      - name: person_id
-        in: path
-        required: true
-        description: ID персоны.
-        schema:
-          type: integer
-          format: int32
-  /social-auths/{user_id}:
+      - $ref: '#/components/parameters/talent_id'
     get:
       operationId: ListSocialAuths
       summary: Список авторизаций пользователя в соц. сетях
       security:
         - TalentOAuth: [user:read]
         - ClientCredentials: []
-      tags:
-        - social-auths
+      tags: [social-auths]
       parameters:
         - name: provider
           in: query
           required: false
           description: Фильтрация по провайдеру авторизации
-          schema:
-            $ref: '#/components/schemas/SocialAuthProvider'
+          schema: {$ref: '#/components/schemas/SocialAuthProvider'}
         - $ref: '#/components/parameters/id_offset_32'
         - $ref: '#/components/parameters/offset'
         - $ref: '#/components/parameters/limit'
@@ -1667,26 +1868,15 @@ paths:
         '200':
           description: Ok
           headers:
-            X-Count:
-              $ref: '#/components/headers/X-Count'
+            X-Count: {$ref: '#/components/headers/X-Count'}
           content:
             application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SocialAuth'
+              schema: {type: array, items: {$ref: '#/components/schemas/SocialAuth'}}
         '403':
           $ref: '#/components/responses/PermissionDenied'
         default:
-          $ref: '#/components/responses/Default'
-    parameters:
-      - name: user_id
-        in: path
-        required: true
-        description: ID пользователя.
-        schema:
-          type: integer
-          format: int32
+          $ref: '#/components/responses/Error'
+
   /subjects:
     get:
       operationId: ListSubjects
@@ -1697,102 +1887,75 @@ paths:
         - $ref: '#/components/parameters/offset'
         - $ref: '#/components/parameters/limit'
       responses:
-        '200':
-          $ref: '#/components/responses/ListSubjects'
-        default:
-          $ref: '#/components/responses/Default'
-  /teams/{team_id}:
-    get:
-      operationId: ReadTeam
-      summary: Чтение параметров команды
-      description: |-
-        Часть данных возвращается только при наличии аутентификации и определенных прав у пользователя,
-        от лица которого выполняется запрос.
-      tags:
-        - teams
-      security:
-        - TalentOAuth: [teams:read]
-        - {}
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Team'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        default:
-          $ref: '#/components/responses/Default'
-    patch:
-      operationId: UpdateTeam
-      summary: Обновление параметров команды
-      description: Доступно только для капитана команды и организатора мероприятия.
-      tags:
-        - teams
-      security:
-        - TalentOAuth: [teams]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                  maxLength: 255
-                description:
-                  type: string
-                  maxLength: 2000
-                assignment_participation:
-                  type: boolean
-                  description: Команда участвует в автораспределении.
-                project_id:
-                  type: integer
-                  format: int32
-                  description: |-
-                    ID проекта команды.
+        '200': {$ref: '#/components/responses/ListSubjects'}
+        default: {$ref: '#/components/responses/Error'}
 
-                    > Доступно для обновления только капитану команды.
-                contact_link:
-                  $ref: '#/components/schemas/TeamContactLink'
+  /teams:
+    get:
+      operationId: ListTeams
+      summary: Список команд
+      description: Все команды пользователей.
+      security: [TalentOAuth: []]
+      tags: [teams]
+      parameters:
+        - $ref: '#/components/parameters/id_offset_32'
+        - $ref: '#/components/parameters/limit'
+        - name: id
+          in: query
+          explode: false
+          description: Фильтрация по массиву идентификаторов команд.
+          schema: {type: array, minItems: 1, maxItems: 100, items: {type: integer, format: int32}}
+        - name: order_by
+          in: query
+          description: Критерий сортировки результатов.
+          schema: {type: string, default: 'id_asc', enum: [id_asc, id_desc]}
       responses:
         '200':
           description: Ok
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Team'
-        '403':
-          $ref: '#/components/responses/PermissionDenied'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '422':
-          description: Контактная ссылка не прошла валидацию
-          $ref: '#/components/responses/ErrorResponse'
+              schema: {type: array, items: {$ref: '#/components/schemas/TeamPublic'}}
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
+
+  /teams/{team_id}:
     parameters:
-      - name: team_id
-        in: path
-        required: true
-        description: ID команды.
-        schema:
-          type: integer
-          format: int32
+      - {$ref: '#/components/parameters/team_id'}
+    get:
+      operationId: ReadTeam
+      summary: Чтение команды
+      description: |-
+        Свойства команды, опционально содержащие список ее участников.
+
+        ### Причины 4xx ошибок
+
+        | Код | Описание |
+        | --- | -------- |
+        | <nobr>`404`</nobr> | Команда не найдена |
+      security: [TalentOAuth: [], {}]
+      tags: [teams]
+      parameters:
+        - {name: persons, in: query, schema: {type: boolean},
+           description: Включить в ответ массив участников команды}
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TeamPublicWithPersons'}
+        default:
+          $ref: '#/components/responses/Error'
+
   /teams/contact-validate:
     post:
       operationId: ValidateTeamContact
       summary: Валидация контактной ссылки
-      tags:
-        - teams
+      tags: [teams]
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/TeamContactLink'
+            schema: {$ref: '#/components/schemas/TeamContactLink'}
       responses:
         '200':
           description: Ссылка корректна для использования в качестве контактной ссылки команды
@@ -1800,28 +1963,247 @@ paths:
         '422':
           description: Ссылка не прошла валидацию
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
 
-  /users/me:
-    patch:
-      operationId: UpdateAuthenticatedUser
-      summary: Изменение аутентифицированного пользователя
-      description: "> Операция еще не доступна"
-      tags: [user-profile]
-      requestBody: {$ref: '#/components/requestBodies/UserUpdate'}
+  /users/me/teams:
+    post:
+      operationId: CreateUserTeam
+      summary: Создание команды
+      description: |-
+        Создание команды от аутентифицированного пользователя.
+        Пользователь становится и ее капитаном и ее первым участником.
+
+        ### Причины 4xx ошибок
+
+        | Код | Описание |
+        | --- | -------- |
+        | <nobr>`403`</nobr> | Мероприятие завершено |
+        | <nobr>`404`</nobr> | Команда не найдена |
+        | <nobr>`409`</nobr> | У пользователя уже имеется команда на мероприятии |
+        | <nobr>`409`</nobr> | Команда с таким названием уже имеется на мероприятии |
+        | <nobr>`422`</nobr> | Невалидный идентификатор мероприятия |
+        | <nobr>`422`</nobr> | Невалидная контактная ссылка |
+        | <nobr>`422`</nobr> | Невалидное название команды |
+        | <nobr>`422`</nobr> | Мероприятие не допускает командного участия |
+        | <nobr>`422`</nobr> | Мероприятие не допускает управления параметром `assignment_participation` |
+        | <nobr>`422`</nobr> | Название команды уже занято на мероприятии |
+      security: [TalentOAuth: [teams]]
+      tags: [teams-user]
+      requestBody:
+        required: true
+        content:
+          application/json: {schema: {$ref: '#/components/schemas/OwnerTeamCreate'}}
       responses:
-        '200':
-          description: Пользователь успешно изменен
-        '403':
-          $ref: '#/components/responses/PermissionDenied'
+        '201':
+          $ref: '#/components/responses/TeamPrivate'
         '422':
           $ref: '#/components/responses/ValidationErrors'
         default:
-          $ref: '#/components/responses/Default'
+          $ref: '#/components/responses/Error'
 
-  /users/{user_id}/consents:
+  /users/me/teams/{team_id}:
     parameters:
-      - $ref: '#/components/parameters/user_id'
+      - $ref: '#/components/parameters/team_id'
+    get:
+      operationId: ReadUserTeam
+      summary: Чтение команды
+      description: |-
+        Чтение команды ее участником или капитаном.
+
+        ### Причины 4xx ошибок
+
+        | Код | Описание |
+        | --- | -------- |
+        | <nobr>`403`</nobr> | Пользователь не является ни участником, ни капитаном команды |
+        | <nobr>`404`</nobr> | Команда не найдена |
+      security: [TalentOAuth: [teams:read]]
+      tags: [teams-user]
+      responses:
+        '200':
+          $ref: '#/components/responses/TeamPrivateWithPersons'
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: UpdateUserTeam
+      summary: Обновление команды
+      description: |-
+        Обновление свойств команды ее капитаном.
+
+        ### Причины 4xx ошибок
+
+        Таблица не включает в себя ошибки валидации возвращаемые с 422 статусом.
+
+        | Код | Описание |
+        | --- | -------- |
+        | <nobr>`403`</nobr> | Пользователь не является капитаном команды |
+        | <nobr>`403`</nobr> | Мероприятие завершено |
+        | <nobr>`404`</nobr> | Команда не найдена |
+        | <nobr>`409`</nobr> | У пользователя уже имеется команда на мероприятии |
+        | <nobr>`409`</nobr> | Команда с таким названием уже имеется на мероприятии |
+      security: [TalentOAuth: [teams]]
+      tags: [teams-user]
+      requestBody:
+        required: true
+        content:
+          application/json: {schema: {$ref: '#/components/schemas/OwnerTeamUpdate'}}
+      responses:
+        '200':
+          $ref: '#/components/responses/TeamPrivate'
+        '422':
+          $ref: '#/components/responses/ValidationErrors'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /users/me/teams/{team_id}/is-owner:
+    parameters:
+      - $ref: '#/components/parameters/team_id'
+    post:
+      operationId: IsTeamOwner
+      summary: Статус капитана в команде
+      description: |-
+        Является ли пользователь капитаном указанной команды.
+
+        ### Причины 4xx ошибок
+
+        | Код | Описание |
+        | --- | -------- |
+        | <nobr>`403`</nobr> | Пользователь не является капитаном команды |
+        | <nobr>`404`</nobr> | Команда не найдена |
+      security: [TalentOAuth: [teams:read]]
+      tags: [teams-user]
+      responses:
+        '200':
+          description: Пользователь является капитаном команды
+        default:
+          $ref: '#/components/responses/Error'
+
+  /users/me/teams/{team_id}/persons:
+    parameters:
+      - $ref: '#/components/parameters/team_id'
+    post:
+      operationId: CreateUserTeamPerson
+      summary: Добавление участника в команду
+      description: |-
+        Добавление в команду нового участника ее капитаном или запрос на добавление от участника.
+
+        Запрос от участника, при наличии в нем (корректного) `invite_code`,
+        не требует подтверждения со стороны капитана команды.
+
+        Если участник уже добавлен в команду, возвращется `200` ответ.
+        В том числе и когда он находится в частично отклоненном состоянии:
+
+          - на запрос от капитана, может вернуться участник, отклонивший свое участие
+          - на запрос от самого участника, может вернуться уже имеющаяся заявка на участие, отклоненная капитаном.
+
+        ### Причины 4xx ошибок
+
+        | Код   | Описание |
+        | ----- | -------- |
+        | <nobr>`403`</nobr> | Пользователь не является капитаном команды |
+        | <nobr>`403`</nobr> | Мероприятие команды завершено |
+        | <nobr>`404`</nobr> | Команда не найдена |
+        | <nobr>`409`</nobr> | У добавляемого пользователя уже имеется команда на мероприятии |
+        | <nobr>`422`</nobr> | Указан невалидный ID пользователя |
+        | <nobr>`422`</nobr> | Указан неправильный инвайт-код |
+        | <nobr>`422`</nobr> | У добавляемого пользователя отсутствует заявка на мероприятие команды |
+        | <nobr>`422`</nobr> | Достижение допустимого количества участников команды |
+        | <nobr>`422`</nobr> | Достижение допустимого количества приглашений в команду |
+        | <nobr>`422`</nobr> | Достижение допустимого количества запросов в команды для пользователя |
+      security: [TalentOAuth: [teams]]
+      tags: [teams-user]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/OwnerTeamPersonCreate'
+                - $ref: '#/components/schemas/UserTeamPersonCreate'
+      responses:
+        '200':
+          $ref: '#/components/responses/TeamPerson'
+        '201':
+          $ref: '#/components/responses/TeamPerson'
+        '422':
+          $ref: '#/components/responses/ValidationErrors'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /users/me/teams/{team_id}/persons/me:
+    parameters:
+      - $ref: '#/components/parameters/team_id'
+    patch:
+      operationId: UpdateUserTeamPerson
+      summary: Обновление своего участия в команде
+      description: |-
+        Изменение статуса участия в команде от ее участника.
+
+        ### Причины 4xx ошибок
+
+        | Код   | Описание |
+        | ----- | -------- |
+        | <nobr>`403`</nobr> | Мероприятие команды завершено |
+        | <nobr>`404`</nobr> | Команда не найдена |
+        | <nobr>`404`</nobr> | Пользователь не является участником команды |
+        | <nobr>`409`</nobr> | У пользователя уже имеется команда на мероприятии |
+        | <nobr>`422`</nobr> | У пользователя отсутствует заявка на мероприятие команды |
+        | <nobr>`422`</nobr> | Достижение допустимого количества участников команды |
+        | <nobr>`422`</nobr> | Достижение допустимого количества запросов в команды для пользователя |
+      security: [TalentOAuth: [teams]]
+      tags: [teams-user]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UserTeamPersonUpdate'}
+      responses:
+        '200':
+          $ref: '#/components/responses/TeamPerson'
+        '422':
+          $ref: '#/components/responses/ValidationErrors'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /users/me/teams/{team_id}/persons/{team_person_id}:
+    parameters:
+      - $ref: '#/components/parameters/team_id'
+      - $ref: '#/components/parameters/team_person_id'
+    patch:
+      operationId: UpdateOwnerTeamPerson
+      summary: Обновление участника команды
+      description: |-
+        Изменение статуса участника команды ее капитаном.
+
+        ### Причины 4xx ошибок
+
+        | Код   | Описание |
+        | ----- | -------- |
+        | <nobr>`403`</nobr> | Пользователь не является капитаном команды |
+        | <nobr>`403`</nobr> | Мероприятие команды завершено |
+        | <nobr>`404`</nobr> | Команда не найдена |
+        | <nobr>`404`</nobr> | Не найден участник команды |
+        | <nobr>`409`</nobr> | У пользователя уже имеется команда на мероприятии |
+        | <nobr>`422`</nobr> | У пользователя отсутствует заявка на мероприятие команды |
+        | <nobr>`422`</nobr> | Достижение допустимого количества участников команды |
+        | <nobr>`422`</nobr> | Достижение допустимого количества приглашений в команду |
+      security: [TalentOAuth: [teams]]
+      tags: [teams-user]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/OwnerTeamPersonUpdate'}
+      responses:
+        '200':
+          $ref: '#/components/responses/TeamPerson'
+        '422':
+          $ref: '#/components/responses/ValidationErrors'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /users/{talent_id}/consents:
+    parameters:
+      - $ref: '#/components/parameters/talent_id'
     get:
       operationId: ListUserConsents
       summary: Список согласий пользователя
@@ -1830,10 +2212,11 @@ paths:
       responses:
         '200': {$ref: '#/components/responses/ListUserConsents'}
         '403': {$ref: '#/components/responses/PermissionDenied'}
-        default: {$ref: '#/components/responses/Default'}
-  /users/{user_id}/consents/{kind}:
+        default: {$ref: '#/components/responses/Error'}
+
+  /users/{talent_id}/consents/{kind}:
     parameters:
-      - $ref: '#/components/parameters/user_id'
+      - $ref: '#/components/parameters/talent_id'
       - $ref: '#/components/parameters/user_consent_kind'
     head:
       operationId: CheckUserConsent
@@ -1844,7 +2227,7 @@ paths:
         '200': {description: Согласие имеется}
         '204': {description: Согласие отсутствует}
         '403': {$ref: '#/components/responses/PermissionDenied'}
-        default: {$ref: '#/components/responses/Default'}
+        default: {$ref: '#/components/responses/Error'}
     post:
       operationId: SubmitUserConsent
       summary: Фиксация согласия пользователя
@@ -1854,11 +2237,10 @@ paths:
         '201': {description: Согласие зафиксировано}
         '204': {description: Согласие уже было дано ранее}
         '403': {$ref: '#/components/responses/PermissionDenied'}
-        default: {$ref: '#/components/responses/Default'}
+        default: {$ref: '#/components/responses/Error'}
 
 components:
   schemas:
-    # Схемы стандартных ответов
     Conflict:
       type: object
       required: [error]
@@ -1868,6 +2250,7 @@ components:
       required: [error]
       properties: {error: {type: string}}
     Error:
+      title: Стандартный формат 4xx ошибок
       type: object
       required: [error]
       properties: {error: {type: string}}
@@ -1888,69 +2271,621 @@ components:
       required: [error]
       properties: {error: {type: string}}
 
-    # Схемы объектов в алфавитном порядке.
+    geoDataRefID: &geoDataRefID
+      type: integer
+      format: int32
+      nullable: true
+      description: Опциональный ID [геоданных](#tag/geodata/operation/ReadGeoData).
+
+    eventCreatedAt: &eventCreatedAt
+      type: string
+      format: date-time
+      description: Дата создания.
+    eventUpdatedAt: &eventUpdatedAt
+      type: string
+      format: date-time
+      description: Дата обновления.
+    eventAchievementsCount: &eventAchievementsCount
+      type: integer
+      format: int32
+    eventAutocreateMember: &eventAutocreateMember
+      type: boolean
+      description: Автоматическое добавление в участники организации пользователя с подтвержденной заявки.
+    eventAchievementsAllowed: &eventAchievementsAllowed
+      type: boolean
+      description: Допуск на создания достижений на мероприятие.
+    eventAltTitle: &eventAltTitle
+      type: string
+      description: Альтернативное название мероприятия.
+    eventCanceled: &eventCanceled
+      type: boolean
+      description: Статус отмены мероприятия.
+    eventCover: &eventCover
+      type: string
+      description: Ссылка на обложку мероприятия.
+    eventCreatedByID: &eventCreatedByID
+      type: integer
+      format: int32
+      nullable: true
+      description: ID автора мероприятия.
+    eventDescription: &eventDescription
+      type: string
+      description: Описание мероприятия.
+    eventDraft: &eventDraft
+      type: boolean
+      description: |-
+        Мероприятие находится в статусе черновика.
+        На такое мероприятие нельзя зарегистрироваться.
+    eventEnd: &eventEnd
+      type: string
+      format: date-time
+      nullable: true
+      description: Дата окончания мероприятия.
+    eventExpectedStart: &eventExpectedStart
+      type: string
+      format: date-time
+      nullable: true
+    eventHidden: &eventHidden
+      type: boolean
+      description: Исключение мероприятия из календаря.
+    eventMaxUsers: &eventMaxUsers
+      type: integer
+      format: int32
+      nullable: true
+    eventMetaEventID: &eventMetaEventID
+      type: integer
+      format: int32
+      nullable: true
+      description: ID мета-мероприятия.
+    eventNotificationEmailMessage: &eventNotificationEmailMessage
+      type: string
+      description: |-
+        Дополнительный текст для Email уведомления о регистрации на мероприятие.
+
+        > Текст интерпретируется в соответствии с форматом markdown.
+    eventOrganizationID: &eventOrganizationID
+      type: integer
+      format: int32
+      nullable: true
+      description: ID организации мероприятия.
+    eventPublic: &eventPublic
+      type: boolean
+      description: Статус публичности мероприятия.
+    eventQuestionnaireCompletedMessage: &eventQuestionnaireCompletedMessage
+      type: string
+      description: Сообщение о заполненной анкете.
+    eventRequestsAllowed: &eventRequestsAllowed
+      type: boolean
+      description: Допуск на создания заявок на мероприятие.
+    eventRequestsCount: &eventRequestsCount
+      type: integer
+      format: int32
+    eventSelfCheckIn: &eventSelfCheckIn
+      type: boolean
+      description: Доступность чекина
+    eventSimplifiedRegistration: &eventSimplifiedRegistration
+      type: boolean
+      description: Доступность упрощенной регистрации на мероприятие.
+    eventStart: &eventStart
+      type: string
+      format: date-time
+      nullable: true
+      description: Дата начала мероприятия.
+    eventTimeMatters: &eventTimeMatters
+      type: boolean
+      description: Учитывается ли время или только даты в полях `start` и `end`.
+    eventTitle: &eventTitle
+      type: string
+      description: Название мероприятия.
+    eventTypeID: &eventTypeID
+      type: integer
+      format: int32
+      nullable: true
+      description: Идентификатор типа мероприятия.
+    eventURL: &eventURL
+      type: string
+      description: Адрес online мероприятия.
+    eventVenueID: &eventVenueID
+      type: integer
+      format: int32
+      nullable: true
+      description: ID [площадки](/venue-api/docs/) на которой проводится мероприятие.
+    EventFormat:
+      type: string
+      enum:
+        - ""
+        - offline
+        - online
+      description: Формат проведения мероприятия.
+      x-enumDescriptions:
+        "": Значение не указано
+        offline: Оффлайн мероприятие.
+        online: Онлайн мероприятие.
+    EventTeamAssignmentMethod:
+      type: string
+      enum:
+        - completion
+        - completion_soft
+        - single
+        - single_soft
+      x-enumDescriptions:
+        completion: Команды будут дополняться до максимального количества.
+        completion_soft: |-
+          Команды будут дополняться до максимального количества.
+          У участников есть возможность отказаться от дополнения их команды.
+        single: |-
+          Команды будут создаваться только из участников-одиночек и команд из одного участника.
+        single_soft: |-
+          Команды будут создаваться только из участников-одиночек и команд из одного участника.
+          У участников есть возможность отказаться от изменения их команды.
+    EventTeamsInvolved:
+      type: integer
+      format: int32
+      description: Формат участия.
+      enum: [0, 1, 2]
+      x-enumDescriptions:
+        0: Допускаются и индивидуальное и командное участия
+        1: Допускается только индивидуальная регистрация
+        2: Допускается регистрация только в команде
+    Event:
+      x-tags: [events-schema]
+      title: Мероприятие полностью
+      allOf:
+        - $ref: '#/components/schemas/EventMeta'
+        - type: object
+          required:
+            - simplified_registration
+            - autocreate_member
+            - achievements_allowed
+            - requests_allowed
+            - self_check_in
+            - teams_involved
+            - owner_can_moderate
+            - user_in_multiple_teams
+            - mentors_allowed
+            - support_i18n
+            - gir_collection
+            - time_matters
+            - promoted
+            - max_users
+            - team_create_notification
+            - team_assignment_method
+            - achievement_roles_count
+            - talent_roles_count
+            - achievements_count
+            - requests_count
+            - expected_start
+            - alt_title
+            - cover
+            - url
+            - type_id
+            - description
+            - cancellation_reason
+            - questionnaire_completed_message
+          properties:
+            simplified_registration: *eventSimplifiedRegistration
+            autocreate_member: *eventAutocreateMember
+            achievements_allowed: *eventAchievementsAllowed
+            requests_allowed: *eventRequestsAllowed
+            self_check_in: *eventSelfCheckIn
+            teams_involved: {$ref: '#/components/schemas/EventTeamsInvolved'}
+            owner_can_moderate: {type: boolean}
+            user_in_multiple_teams: {type: boolean}
+            mentors_allowed: {type: boolean}
+            support_i18n: {type: boolean}
+            gir_collection: {type: boolean}
+            promoted: {type: boolean}
+            time_matters: *eventTimeMatters
+            max_users: *eventMaxUsers
+            team_create_notification: {type: boolean}
+            team_assignment_method: {$ref: '#/components/schemas/EventTeamAssignmentMethod'}
+            achievement_roles_count: {type: integer, format: int32}
+            achievements_count: *eventAchievementsCount
+            requests_count: *eventRequestsCount
+            expected_start: *eventExpectedStart
+            alt_title: *eventAltTitle
+            cover: *eventCover
+            url: *eventURL
+            type_id: *eventTypeID
+            description: *eventDescription
+            cancellation_reason: {type: string, description: Причина отмены мероприятия.}
+            questionnaire_completed_message: *eventQuestionnaireCompletedMessage
+    EventMeta:
+      x-tags: [events-schema]
+      title: Метаданные мероприятия
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - draft
+        - public
+        - hidden
+        - canceled
+        - title
+        - start
+        - end
+        - format
+        - organization_id
+        - meta_event_id
+        - created_by_id
+        - geo_data_id
+        - venue_id
+      properties:
+        id: &eventID
+          type: integer
+          format: int32
+          description: ID мероприятия.
+        created_at: *eventCreatedAt
+        updated_at: *eventUpdatedAt
+        draft: *eventDraft
+        public: *eventPublic
+        hidden: *eventHidden
+        canceled: *eventCanceled
+        title: *eventTitle
+        start: *eventStart
+        end: *eventEnd
+        format: {$ref: '#/components/schemas/EventFormat'}
+        organization_id: *eventOrganizationID
+        meta_event_id: *eventMetaEventID
+        created_by_id: *eventCreatedByID
+        geo_data_id: *geoDataRefID
+        venue_id: *eventVenueID
+    EventWrite:
+      type: object
+      description: |-
+        Следующие поля доступны для записи только с административной привилегией:
+
+          - mentors_allowed
+          - gir_collection
+          - promoted
+          - team_create_notification
+      properties:
+        meta_event_id: *eventMetaEventID
+        draft: *eventDraft
+        public: *eventPublic
+        hidden: *eventHidden
+        title:
+          <<: *eventTitle
+          minLength: 1
+          maxLength: 250
+        start: *eventStart
+        end: *eventEnd
+        format: {$ref: '#/components/schemas/EventFormat'}
+        venue_id: *eventVenueID
+        simplified_registration: *eventSimplifiedRegistration
+        autocreate_member: *eventAutocreateMember
+        achievements_allowed: *eventAchievementsAllowed
+        requests_allowed: *eventRequestsAllowed
+        self_check_in: *eventSelfCheckIn
+        teams_involved: {$ref: '#/components/schemas/EventTeamsInvolved'}
+        owner_can_moderate: {type: boolean}
+        user_in_multiple_teams: {type: boolean}
+        mentors_allowed: {type: boolean}  # TODO: Только для админов
+        support_i18n: {type: boolean}
+        gir_collection: {type: boolean}  # TODO: Только для админов
+        promoted: {type: boolean}  # TODO: Только для админов
+        time_matters: *eventTimeMatters
+        max_users: *eventMaxUsers
+        team_create_notification: {type: boolean}  # TODO: Только для админов
+        team_assignment_method: {$ref: '#/components/schemas/EventTeamAssignmentMethod'}
+        expected_start: *eventExpectedStart
+        alt_title:
+          <<: *eventAltTitle
+          maxLength: 180
+        url:
+          <<: *eventURL
+          format: uri
+        type_id: *eventTypeID
+        description:
+          <<: *eventDescription
+          maxLength: 10000
+        questionnaire_completed_message:
+          <<: *eventQuestionnaireCompletedMessage
+          maxLength: 2500
+        notification_email_message:
+          <<: *eventNotificationEmailMessage
+          maxLength: 1500
+        cover_url:
+          type: string
+          format: uri
+          description: Ссылка на обложку мероприятия.
+        keywords: {type: string, maxLength: 200}
+    AddAchievementEvent:
+      type: object
+      required:
+        - id
+        - title
+        - alt_title
+        - start
+        - end
+        - achievement_roles
+      properties:
+        id: *eventID
+        title: *eventTitle
+        alt_title: *eventAltTitle
+        start: *eventStart
+        end: *eventEnd
+        achievement_roles: {type: array, items: {type: integer, format: int32}}
+    CalendarEvent:
+      type: object
+      required:
+        - id
+        - canceled
+        - title
+        - alt_title
+        - format
+        - start
+        - end
+        - requests_allowed
+        - expected_start
+        - time_matters
+        - limits
+        - cover
+        - city
+        - brands
+      properties:
+        id: *eventID
+        canceled: *eventCanceled
+        title: *eventTitle
+        alt_title: *eventAltTitle
+        format: {$ref: '#/components/schemas/EventFormat'}
+        start: *eventStart
+        end: *eventEnd
+        requests_allowed: *eventRequestsAllowed
+        expected_start: *eventExpectedStart
+        time_matters: *eventTimeMatters
+        limits: {$ref: '#/components/schemas/EventLimitOnlyDateEndRequest'}
+        cover: *eventCover
+        city: {$ref: '#/components/schemas/GeodataCity'}
+        brands: {type: array, items: {type: integer, format: int32}}
+    OrganizationEvent:
+      type: object
+      required:
+        - id
+        - updated_at
+        - draft
+        - public
+        - hidden
+        - canceled
+        - title
+        - alt_title
+        - start
+        - end
+        - format
+        - organization_id
+        - meta_event_id
+        - achievements_allowed
+        - requests_allowed
+        - self_check_in
+        - teams_involved
+        - max_users
+        - limits
+        - achievements_count
+        - requests_count
+        - cover
+        - url
+        - city
+        - address
+        - edges_incoming
+      properties:
+        id: *eventID
+        updated_at: *eventUpdatedAt
+        draft: *eventDraft
+        public: *eventPublic
+        hidden: *eventHidden
+        canceled: *eventCanceled
+        title: *eventTitle
+        alt_title: *eventAltTitle
+        start: *eventStart
+        end: *eventEnd
+        format: {$ref: '#/components/schemas/EventFormat'}
+        organization_id: *eventOrganizationID
+        meta_event_id: *eventMetaEventID
+        achievements_allowed: *eventAchievementsAllowed
+        requests_allowed: *eventRequestsAllowed
+        self_check_in: *eventSelfCheckIn
+        teams_involved: {$ref: '#/components/schemas/EventTeamsInvolved'}
+        max_users: *eventMaxUsers
+        limits: {$ref: '#/components/schemas/EventLimitOnlyDateEndRequest'}
+        achievements_count: *eventAchievementsCount
+        requests_count: *eventRequestsCount
+        cover: *eventCover
+        url: *eventURL
+        city: {$ref: '#/components/schemas/GeodataCity'}
+        address: {$ref: '#/components/schemas/GeodataAddress'}
+        edges_incoming: {type: array, items: {$ref: '#/components/schemas/EventEdge'}}
+
+    eventEdgeID: &eventEdgeID
+      type: integer
+      format: int32
+      description: Идентификатор связи/ребра.
+    eventEdgeType: &eventEdgeType
+      type: integer
+      format: int16
+      enum: [1, 2]
+      x-enumDescriptions:
+        1: Отбор
+        2: Вложенность
+      description: Тип отношения мероприятий.
+    eventEdgeFrom: &eventEdgeFrom
+      type: integer
+      format: int32
+      description: Исходная вершина.
+    eventEdgeTo: &eventEdgeTo
+      type: integer
+      format: int32
+      description: Целевая вершина.
+    EventEdge:
+      title: Ребро между мероприятиями
+      type: object
+      required:
+        - id
+        - type
+        - from_event_id
+        - to_event_id
+      properties:
+        id: *eventEdgeID
+        type: *eventEdgeType
+        from_event_id: *eventEdgeFrom
+        to_event_id: *eventEdgeTo
+
+    EventLimit:
+      type: object
+      required:
+        - id
+        - event_id
+        - auto_approve
+        - collect_snils
+        - collect_phones
+        - participant_limit
+        - date_end_request
+        - date_end_update
+        - user_age_start
+        - user_age_end
+        - requires_project
+        - requires_stepik
+        - requires_github
+        - requires_yandex
+        - requires_kaggle
+        - requires_leader
+        - requires_vk
+        - requires_telegram
+        - countries
+        - regions
+        - cities
+        - description
+      properties:
+        id: {type: integer, format: int32}
+        event_id: *eventID
+        auto_approve: &eventLimitAutoApprove
+          type: boolean
+          description: Автосогласование заявок.
+        collect_snils: &eventLimitCollectSNILS
+          type: boolean
+          description: Собирать СНИЛС в заявках.
+        collect_phones: &eventLimitCollectPhones
+          type: boolean
+          description: Собирать номера телефонов в заявках.
+        participant_limit: &eventLimitParticipantLimit
+          type: integer
+          format: int32
+          nullable: true
+          description: Максимальное количество участников.
+        date_end_request: &eventLimitDateEndRequest
+          type: string
+          format: date-time
+          nullable: true
+          description: Крайний срок подачи заявки.
+        date_end_update: &eventLimitDateEndUpdate
+          type: string
+          format: date-time
+          nullable: true
+          description: Крайний срок обновления заявки.
+        user_age_start: &eventLimitUserAgeStart
+          type: integer
+          format: int32
+          nullable: true
+          description: Минимальный возраст участника. Рассчитывается от даты начала мероприятия.
+        user_age_end: &eventLimitUserAgeEnd
+          type: integer
+          format: int32
+          nullable: true
+          description: Максимальный возраст участника. Рассчитывается от даты начала мероприятия.
+        requires_project: &eventLimitRequiresProject
+          type: boolean
+          description: Требуется проект.
+        requires_stepik: &eventLimitRequiresStepik
+          type: boolean
+          description: Требуется учетная запись Stepik.
+        requires_github: &eventLimitRequiresGitHub
+          type: boolean
+          description: Требуется учетная запись GitHub.
+        requires_yandex: &eventLimitRequiresYandex
+          type: boolean
+          description: Требуется учетная запись Yandex.
+        requires_kaggle: &eventLimitRequiresKaggle
+          type: boolean
+          description: Требуется учетная запись Kaggle.
+        requires_leader: &eventLimitRequiresLeader
+          type: boolean
+          description: Требуется учетная запись Leader.
+        requires_vk: &eventLimitRequiresVK
+          type: boolean
+          description: Требуется учетная запись VK.
+        requires_telegram: &eventLimitRequiresTelegram
+          type: boolean
+          description: Требуется учетная запись Telegram.
+        regions_fias: &eventLimitRegionsFIAS
+          type: array
+          description: ФИАС ID допускаемых к регистрации регионов.
+          items: {type: string, format: uuid}
+        cities_fias: &eventLimitCitiesFIAS
+          type: array
+          description: ФИАС ID допускаемых к регистрации городов.
+          items: {type: string, format: uuid}
+        countries: &eventLimitCountries
+          type: array
+          description: Допускаемые к регистрации страны.
+          items: {type: string}
+        regions: &eventLimitRegions
+          type: array
+          description: Допускаемые к регистрации регионы.
+          items: {type: string}
+        cities: &eventLimitCities
+          type: array
+          description: Допускаемые к регистрации города.
+          items: {type: string}
+        description: &eventLimitDescription
+          type: string
+          description: Текстовое описание ограничений по регистрации.
+    EventLimitWrite:
+      type: object
+      properties:
+        auto_approve: *eventLimitAutoApprove
+        collect_snils: *eventLimitCollectSNILS
+        collect_phones: *eventLimitCollectPhones
+        participant_limit:
+          <<: *eventLimitParticipantLimit
+          minimum: 1
+        date_end_request: *eventLimitDateEndRequest
+        date_end_update: *eventLimitDateEndUpdate
+        user_age_start: *eventLimitUserAgeStart
+        user_age_end: *eventLimitUserAgeEnd
+        requires_project: *eventLimitRequiresProject
+        requires_stepik: *eventLimitRequiresStepik
+        requires_github: *eventLimitRequiresGitHub
+        requires_yandex: *eventLimitRequiresYandex
+        requires_kaggle: *eventLimitRequiresKaggle
+        requires_leader: *eventLimitRequiresLeader
+        requires_vk: *eventLimitRequiresVK
+        requires_telegram: *eventLimitRequiresTelegram
+        regions_fias: *eventLimitRegionsFIAS
+        cities_fias: *eventLimitCitiesFIAS
+        countries: *eventLimitCountries
+        regions: *eventLimitRegions
+        cities: *eventLimitCities
+        description: *eventLimitDescription
+    EventLimitOnlyDateEndRequest:
+      type: object
+      required:
+        - date_end_request
+      properties:
+        date_end_request: *eventLimitDateEndRequest
+
+    phone: &phone
+      type: string
+      title: Номер телефона
+    phoneUnconfirmed: &phoneUnconfirmed
+      type: string
+      title: Номер неподтвержденного телефона
+
     ContentLength:
       type: integer
       format: int32
       minimum: 1
       description: Размер файла в байтах.
-    EventSignup:
-      type: object
-      properties:
-        consents: {type: array, items: {$ref: '#/components/schemas/UserConsentKind'}}
-        email: {type: string, title: Email, format: email}
-        last_name: {type: string, title: Фамилия}
-        first_name: {type: string, title: Имя}
-        middle_name: {type: string, title: Отчество}
-        no_middle_name: {type: boolean, title: Нет отчества}
-        birthday: {type: string, title: Дата рождения, format: date}
-        address: {type: string, title: Адрес}
-        sex: {$ref: '#/components/schemas/UserSex'}
-        grade: {type: integer, title: Класс, format: int8}
-        snils: {type: string, title: СНИЛС}
-        adult_confirm: {type: integer, title: Подтверждение родителей, format: int32}
-        phone:
-          type: string
-          title: Номер телефона
-        phone_unconfirmed:
-          type: string
-          title: Номер неподтвержденного телефона
-        session_token: {type: string, title: Токен подтверждения телефона}
-        stepik_uid: {type: string, title: ID пользователя Stepik}
-        github_uid: {type: string, title: ID пользователя GitHub}
-        yandex_uid: {type: string, title: ID пользователя Yandex}
-        leader_uid: {type: string, title: ID пользователя LeaderID}
-        vk_uid: {type: string, title: ID пользователя VK}
-        telegram_id: {type: integer, format: int64, title: UID Telegram}
-        kaggle_username: {type: string, maxLength: 255, title: Имя пользователя Kaggle аккаунта}
-        # team_assignment_fields
-        fields:
-          type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: integer
-    DiplomaTemplate:
-      type: string
-      enum:
-        - diploma
-        - cert
-      x-enumDescriptions:
-        diploma: Шаблон диплома
-        cert: Шаблон сертификата
-      default: diploma
-    DiplomaIssueMode:
-      type: string
-      description: Для кого предусмотрена выдача дипломов
-      enum:
-        - all
-        - roles
-        - none
-      x-enumDescriptions:
-        all: Выдаются всем
-        roles: Выдаются по ролям
-        none: Не выдаются никому
-      default: none
+
     EducationalCategory:
       title: Тип образования
       description: Тип образования.
@@ -1960,29 +2895,16 @@ components:
         - high
         - vocational
         - secondary
-    EventAchievementsCount:
-      type: integer
-      format: int32
+
     EventAchievementRole:
       type: object
       required:
         - id
         - name
       properties:
-        id:
-          type: integer
-          format: int32
-        name:
-          type: string
-    EventAchievementsAllowed:
-      type: boolean
-      description: Допуск на создания достижений на мероприятие.
-    EventAltTitle:
-      type: string
-      description: Альтернативное название мероприятия.
-    EventAutocreateMember:
-      type: boolean
-      description: Автоматическое добавление в участники организации пользователя с подтвержденной заявки.
+        id: {type: integer, format: int32}
+        name: {type: string}
+
     EventBrand:
       type: object
       required:
@@ -1990,33 +2912,10 @@ components:
         - event_id
         - brand_id
       properties:
-        id:
-          type: integer
-          format: int32
-        event_id:
-          $ref: '#/components/schemas/EventID'
-        brand_id:
-          type: integer
-          format: int32
-    EventCanceled:
-      type: boolean
-      description: Статус отмены мероприятия.
-    EventCover:
-      type: string
-      description: Ссылка на обложку мероприятия.
-    EventCoverURLWrite:
-      type: string
-      format: uri
-      description: Ссылка на обложку мероприятия.
-    EventCreatedAt:
-      type: string
-      format: date-time
-      description: Дата создания.
-    EventCreatedByID:
-      type: integer
-      format: int32
-      nullable: true
-      description: ID автора мероприятия.
+        id: {type: integer, format: int32}
+        event_id: *eventID
+        brand_id: {type: integer, format: int32}
+
     EventDeferredNotification:
       title: Отложенное уведомление для участников мероприятия
       type: object
@@ -2033,8 +2932,7 @@ components:
       properties:
         qstatus:
           $ref: '#/components/schemas/QueueStatus'
-        event_id:
-          $ref: '#/components/schemas/EventID'
+        event_id: *eventID
         created_at:
           type: string
           format: date-time
@@ -2076,18 +2974,10 @@ components:
         - days
         - months
       properties:
-        microseconds:
-          type: integer
-          format: int64
-        days:
-          type: integer
-          format: int32
-        months:
-          type: integer
-          format: int32
-    EventDescription:
-      type: string
-      description: Описание мероприятия.
+        microseconds: {type: integer, format: int64}
+        days: {type: integer, format: int32}
+        months: {type: integer, format: int32}
+
     EventDiplomaSettings:
       type: object
       required:
@@ -2124,52 +3014,8 @@ components:
           description: |-
             Массив ID ролей, для которых выдаются дипломы.
             Возвращается только если diploma_issue_mode равен roles и только в операциях чтения.
-          items:
-            type: integer
-            format: int32
-    EventDraft:
-      type: boolean
-      description: |-
-        Мероприятие находится в статусе черновика.
-        На такое мероприятие нельзя зарегистрироваться.
-    EventEdge:
-      title: Ребро между мероприятиями
-      type: object
-      required:
-        - id
-        - type
-        - from_event_id
-        - to_event_id
-      properties:
-        id:
-          type: integer
-          format: int32
-          description: Идентификатор связи/ребра.
-        type:
-          type: integer
-          format: int16
-          enum: [1, 2]
-          x-enumDescriptions:
-            1: Отбор
-            2: Вложенность
-          description: Тип отношения мероприятий.
-        from_event_id:
-          type: integer
-          format: int32
-          description: Исходная вершина.
-        to_event_id:
-          type: integer
-          format: int32
-          description: Целевая вершина.
-    EventEnd:
-      type: string
-      format: date-time
-      nullable: true
-      description: Дата окончания мероприятия.
-    EventExpectedStart:
-      type: string
-      format: date-time
-      nullable: true
+          items: {type: integer, format: int32}
+
     EventFieldListed:
       type: object
       required:
@@ -2194,266 +3040,144 @@ components:
         hidden: {type: boolean}
         another: {type: boolean}
         help_text: {type: string}
-    EventFormat:
-      type: string
-      enum:
-        - ""
-        - offline
-        - online
-      description: Формат проведения мероприятия.
-      x-enumDescriptions:
-        "": Значение не указано
-        offline: Оффлайн мероприятие.
-        online: Онлайн мероприятие.
-    EventHidden:
-      type: boolean
-      description: Исключение мероприятия из календаря.
-    EventID:
-      type: integer
-      format: int32
-      description: ID мероприятия.
-    EventLimit:
+
+    EventRequest:
       type: object
       required:
         - id
+        - created_at
+        - updated_at
         - event_id
-        - auto_approve
-        - collect_snils
-        - collect_phones
-        - participant_limit
-        - date_end_request
-        - date_end_update
-        - user_age_start
-        - user_age_end
-        - requires_project
-        - requires_stepik
-        - requires_github
-        - requires_yandex
-        - requires_kaggle
-        - requires_leader
-        - requires_vk
-        - requires_telegram
-        - countries
-        - regions
-        - cities
-        - description
+        - team_id
+        - user_id
+        - unconfirmed_user_id
+        - status
+        - removed
+        - rejected_at
+        - rejection_reason
+        - comment
+        - comment_updated_at
+        - github_uid
+        - kaggle_username
+        - leader_uid
+        - stepik_uid
+        - telegram_id
+        - vk_uid
+        - yandex_uid
       properties:
-        id:
-          type: integer
-          format: int32
-        event_id: {$ref: '#/components/schemas/EventID'}
-        auto_approve: {$ref: '#/components/schemas/EventLimitAutoApprove'}
-        collect_snils: {$ref: '#/components/schemas/EventLimitCollectSNILS'}
-        collect_phones: {$ref: '#/components/schemas/EventLimitCollectPhones'}
-        participant_limit: {$ref: '#/components/schemas/EventLimitParticipantLimit'}
-        date_end_request: {$ref: '#/components/schemas/EventLimitDateEndRequest'}
-        date_end_update: {$ref: '#/components/schemas/EventLimitDateEndUpdate'}
-        user_age_start: {$ref: '#/components/schemas/EventLimitUserAgeStart'}
-        user_age_end: {$ref: '#/components/schemas/EventLimitUserAgeEnd'}
-        requires_project: {$ref: '#/components/schemas/EventLimitRequiresProject'}
-        requires_stepik: {$ref: '#/components/schemas/EventLimitRequiresStepik'}
-        requires_github: {$ref: '#/components/schemas/EventLimitRequiresGitHub'}
-        requires_yandex: {$ref: '#/components/schemas/EventLimitRequiresYandex'}
-        requires_kaggle: {$ref: '#/components/schemas/EventLimitRequiresKaggle'}
-        requires_leader: {$ref: '#/components/schemas/EventLimitRequiresLeader'}
-        requires_vk: {$ref: '#/components/schemas/EventLimitRequiresVK'}
-        requires_telegram: {$ref: '#/components/schemas/EventLimitRequiresTelegram'}
-        countries: {$ref: '#/components/schemas/EventLimitCountries'}
-        regions: {$ref: '#/components/schemas/EventLimitRegions'}
-        cities: {$ref: '#/components/schemas/EventLimitCities'}
-        description: {$ref: '#/components/schemas/EventLimitDescription'}
-    EventLimitAutoApprove:
-      type: boolean
-      description: Автосогласование заявок.
-    EventLimitCities:
-      type: array
-      description: Допускаемые к регистрации города.
-      items:
-        type: string
-    EventLimitCollectPhones:
-      type: boolean
-      description: Собирать номера телефонов в заявках.
-    EventLimitCollectSNILS:
-      type: boolean
-      description: Собирать СНИЛС в заявках.
-    EventLimitCountries:
-      type: array
-      description: Допускаемые к регистрации страны.
-      items:
-        type: string
-    EventLimitDateEndRequest:
-      type: string
-      format: date-time
-      nullable: true
-      description: Крайний срок подачи заявки.
-    EventLimitDateEndUpdate:
-      type: string
-      format: date-time
-      nullable: true
-      description: Крайний срок обновления заявки.
-    EventLimitDescription:
-      type: string
-      description: Текстовое описание ограничений по регистрации.
-    EventLimitOnlyDateEndRequest:
-      type: object
-      required:
-        - date_end_request
-      properties:
-        date_end_request:
-          $ref: '#/components/schemas/EventLimitDateEndRequest'
-    EventLimitParticipantLimit:
-      type: integer
-      minimum: 1
-      nullable: true
-      description: Максимальное количество участников.
-    EventLimitRegions:
-      type: array
-      description: Допускаемые к регистрации регионы.
-      items:
-        type: string
-    EventLimitRequiresProject:
-      type: boolean
-      description: Требуется проект.
-    EventLimitRequiresStepik:
-      type: boolean
-      description: Требуется учетная запись Stepik.
-    EventLimitRequiresGitHub:
-      type: boolean
-      description: Требуется учетная запись GitHub.
-    EventLimitRequiresYandex:
-      type: boolean
-      description: Требуется учетная запись Yandex.
-    EventLimitRequiresKaggle:
-      type: boolean
-      description: Требуется учетная запись Kaggle.
-    EventLimitRequiresLeader:
-      type: boolean
-      description: Требуется учетная запись Leader.
-    EventLimitRequiresVK:
-      type: boolean
-      description: Требуется учетная запись VK.
-    EventLimitRequiresTelegram:
-      type: boolean
-      description: Требуется учетная запись Telegram.
-    EventLimitUserAgeStart:
-      type: integer
-      format: int32
-      nullable: true
-      description: Минимальный возраст участника. Рассчитывается от даты начала мероприятия.
-    EventLimitUserAgeEnd:
-      type: integer
-      format: int32
-      nullable: true
-      description: Максимальный возраст участника. Рассчитывается от даты начала мероприятия.
-    EventMaxUsers:
-      type: integer
-      nullable: true
-    EventMetaEventID:
-      type: integer
-      format: int32
-      nullable: true
-      description: ID мета-мероприятия.
-    EventNotificationEmailMessage:
-      type: string
-      description: |-
-        Дополнительный текст для Email уведомления о регистрации на мероприятие.
+        id: {type: integer, format: int32}
+        created_at: {type: string, format: date-time}
+        updated_at: {type: string, format: date-time}
+        event_id: {type: integer, format: int32}
+        team_id: {type: integer, format: int32, nullable: true}
+        user_id: {type: integer, format: int32, nullable: true}
+        unconfirmed_user_id: {type: integer, format: int32, nullable: true}
+        status: {type: integer, format: int32}
+        removed: {type: boolean}
+        rejected_at: {type: string, format: date-time, nullable: true}
+        rejection_reason: {type: string}
+        comment: {type: string}
+        comment_updated_at: {type: string, format: date-time, nullable: true}
+        github_uid: {type: string}
+        kaggle_username: {type: string}
+        leader_uid: {type: string}
+        stepik_uid: {type: string}
+        telegram_id: {type: integer, format: int64, nullable: true}
+        vk_uid: {type: string}
+        yandex_uid: {type: string}
 
-        > Текст интерпретируется в соответствии с форматом markdown.
-    EventOrganizationID:
-      type: integer
-      format: int32
-      nullable: true
-      description: ID организации мероприятия.
-    EventPublic:
-      type: boolean
-      description: Статус публичности мероприятия.
-    EventQuestionnaireCompletedMessage:
-      type: string
-      description: Сообщение о заполненной анкете.
-    EventRequestsAllowed:
-      type: boolean
-      description: Допуск на создания заявок на мероприятие.
-    EventRequestsCount:
-      type: integer
-      format: int32
     EventRoute:
       type: object
-      required:
-        - id
-        - event_id
-        - route_id
+      required: [id, event_id, route_id]
       properties:
-        id:
-          type: integer
-          format: int32
-        event_id:
-          $ref: '#/components/schemas/EventID'
-        route_id:
-          type: integer
-          format: int32
-    EventSelfCheckIn:
-      type: boolean
-      description: Доступность чекина
-    EventStart:
-      type: string
-      format: date-time
-      nullable: true
-      description: Дата начала мероприятия.
-    EventTeamAssignmentMethod:
+        id: {type: integer, format: int32}
+        event_id: *eventID
+        route_id: {type: integer, format: int32}
+
+    EventSignup:
+      type: object
+      properties:
+        consents: {type: array, items: {$ref: '#/components/schemas/UserConsentKind'}}
+        email: {type: string, title: Email, format: email}
+        last_name: {type: string, title: Фамилия}
+        first_name: {type: string, title: Имя}
+        middle_name: {type: string, title: Отчество}
+        no_middle_name: {type: boolean, title: Нет отчества}
+        birthday: {type: string, title: Дата рождения, format: date}
+        address: {type: string, title: Адрес}
+        sex: {$ref: '#/components/schemas/UserSex'}
+        grade: {type: integer, title: Класс, format: int8}
+        snils: {type: string, title: СНИЛС}
+        adult_confirm: {type: integer, title: Подтверждение родителей, format: int32}
+        phone: *phone
+        phone_unconfirmed: *phoneUnconfirmed
+        session_token: {type: string, title: Токен подтверждения телефона}
+        stepik_uid: {type: string, title: ID пользователя Stepik}
+        github_uid: {type: string, title: ID пользователя GitHub}
+        yandex_uid: {type: string, title: ID пользователя Yandex}
+        leader_uid: {type: string, title: ID пользователя LeaderID}
+        vk_uid: {type: string, title: ID пользователя VK}
+        telegram_id: {type: integer, format: int64, title: UID Telegram}
+        kaggle_username: {type: string, maxLength: 255, title: Имя пользователя Kaggle аккаунта}
+        # team_assignment_fields
+        fields: {$ref: '#/components/schemas/EventSignupFields'}
+
+    EventSignupFields:
+      type: object
+      additionalProperties:
+        oneOf:
+          - {type: string, nullable: true}
+          - {type: integer, nullable: true}
+
+    EventSignupUpdate:
+      type: object
+      properties:
+        team_id: {type: integer, format: int32, nullable: true}
+        stepik_uid: {type: string, title: ID пользователя Stepik}
+        github_uid: {type: string, title: ID пользователя GitHub}
+        yandex_uid: {type: string, title: ID пользователя Yandex}
+        leader_uid: {type: string, title: ID пользователя LeaderID}
+        vk_uid: {type: string, title: ID пользователя VK}
+        telegram_id: {type: integer, format: int64, title: UID Telegram, nullable: true}
+        kaggle_username: {type: string, maxLength: 255, title: Имя пользователя Kaggle аккаунта}
+        fields: {$ref: '#/components/schemas/EventSignupFields'}
+
+    EventSignupConfirmed:
+      type: object
+      required: [user]
+      properties:
+        user:
+          type: object
+          required: [email, phone, last_name, first_name]
+          properties:
+            email: {type: string}
+            phone: {type: string}
+            last_name: {type: string}
+            first_name: {type: string}
+
+    DiplomaTemplate:
       type: string
       enum:
-        - completion
-        - completion_soft
-        - single
-        - single_soft
+        - diploma
+        - cert
       x-enumDescriptions:
-        completion: Команды будут дополняться до максимального количества.
-        completion_soft: |-
-          Команды будут дополняться до максимального количества.
-          У участников есть возможность отказаться от дополнения их команды.
-        single: |-
-          Команды будут создаваться только из участников-одиночек и команд из одного участника.
-        single_soft: |-
-          Команды будут создаваться только из участников-одиночек и команд из одного участника.
-          У участников есть возможность отказаться от изменения их команды.
-    EventTeamsInvolved:
-      type: integer
-      format: int32
-      description: Формат участия.
-      enum: [0, 1, 2]
+        diploma: Шаблон диплома
+        cert: Шаблон сертификата
+      default: diploma
+
+    DiplomaIssueMode:
+      type: string
+      description: Для кого предусмотрена выдача дипломов
+      enum:
+        - all
+        - roles
+        - none
       x-enumDescriptions:
-        0: Допускаются и индивидуальное и командное участия
-        1: Допускается только индивидуальная регистрация
-        2: Допускается регистрация только в команде
-    EventTimeMatters:
-      type: boolean
-      description: Учитывается ли время или только даты в полях `start` и `end`.
-    EventTitle:
-      type: string
-      description: Название мероприятия.
-    EventTitleInput:
-      allOf:
-        - $ref: '#/components/schemas/EventTitle'
-        - minLength: 1
-    EventTypeID:
-      type: integer
-      format: int32
-      nullable: true
-      description: Идентификатор типа мероприятия.
-    EventUpdatedAt:
-      type: string
-      format: date-time
-      description: Дата обновления.
-    EventURL:
-      type: string
-      format: url
-      maxLength: 200
-      description: Адрес online мероприятия.
-    EventVenueID:
-      type: integer
-      format: int32
-      nullable: true
-      description: ID [площадки](/venue-api/docs/) на которой проводится мероприятие.
+        all: Выдаются всем
+        roles: Выдаются по ролям
+        none: Не выдаются никому
+      default: none
+
     FileMeta:
       type: object
       required:
@@ -2505,10 +3229,12 @@ components:
           type: integer
           format: int32
           description: Текущая загруженная версия файла.
+
     FileMetaName:
       type: string
       maxLength: 200
       description: Опциональное название файла.
+
     FilePresignedRequest:
       type: object
       required:
@@ -2528,6 +3254,7 @@ components:
           additionalProperties:
             type: string
             description: Заголовки запроса на загрузку файла.
+
     FileReference:
       type: object
       required:
@@ -2547,12 +3274,44 @@ components:
           type: string
           format: date-time
           description: Дата создания ссылки на файл
+
+    GeoData:
+      type: object
+      required:
+        - country
+        - federal_district
+        - region_fias
+        - region_with_type
+        - city
+        - city_fias
+        - city_type_full
+        - settlement
+        - settlement_type_full
+        - city_district_with_type
+        - address
+        - geo_lat
+        - geo_lon
+      properties:
+        country: {type: string}
+        federal_district: {type: string}
+        region_fias: {type: string, format: uuid, nullable: true}
+        region_with_type: {type: string}
+        city: {type: string}
+        city_fias: {type: string, format: uuid, nullable: true}
+        city_type_full: {type: string}
+        settlement: {type: string}
+        settlement_type_full: {type: string}
+        city_district_with_type: {type: string}
+        address: {type: string}
+        geo_lat: {type: string}
+        geo_lon: {type: string}
     GeodataAddress:
       type: string
       description: Полный адрес
     GeodataCity:
       type: string
       description: Название города
+
     OrganizationMeta:
       type: object
       required:
@@ -2565,28 +3324,19 @@ components:
         - educational_category
         - short_name
         - full_name
+        - geo_data_id
       properties:
-        id:
-          type: integer
-          format: int32
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        is_permitted:
-          type: boolean
-        legal_entity_id:
-          type: integer
-          format: int32
-          nullable: true
-        parent_organization_id:
-          type: integer
-          format: int32
-          nullable: true
-        educational_category:
-          $ref: '#/components/schemas/EducationalCategory'
+        id: {type: integer, format: int32}
+        created_at: {type: string, format: date-time}
+        updated_at: {type: string, format: date-time}
+        is_permitted: {type: boolean}
+        legal_entity_id: {type: integer, format: int32, nullable: true}
+        parent_organization_id: {type: integer, format: int32, nullable: true}
+        educational_category: {$ref: '#/components/schemas/EducationalCategory'}
+        short_name: {type: string}
+        full_name: {type: string}
+        geo_data_id: *geoDataRefID
+
     OrganizationSubject:
       allOf:
         - type: object
@@ -2596,12 +3346,8 @@ components:
             - organization_id
             - subject_id
           properties:
-            id:
-              type: integer
-              format: int32
-            created_at:
-              type: string
-              format: date-time
+            id: {type: integer, format: int32}
+            created_at: {type: string, format: date-time}
         - $ref: '#/components/schemas/OrganizationSubjectBody'
     OrganizationSubjectBody:
       # Параметры OrganizationSubject заполняемые клиентом.
@@ -2617,6 +3363,7 @@ components:
           type: integer
           format: int32
           description: ID [тематики](#tag/organization-subjects/operation/SubjectList)
+
     QueueStatus:
       type: string
       enum:
@@ -2630,6 +3377,7 @@ components:
         started: Задача выполняется
         finished: Задача завершена
         canceled: Выполнение отменено
+
     QueueStatusPatch:
       type: string
       enum:
@@ -2639,130 +3387,7 @@ components:
       x-enumDescriptions:
         pending: Ожидает выполнения
         canceled: Выполнение отменено
-    SocialAuth:
-      type: object
-      required:
-        - provider
-        - uid
-      properties:
-        provider:
-          $ref: '#/components/schemas/SocialAuthProvider'
-        uid:
-          type: string
-          description: ID пользователя в провайдере авторизации.
-    SocialAuthProvider:
-      type: string
-      title: Имя провайдера внешней авторизации
-      description: Включает все возможные значения, в том числе и недоступные для авторизации имена провайдеров.
-      enum:
-        - github
-        - github_legacy
-        - gitlab
-        - leader
-        - mos
-        - stackoverflow
-        - stepik
-        - rsv
-        - unti
-        - vkid
-        - vk-oauth2
-        - yandex
-    Subject:
-      type: object
-      required:
-        - id
-        - title
-      properties:
-        id:
-          type: integer
-          format: int32
-        title:
-          type: string
-    Team:
-      x-tags:
-        - teams-schema
-      title: Команда пользователей
-      type: object
-      required:
-        - id
-        - created_at
-        - updated_at
-        - title
-        - description
-        - assignment_participation
-        - created_by_assignment
-        - event_id
-        - project_id
-      properties:
-        id:
-          type: integer
-          format: int32
-          description: ID команды.
-        created_at:
-          type: string
-          format: date-time
-          description: Дата создания.
-        updated_at:
-          type: string
-          format: date-time
-          description: Дата обновления.
-        title:
-          type: string
-          description: Название команды.
-        description:
-          type: string
-          description: Описание команды.
-        assignment_participation:
-          type: boolean
-          description: Команда участвует в автораспределении.
-        created_by_assignment:
-          type: boolean
-          description: Команда создана автораспределением.
-        event_id:
-          type: integer
-          format: int32
-          description: ID мероприятия команды.
-        project_id:
-          type: integer
-          format: int32
-          description: ID проекта команды.
-        owner_id:
-          type: integer
-          format: int32
-          description: |-
-            TalentID капитана команды.
 
-            > Доступно только для участников команды и организатора мероприятия.
-        contact_link:
-          type: string
-          description: |-
-            Контактная ссылка команды.
-
-            > Доступно только для участников команды и организатора мероприятия.
-        invite_code:
-          type: string
-          description: |-
-            Код для вступления в команду.
-
-            > Доступен только капитану команды.
-    TeamContactLink:
-      type: string
-      format: uri
-      description: Контактная ссылка.
-    UUIDs:
-      type: array
-      items:
-        type: string
-        format: uuid
-    UserConsentKind:
-      type: string
-      enum:
-        - personal_data_processing
-        - terms_of_service
-    UserSex:
-      type: string
-      title: Пол
-      enum: [m, w]
     Signup:
       type: object
       properties:
@@ -2780,264 +3405,308 @@ components:
         snils: {type: string, title: СНИЛС}
         adult_confirm: {type: integer, title: Подтверждение родителей, format: int32}
         redirect_uri: {type: string, title: URI перенаправления, maxLength: 1000}
-        phone:
-          type: string
-          title: Номер телефона
+        phone: *phone
         session_token: {type: string, title: Токен подтверждения телефона}
-    UserUpdate:
-      type: object
-      properties:
-        last_name: {type: string, title: Фамилия}
-        first_name: {type: string, title: Имя}
-        middle_name: {type: string, title: Отчество}
-        no_middle_name: {type: boolean, title: Нет отчества}
-        birthday: {type: string, title: Дата рождения, format: date}
-        address: {type: string, title: Адрес}
-        sex: {$ref: '#/components/schemas/UserSex'}
-        grade: {type: integer, title: Класс, format: int8}
-        snils: {type: string, title: СНИЛС}
-        phone:
-          type: string
-          title: Номер телефона
-        session_token: {type: string, title: Токен подтверждения телефона}
-        about: {type: string}
-        status_text: {type: string}
-        public_page_enabled: {type: boolean}
-        first_grade_year: {type: integer, format: int16}
-        # avatar: {type: string}
-        current_education: {type: integer, format: int32}
 
-    # Представления мероприятий
-    Event:
-      x-tags:
-        - events-schema
-      title: Мероприятие полностью
-      allOf:
-        - $ref: '#/components/schemas/EventMeta'
-        - type: object
-          required:
-            - simplified_registration
-            - autocreate_member
-            - achievements_allowed
-            - requests_allowed
-            - self_check_in
-            - teams_involved
-            - owner_can_moderate
-            - user_in_multiple_teams
-            - mentors_allowed
-            - support_i18n
-            - gir_collection
-            - time_matters
-            - promoted
-            - max_users
-            - team_create_notification
-            - team_assignment_method
-            - achievement_roles_count
-            - talent_roles_count
-            - achievements_count
-            - requests_count
-            - expected_start
-            - alt_title
-            - cover
-            - url
-            - type_id
-            - description
-            - cancellation_reason
-            - questionnaire_completed_message
-          properties:
-            simplified_registration:
-              type: boolean
-              description: Доступность упрощенной регистрации на мероприятие.
-            autocreate_member: {$ref: '#/components/schemas/EventAutocreateMember'}
-            achievements_allowed: {$ref: '#/components/schemas/EventAchievementsAllowed'}
-            requests_allowed: {$ref: '#/components/schemas/EventRequestsAllowed'}
-            self_check_in: {$ref: '#/components/schemas/EventSelfCheckIn'}
-            teams_involved: {$ref: '#/components/schemas/EventTeamsInvolved'}
-            owner_can_moderate:
-              type: boolean
-            user_in_multiple_teams:
-              type: boolean
-            mentors_allowed:
-              type: boolean
-            support_i18n:
-              type: boolean
-            gir_collection:
-              type: boolean
-            time_matters: {$ref: '#/components/schemas/EventTimeMatters'}
-            promoted:
-              type: boolean
-            max_users:
-              $ref: '#/components/schemas/EventMaxUsers'
-            team_create_notification:
-              type: boolean
-            team_assignment_method: {$ref: '#/components/schemas/EventTeamAssignmentMethod'}
-            achievement_roles_count:
-              type: integer
-              format: int32
-            achievements_count: {$ref: '#/components/schemas/EventAchievementsCount'}
-            requests_count: {$ref: '#/components/schemas/EventRequestsCount'}
-            expected_start: {$ref: '#/components/schemas/EventExpectedStart'}
-            alt_title: {$ref: '#/components/schemas/EventAltTitle'}
-            cover: {$ref: '#/components/schemas/EventCover'}
-            url: {$ref: '#/components/schemas/EventURL'}
-            type_id: {$ref: '#/components/schemas/EventTypeID'}
-            description: {$ref: '#/components/schemas/EventDescription'}
-            cancellation_reason:
-              type: string
-              description: Причина отмены мероприятия.
-            questionnaire_completed_message: {$ref: '#/components/schemas/EventQuestionnaireCompletedMessage'}
-    EventMeta:
-      x-tags:
-        - events-schema
-      title: Метаданные мероприятия
+    SocialAuth:
+      type: object
+      required:
+        - id
+        - provider
+        - uid
+      properties:
+        id: {type: integer, format: int32}
+        provider: {$ref: '#/components/schemas/SocialAuthProvider'}
+        uid: {type: string, description: ID пользователя в провайдере авторизации.}
+    SocialAuthProvider:
+      type: string
+      title: Имя провайдера внешней авторизации
+      description: Включает все возможные значения, в том числе и недоступные для авторизации имена провайдеров.
+      enum:
+        - github
+        - github_legacy
+        - gitlab
+        - leader
+        - mos
+        - stackoverflow
+        - stepik
+        - rsv
+        - unti
+        - vkid
+        - vk-oauth2
+        - yandex
+
+    Subject:
+      type: object
+      required: [id, title]
+      properties:
+        id: {type: integer, format: int32}
+        title: {type: string}
+
+    teamEventID: &teamEventID
+      type: integer
+      format: int32
+      description: ID мероприятия команды.
+
+    teamOwnerID: &teamOwnerID
+      type: integer
+      format: int32
+      description: TalentID капитана команды.
+
+    TeamPublic:
+      title: Команда
       type: object
       required:
         - id
         - created_at
         - updated_at
-        - draft
-        - public
-        - hidden
-        - canceled
         - title
-        - start
-        - end
-        - format
-        - organization_id
-        - meta_event_id
-        - created_by_id
-        - venue_id
+        - description
+        - assignment_participation
+        - created_by_assignment
+        - event_id
+        - project_id
+        - owner_id
       properties:
-        id: {$ref: '#/components/schemas/EventID'}
-        created_at: {$ref: '#/components/schemas/EventCreatedAt'}
-        updated_at: {$ref: '#/components/schemas/EventUpdatedAt'}
-        draft: {$ref: '#/components/schemas/EventDraft'}
-        public: {$ref: '#/components/schemas/EventPublic'}
-        hidden: {$ref: '#/components/schemas/EventHidden'}
-        canceled: {$ref: '#/components/schemas/EventCanceled'}
-        title: {$ref: '#/components/schemas/EventTitle'}
-        start: {$ref: '#/components/schemas/EventStart'}
-        end: {$ref: '#/components/schemas/EventEnd'}
-        format: {$ref: '#/components/schemas/EventFormat'}
-        organization_id: {$ref: '#/components/schemas/EventOrganizationID'}
-        meta_event_id: {$ref: '#/components/schemas/EventMetaEventID'}
-        created_by_id: {$ref: '#/components/schemas/EventCreatedByID'}
-        venue_id: {$ref: '#/components/schemas/EventVenueID'}
-    AddAchievementEvent:
+        id:
+          type: integer
+          format: int32
+          description: ID команды.
+        created_at:
+          type: string
+          format: date-time
+          description: Дата создания.
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата обновления.
+        title: &teamTitle
+          type: string
+          description: Название команды.
+          minLength: 1
+          maxLength: 255 # TODO: Возможно надо вместо шаблона создавать отдельный тип.
+        description: &teamDescription
+          type: string
+          description: Описание команды.
+          maxLength: 2000 # TODO: Возможно надо вместо шаблона создавать отдельный тип.
+        assignment_participation: &teamAssignmentParticipation
+          type: boolean
+          default: true
+          description: Команда участвует в автораспределении.
+        created_by_assignment:
+          type: boolean
+          description: Команда создана автораспределением.
+        event_id:
+          <<: *teamEventID
+          nullable: true
+        owner_id:
+          <<: *teamOwnerID
+          nullable: true
+        project_id: &teamProjectID
+          type: integer
+          format: int32
+          nullable: true
+          description: ID проекта команды.
+
+    TeamPublicWithPersons:
+      title: Команда с опциональным массивом участников
+      allOf:
+        - {$ref: '#/components/schemas/TeamPublic'}
+        - type: object
+          properties:
+            persons: {type: array, items: {$ref: '#/components/schemas/TeamPersonWithUser'}}
+
+    TeamPrivate:
+      allOf:
+        - $ref: '#/components/schemas/TeamPublic'
+        - type: object
+          required: [contact_link]
+          properties:
+            contact_link:
+              type: string
+              description: Контактная ссылка команды.
+            invite_code:
+              type: string
+              description: Код для вступления в команду.
+
+    TeamPrivateWithPersons:
+      title: Команда с участниками
+      allOf:
+        - {$ref: '#/components/schemas/TeamPrivate'}
+        - type: object
+          required: [persons]
+          properties:
+            persons: {type: array, items: {$ref: '#/components/schemas/TeamPersonWithUser'}}
+
+    AdminTeamCreate:
+      allOf:
+        - $ref: '#/components/schemas/AdminTeamUpdate'
       type: object
-      required:
-        - id
-        - title
-        - alt_title
-        - start
-        - end
-        - achievement_roles
-      properties:
-        id: {$ref: '#/components/schemas/EventID'}
-        title: {$ref: '#/components/schemas/EventTitle'}
-        alt_title: {$ref: '#/components/schemas/EventAltTitle'}
-        start: {$ref: '#/components/schemas/EventStart'}
-        end: {$ref: '#/components/schemas/EventEnd'}
-        achievement_roles:
-          type: array
-          items:
-            type: integer
-            format: int32
-    CalendarEvent:
+      required: [event_id, owner_id, title]
+
+    AdminTeamUpdate:
       type: object
-      required:
-        - id
-        - canceled
-        - title
-        - alt_title
-        - format
-        - start
-        - end
-        - requests_allowed
-        - expected_start
-        - time_matters
-        - limits
-        - cover
-        - city
-        - brands
       properties:
-        id: {$ref: '#/components/schemas/EventID'}
-        canceled: {$ref: '#/components/schemas/EventCanceled'}
-        title: {$ref: '#/components/schemas/EventTitle'}
-        alt_title: {$ref: '#/components/schemas/EventAltTitle'}
-        format: {$ref: '#/components/schemas/EventFormat'}
-        start: {$ref: '#/components/schemas/EventStart'}
-        end: {$ref: '#/components/schemas/EventEnd'}
-        requests_allowed: {$ref: '#/components/schemas/EventRequestsAllowed'}
-        expected_start: {$ref: '#/components/schemas/EventExpectedStart'}
-        time_matters: {$ref: '#/components/schemas/EventTimeMatters'}
-        limits: {$ref: '#/components/schemas/EventLimitOnlyDateEndRequest'}
-        cover: {$ref: '#/components/schemas/EventCover'}
-        city: {$ref: '#/components/schemas/GeodataCity'}
-        brands:
-          type: array
-          items:
-            type: integer
-            format: int32
-    OrganizationEvent:
+        event_id: *teamEventID
+        project_id: *teamProjectID
+        owner_id: *teamOwnerID
+        title: *teamTitle
+        description: *teamDescription
+        assignment_participation: *teamAssignmentParticipation
+        contact_link: {$ref: '#/components/schemas/TeamContactLink'}
+
+    OrganizationTeamCreate:
+      allOf:
+        - $ref: '#/components/schemas/OrganizationTeamUpdate'
       type: object
-      required:
-        - id
-        - updated_at
-        - draft
-        - public
-        - hidden
-        - canceled
-        - title
-        - alt_title
-        - start
-        - end
-        - format
-        - organization_id
-        - meta_event_id
-        - achievements_allowed
-        - requests_allowed
-        - self_check_in
-        - teams_involved
-        - max_users
-        - limits
-        - achievements_count
-        - requests_count
-        - cover
-        - url
-        - city
-        - address
-        - edges_incoming
+      required: [event_id, owner_id, title]
       properties:
-        id: {$ref: '#/components/schemas/EventID'}
-        updated_at: {$ref: '#/components/schemas/EventUpdatedAt'}
-        draft: {$ref: '#/components/schemas/EventDraft'}
-        public: {$ref: '#/components/schemas/EventPublic'}
-        hidden: {$ref: '#/components/schemas/EventHidden'}
-        canceled: {$ref: '#/components/schemas/EventCanceled'}
-        title: {$ref: '#/components/schemas/EventTitle'}
-        alt_title: {$ref: '#/components/schemas/EventAltTitle'}
-        start: {$ref: '#/components/schemas/EventStart'}
-        end: {$ref: '#/components/schemas/EventEnd'}
-        format: {$ref: '#/components/schemas/EventFormat'}
-        organization_id: {$ref: '#/components/schemas/EventOrganizationID'}
-        meta_event_id: {$ref: '#/components/schemas/EventMetaEventID'}
-        achievements_allowed: {$ref: '#/components/schemas/EventAchievementsAllowed'}
-        requests_allowed: {$ref: '#/components/schemas/EventRequestsAllowed'}
-        self_check_in: {$ref: '#/components/schemas/EventSelfCheckIn'}
-        teams_involved: {$ref: '#/components/schemas/EventTeamsInvolved'}
-        max_users: {$ref: '#/components/schemas/EventMaxUsers'}
-        limits: {$ref: '#/components/schemas/EventLimitOnlyDateEndRequest'}
-        achievements_count: {$ref: '#/components/schemas/EventAchievementsCount'}
-        requests_count: {$ref: '#/components/schemas/EventRequestsCount'}
-        cover: {$ref: '#/components/schemas/EventCover'}
-        url: {$ref: '#/components/schemas/EventURL'}
-        city: {$ref: '#/components/schemas/GeodataCity'}
-        address: {$ref: '#/components/schemas/GeodataAddress'}
-        edges_incoming:
-          type: array
-          items:
-            $ref: '#/components/schemas/EventEdge'
+        event_id: *teamEventID
+
+    OrganizationTeamUpdate:
+      type: object
+      properties:
+        owner_id: *teamOwnerID
+        title: *teamTitle
+        description: *teamDescription
+        assignment_participation: *teamAssignmentParticipation
+        contact_link: {$ref: '#/components/schemas/TeamContactLink'}
+
+    ownerTeamWrite:
+      type: object
+      properties:
+        title: *teamTitle
+        description: *teamDescription
+        assignment_participation: *teamAssignmentParticipation
+        contact_link: {$ref: '#/components/schemas/TeamContactLink'}
+        project_id: *teamProjectID
+
+    OwnerTeamCreate:
+      allOf:
+        - $ref: '#/components/schemas/ownerTeamWrite'
+      type: object
+      required: [event_id, title]
+      properties:
+        event_id: *teamEventID
+
+    OwnerTeamUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ownerTeamWrite'
+      type: object
+      properties:
+        owner_id: *teamOwnerID
+
+    TeamContactLink:
+      type: string
+      format: uri
+      description: Контактная ссылка.
+
+    TeamPerson:
+      type: object
+      required: [id, user_accepted, owner_accepted, person_id]
+      properties:
+        id: {type: integer, format: int32}
+        user_accepted: {$ref: '#/components/schemas/TeamPersonAccepted'}
+        owner_accepted: {$ref: '#/components/schemas/TeamPersonAccepted'}
+        person_id: {type: integer, format: int32}
+
+    TeamPersonAccepted:
+      title: Статус подтверждения участия в команде
+      type: string
+      enum:
+        - ""
+        - a
+        - r
+      x-enumDescriptions:
+        "": Значение не указано.
+        a: Подтверждено.
+        r: Отклонено.
+
+    TeamPersonAcceptValue:
+      title: Подтверждение или отклонение участия в команде
+      type: string
+      enum:
+        - a
+        - r
+      x-enumDescriptions:
+        a: Подтверждено.
+        r: Отклонено.
+
+    TeamPersonAcceptApprove:
+      title: Подтверждение участия в команде
+      type: string
+      enum:
+        - a
+      x-enumDescriptions:
+        a: Подтверждено.
+
+    TeamPersonWithUser:
+      type: object
+      required: [id, user_accepted, owner_accepted, person]
+      properties:
+        id: {type: integer, format: int32}
+        user_accepted: {$ref: '#/components/schemas/TeamPersonAccepted'}
+        owner_accepted: {$ref: '#/components/schemas/TeamPersonAccepted'}
+        person:
+          type: object
+          required: [id, user]
+          properties:
+            id: {type: integer, format: int32}
+            user:
+              type: object
+              nullable: true
+              required: [id, last_name, first_name]
+              properties:
+                id: {type: integer, format: int32}
+                avatar: {type: string, nullable: true}
+                last_name: {type: string}
+                first_name: {type: string}
+                middle_name: {type: string}
+
+    OrganizationTeamPersonUpdate:
+      type: object
+      properties:
+        owner_accepted: {$ref: '#/components/schemas/TeamPersonAcceptValue'}
+        user_accepted: {$ref: '#/components/schemas/TeamPersonAcceptApprove'}
+
+    OwnerTeamPersonCreate:
+      title: Добавление участника от капитана
+      type: object
+      required: [user_id]
+      properties: {user_id: {type: integer, format: int32}}
+
+    UserTeamPersonCreate:
+      title: Запрос на добавление в участники
+      type: object
+      properties: {invite_code: {type: string, minLength: 10, maxLength: 10}}
+
+    OwnerTeamPersonUpdate:
+      title: Изменение капитаном команды
+      type: object
+      required: [owner_accepted]
+      properties: {owner_accepted: {$ref: '#/components/schemas/TeamPersonAcceptValue'}}
+
+    UserTeamPersonUpdate:
+      title: Изменение самим участником
+      type: object
+      required: [user_accepted]
+      properties: {user_accepted: {$ref: '#/components/schemas/TeamPersonAcceptValue'}}
+
+    UUIDs:
+      type: array
+      items:
+        type: string
+        format: uuid
+    UserConsentKind:
+      type: string
+      enum:
+        - personal_data_processing
+        - terms_of_service
+
+    UserSex:
+      type: string
+      title: Пол
+      enum: [m, w]
 
   requestBodies:
     EventCreate:
@@ -3045,92 +3714,48 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            required:
-              - organization_id
-              - title
-            properties:
-              organization_id:
-                type: integer
-                format: int32
-                description: ID организации мероприятия.
-              draft: {$ref: '#/components/schemas/EventDraft'}
-              public: {$ref: '#/components/schemas/EventPublic'}
-              hidden: {$ref: '#/components/schemas/EventHidden'}
-              title: {$ref: '#/components/schemas/EventTitleInput'}
-              start: {$ref: '#/components/schemas/EventStart'}
-              end: {$ref: '#/components/schemas/EventEnd'}
-              format: {$ref: '#/components/schemas/EventFormat'}
-              venue_id: {$ref: '#/components/schemas/EventVenueID'}
-              autocreate_member: {$ref: '#/components/schemas/EventAutocreateMember'}
-              achievements_allowed: {$ref: '#/components/schemas/EventAchievementsAllowed'}
-              requests_allowed: {$ref: '#/components/schemas/EventRequestsAllowed'}
-              teams_involved: {$ref: '#/components/schemas/EventTeamsInvolved'}
-              user_in_multiple_teams: {type: boolean}
-              time_matters: {$ref: '#/components/schemas/EventTimeMatters'}
-              team_assignment_method: {$ref: '#/components/schemas/EventTeamAssignmentMethod'}
-              url: {$ref: '#/components/schemas/EventURL'}
-              type_id: {$ref: '#/components/schemas/EventTypeID'}
-              description: {$ref: '#/components/schemas/EventDescription'}
-              questionnaire_completed_message: {$ref: '#/components/schemas/EventQuestionnaireCompletedMessage'}
-              notification_email_message: {$ref: '#/components/schemas/EventNotificationEmailMessage'}
-              cover_url: {$ref: '#/components/schemas/EventCoverURLWrite'}
-              achievement_roles:
-                type: array
-                items:
-                  type: integer
-                  format: int32
-              brands:
-                type: array
-                items:
-                  type: integer
-                  format: int32
-              # address
-              # geo_lat
-              # geo_lon
-    EventLimit:
+            allOf:
+              - $ref: '#/components/schemas/EventWrite'
+              - type: object
+                required:
+                  - organization_id
+                  - title
+                properties:
+                  organization_id: {type: integer, format: int32, description: ID организации мероприятия.}
+                  achievement_roles: {type: array, items: {type: integer, format: int32}}
+                  brands: {type: array, items: {type: integer, format: int32}}
+
+    EventUpdate:
       required: true
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              auto_approve: {$ref: '#/components/schemas/EventLimitAutoApprove'}
-              collect_snils: {$ref: '#/components/schemas/EventLimitCollectSNILS'}
-              collect_phones: {$ref: '#/components/schemas/EventLimitCollectPhones'}
-              participant_limit: {$ref: '#/components/schemas/EventLimitParticipantLimit'}
-              date_end_request: {$ref: '#/components/schemas/EventLimitDateEndRequest'}
-              date_end_update: {$ref: '#/components/schemas/EventLimitDateEndUpdate'}
-              user_age_start: {$ref: '#/components/schemas/EventLimitUserAgeStart'}
-              user_age_end: {$ref: '#/components/schemas/EventLimitUserAgeEnd'}
-              requires_project: {$ref: '#/components/schemas/EventLimitRequiresProject'}
-              requires_stepik: {$ref: '#/components/schemas/EventLimitRequiresStepik'}
-              requires_github: {$ref: '#/components/schemas/EventLimitRequiresGitHub'}
-              requires_yandex: {$ref: '#/components/schemas/EventLimitRequiresYandex'}
-              requires_kaggle: {$ref: '#/components/schemas/EventLimitRequiresKaggle'}
-              requires_leader: {$ref: '#/components/schemas/EventLimitRequiresLeader'}
-              requires_vk: {$ref: '#/components/schemas/EventLimitRequiresVK'}
-              requires_telegram: {$ref: '#/components/schemas/EventLimitRequiresTelegram'}
-              countries: {$ref: '#/components/schemas/EventLimitCountries'}
-              regions: {$ref: '#/components/schemas/EventLimitRegions'}
-              cities: {$ref: '#/components/schemas/EventLimitCities'}
-              description: {$ref: '#/components/schemas/EventLimitDescription'}
+            allOf:
+              - $ref: '#/components/schemas/EventWrite'
+              - type: object
+                properties:
+                  organization_id: *eventOrganizationID
+                  canceled: *eventCanceled
+                  cancellation_reason: {type: string, description: Причина отмены мероприятия.}
+
+    EventLimit:
+      required: true
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/EventLimitWrite'}
+
     EventDeferredNotificationCreate:
       required: true
       content:
         application/json:
           schema:
             type: object
-            required:
-              - before_start
-              - message
+            required: [before_start, message]
             properties:
-              before_start:
-                $ref: '#/components/schemas/EventDeferredNotificationBeforeStart'
-              template:
-                $ref: '#/components/schemas/EventDeferredNotificationTemplateID'
-              message:
-                type: string
+              before_start: {$ref: '#/components/schemas/EventDeferredNotificationBeforeStart'}
+              template: {$ref: '#/components/schemas/EventDeferredNotificationTemplateID'}
+              message: {type: string}
+
     EventDeferredNotificationUpdate:
       required: true
       content:
@@ -3138,18 +3763,16 @@ components:
           schema:
             type: object
             properties:
-              before_start:
-                $ref: '#/components/schemas/EventDeferredNotificationBeforeStart'
-              template:
-                $ref: '#/components/schemas/EventDeferredNotificationTemplateID'
-              message:
-                type: string
-    EventSignup:
+              before_start: {$ref: '#/components/schemas/EventDeferredNotificationBeforeStart'}
+              template: {$ref: '#/components/schemas/EventDeferredNotificationTemplateID'}
+              message: {type: string}
+
+    EventSignup: # FIXME: Перенести в описание операции
       required: true
       content:
         application/json:
-          schema:
-            $ref: '#/components/schemas/EventSignup'
+          schema: {$ref: '#/components/schemas/EventSignup'}
+
     MutationLockCreate:
       required: true
       content:
@@ -3158,36 +3781,26 @@ components:
             type: array
             minItems: 1
             maxItems: 20
-            items:
-              type: string
-              format: uuid
-              description: Идентификатор файла
+            items: {type: string, format: uuid, description: Идентификатор файла}
+
     MutationLockPatch:
       required: true
       content:
         application/json:
           schema:
             type: object
-            required:
-              - active
+            required: [active]
             properties:
-              active:
-                type: boolean
+              active: {type: boolean}
+
     Signup:
       required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Signup'
-    UserUpdate:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UserUpdate'
 
   responses:
-    # Стандартные ответы
     BadRequest:
       description: Невалидный запрос
       content: {application/json: {schema: {type: object, required: [error], properties: {error: {type: string}}}}}
@@ -3197,27 +3810,14 @@ components:
     ContentTooLarge:
       description: Содержимое запроса превышает допустимый лимит
       content: {application/json: {schema: {$ref: '#/components/schemas/ContentTooLarge'}}}
-    Default:
-      description: Ошибка обработки запроса
-      headers:
-        Www-Authenticate:
-          schema:
-            type: string
+    Error:
+      x-summary: Стандартный формат ошибки
+      description: |-
+        Ответы со статусами в диапазонах 4xx и 5xx,
+        за исключением статусов, явно указанных в ответах операции.
       content:
         application/json:
-          schema:
-            type: object
-            required:
-              - error
-            properties:
-              error:
-                type: string
-    ErrorResponse:
-      description: Ошибка
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+          schema: {$ref: '#/components/schemas/Error'}
     NotFound:
       description: Объект не найден
       content: {application/json: {schema: {$ref: '#/components/schemas/NotFound'}}}
@@ -3239,22 +3839,22 @@ components:
       content:
         application/json: {schema: {$ref: '#/components/schemas/UnproccessableEntity'}}
     ValidationErrors:
+      x-summary: Ошибки валидации запроса
       description: |-
-        Ошибки валидации запроса
+        Описания ошибок валидации, ассоциированных с параметрами запроса.
 
-        Каждый ключ - это аспект запроса, которого касается массив ошибок под ключом.
-        В большинстве случаев ключи указывают на имя параметра из запроса.
-        В некоторых случаях ошибки возвращаются под ключом `non_field_errors`.
+        Ошибки, не относящиеся к одному конкретному параметру,
+        возвращаются под ключом `non_field_errors`.
       content:
         application/json:
           schema:
             type: object
             additionalProperties:
               type: array
-              items:
-                type: string
+              description: Описания ошибок
+              x-additionalPropertiesName: Имя параметра
+              items: {type: string}
 
-    # Ответы OAuth2 провайдера
     IssueTokenSuccess:
       description: Успешно выданный токен
       headers:
@@ -3270,6 +3870,7 @@ components:
               expires_in: {type: integer, format: int32}
               refresh_token: {type: string}
               scope: {type: string}
+
     IssueTokenError:
       description: Ошибка получения токена
       content:
@@ -3282,12 +3883,10 @@ components:
               error_description: {type: string}
               error_uri: {type: string}
 
-    # Мероприятия
     ListEvents:
       description: OK
       headers:
-        X-Count:
-          $ref: '#/components/headers/X-Count'
+        X-Count: {$ref: '#/components/headers/X-Count'}
       content:
         application/json:
           schema:
@@ -3296,92 +3895,76 @@ components:
               allOf:
                 - $ref: '#/components/schemas/EventMeta'
                 - type: object
-                  required:
-                    - cover
+                  required: [cover]
                   properties:
-                    cover: {$ref: '#/components/schemas/EventCover'}
+                    cover: *eventCover
+
     ListAddAchievementEvents:
       description: OK
       headers:
-        X-Count:
-          $ref: '#/components/headers/X-Count'
+        X-Count: {$ref: '#/components/headers/X-Count'}
       content:
         application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/AddAchievementEvent'
+          schema: {type: array, items: {$ref: '#/components/schemas/AddAchievementEvent'}}
+
     ListCalendarEvents:
       description: OK
       headers:
-        X-Count:
-          $ref: '#/components/headers/X-Count'
+        X-Count: {$ref: '#/components/headers/X-Count'}
       content:
         application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/CalendarEvent'
+          schema: {type: array, items: {$ref: '#/components/schemas/CalendarEvent'}}
+
     ListOrganizationEvents:
       description: OK
       headers:
-        X-Count:
-          $ref: '#/components/headers/X-Count'
+        X-Count: {$ref: '#/components/headers/X-Count'}
       content:
         application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/OrganizationEvent'
+          schema: {type: array, items: {$ref: '#/components/schemas/OrganizationEvent'}}
 
-    # Связанные с мероприятиями обьекты
+    Event:
+      description: Мероприятие
+      content: {application/json: {schema: {$ref: '#/components/schemas/Event'}}}
     EventLimit:
       description: Ограничения мероприятие
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/EventLimit'
+      content: {application/json: {schema: {$ref: '#/components/schemas/EventLimit'}}}
     ListEventBrands:
       description: OK
       headers:
-        X-Count:
-          $ref: '#/components/headers/X-Count'
+        X-Count: {$ref: '#/components/headers/X-Count'}
       content:
         application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/EventBrand'
-    ListEventRoutes:
-      description: OK
-      headers:
-        X-Count:
-          $ref: '#/components/headers/X-Count'
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/EventRoute'
+          schema: {type: array, items: {$ref: '#/components/schemas/EventBrand'}}
     EventDeferredNotification:
       description: Отложенное уведомление
       content:
         application/json:
-          schema:
-            $ref: '#/components/schemas/EventDeferredNotification'
+          schema: {$ref: '#/components/schemas/EventDeferredNotification'}
     EventDeferredNotificationLocked:
       description: Отложенное уведомление заблокировано выполнением его отправки
       content:
         application/json:
           schema:
             type: object
-            required:
-              - error
+            required: [error]
             properties:
-              error:
-                type: string
+              error: {type: string}
 
-    # Организации
+    TeamPrivate:
+      description: Команда
+      content: {application/json: {schema: {$ref: '#/components/schemas/TeamPrivate'}}}
+    TeamPrivateWithPersons:
+      description: Команда с ее участниками
+      content: {application/json: {schema: {$ref: '#/components/schemas/TeamPrivateWithPersons'}}}
+    TeamPrivateList:
+      description: Список команд
+      content:
+        application/json: {schema: {type: array, items: {$ref: '#/components/schemas/TeamPrivate'}}}
+    TeamPerson:
+      description: Участник команды
+      content: {application/json: {schema: {$ref: '#/components/schemas/TeamPerson'}}}
+
     ListOrganizations:
       description: OK
       headers:
@@ -3405,18 +3988,35 @@ components:
             items:
               $ref: '#/components/schemas/OrganizationSubject'
 
-    # Прочее
-    ListSubjects:
-      description: OK
-      headers:
-        X-Count:
-          $ref: '#/components/headers/X-Count'
+    EventRequest:
+      description: Заявка на мероприятие
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Subject'
+            allOf:
+              - $ref: '#/components/schemas/EventRequest'
+              - type: object
+                properties:
+                  fields:
+                    type: array
+                    items:
+                      type: object
+                      required: [field_id, value_string]
+                      properties:
+                        field_id: {type: integer, format: int32}
+                        value_number: {type: integer, format: int32}
+                        value_string: {type: string}
+                        value_file: {type: string, format: uuid}
+                        value_files: {type: array, items: {type: string, format: uuid}}
+
+    ListSubjects:
+      description: OK
+      headers:
+        X-Count: {$ref: '#/components/headers/X-Count'}
+      content:
+        application/json:
+          schema: {type: array, items: {$ref: '#/components/schemas/Subject'}}
+
     ListUserConsents:
       description: OK
       content:
@@ -3429,6 +4029,7 @@ components:
               properties:
                 created_at: {type: string, format: date-time}
                 kind: {$ref: '#/components/schemas/UserConsentKind'}
+
     MutationLockPatched:
       description: Состояние блокировки изменено
       content:
@@ -3440,6 +4041,7 @@ components:
             properties:
               active:
                 type: boolean
+
     SocialAuthForbidden:
       description: Авторизация недоступна с указанными параметрами
       content: {text/plain: {schema: {type: string}}}
@@ -3448,208 +4050,134 @@ components:
     id_offset_32:
       name: id_offset
       in: query
-      schema:
-        type: integer
-        format: int32
+      schema: {type: integer, format: int32}
       description: Пропуск объектов с идентификатором равном или менее указанного.
     id_offset_64:
       name: id_offset
       in: query
-      schema:
-        type: integer
-        format: int64
+      schema: {type: integer, format: int64}
       description: Пропуск объектов с идентификатором равном или менее указанного.
     offset:
       name: offset
       in: query
-      schema:
-        type: integer
-        format: int32
-        default: 0
-        minimum: 0
-        maximum: 200
+      schema: {type: integer, format: int32, default: 0, minimum: 0, maximum: 200}
       description: Кол-во объектов выборки для пропуска.
     limit:
       name: limit
       in: query
-      schema:
-        type: integer
-        format: int32
-        default: 100
-        minimum: 1
-        maximum: 200
+      schema: {type: integer, format: int32, default: 100, minimum: 1, maximum: 200}
       description: Максимум объектов возвращаемых в теле ответа.
+    achievements_order_by:
+      name: order_by
+      in: query
+      schema: {type: string, default: id_desc, enum: [id_asc, id_desc]}
+      description: Сортировка списка достижений.
     brand_ids:
       name: brand_id
       in: query
       explode: false
-      schema:
-        type: array
-        items:
-          type: integer
-          format: int32
-          minimum: 1
+      schema: {type: array, items: {type: integer, format: int32, minimum: 1}}
       description: Фильтр по массиву идентификаторов брендов.
     competency_ids:
       name: competency_id
       in: query
       explode: false
-      schema:
-        type: array
-        items:
-          type: integer
-          format: int32
-          minimum: 1
+      schema: {type: array, items: {type: integer, format: int32, minimum: 1}}
       description: Фильтр по массиву идентификаторов компетенций Конкурса Талант.
     event_id:
       name: event_id
       in: path
       required: true
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
+      schema: {type: integer, format: int32, minimum: 1}
       description: ID мероприятия
     event_ids:
       name: event_id
       in: query
       explode: false
-      schema:
-        type: array
-        items:
-          type: integer
-          format: int32
-          minimum: 1
+      schema: {type: array, items: {type: integer, format: int32, minimum: 1}}
       description: Фильтр по массиву идентификаторов мероприятий.
     event_meta_event_id:
       name: meta_event_id
       in: query
       explode: false
-      schema:
-        type: array
-        items:
-          type: integer
-          format: int32
-          minimum: 1
+      schema: {type: array, items: {type: integer, format: int32, minimum: 1}}
       description: Фильтрация мероприятий по ID мета-мероприятия.
     event_organization_id:
       name: organization_id
       in: query
       explode: false
-      schema:
-        type: array
-        items:
-          type: integer
-          format: int32
-          minimum: 1
+      schema: {type: array, items: {type: integer, format: int32, minimum: 1}}
       description: Фильтрация мероприятий по ID организации.
     event_venue_id:
       name: venue_id
       in: query
       explode: false
-      schema:
-        type: array
-        items:
-          type: integer
-          format: int32
-          minimum: 1
+      schema: {type: array, items: {type: integer, format: int32, minimum: 1}}
       description: Фильтрация мероприятий по ID площадки их проведения.
     event_search:
       name: search
       in: query
-      schema:
-        type: string
-        minLength: 3
-        maxLength: 150
+      schema: {type: string, minLength: 3, maxLength: 150}
       description: Поиск по названию, ключевым словам и описанию.
     event_format:
       name: format
       in: query
-      schema:
-        $ref: '#/components/schemas/EventFormat'
+      schema: {$ref: '#/components/schemas/EventFormat'}
       description: Фильтрация по формату мероприятий.
     event_start_before:
       name: start_before
       in: query
-      schema:
-        type: string
-        format: date-time
+      schema: {type: string, format: date-time}
       description: Мероприятия с датой начала ранее указанной.
     event_end_after:
       name: end_after
       in: query
-      schema:
-        type: string
-        format: date-time
+      schema: {type: string, format: date-time}
       description: Мероприятия с датой завершения после указанной.
     city:
       name: city
       in: query
-      schema:
-        type: string
+      schema: {type: string}
       description: Фильтрация по названию города.
     mutation_lock_object_key:
       name: object_key
       in: path
       required: true
       description: Ключ объекта зависящего от блокируемых файлов
-      schema:
-        type: string
-        minLength: 1
-        maxLength: 36
+      schema: {type: string, minLength: 1, maxLength: 36}
     mutation_lock_object_namespace:
       name: object_namespace
       in: path
       required: true
       description: Имя пространства имен, к которому относится зависимый объект
-      schema:
-        type: string
-        minLength: 5
-        maxLength: 50
+      schema: {type: string, minLength: 5, maxLength: 50}
     region:
       name: region
       in: query
-      schema:
-        type: string
+      schema: {type: string}
       description: Фильтрация по названию региона.
     organization_id:
       name: organization_id
       in: path
       required: true
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
+      schema: {type: integer, format: int32, minimum: 1}
       description: ID организации.
     organization_ids:
       name: organization_id
       in: query
       explode: false
-      schema:
-        type: array
-        items:
-          type: integer
-          format: int32
-          minimum: 1
+      schema: {type: array, items: {type: integer, format: int32, minimum: 1}}
       description: Фильтр по массиву идентификаторов организаций.
     parent_organization_id:
       name: parent_organization_id
       in: query
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
+      schema: {type: integer, format: int32, minimum: 1}
       description: ID родительской организации.
     route_ids:
       name: route_id
       in: query
       explode: false
-      schema:
-        type: array
-        items:
-          type: integer
-          format: int32
-          minimum: 1
+      schema: {type: array, items: {type: integer, format: int32, minimum: 1}}
       description: Фильтр по массиву идентификаторов направлений.
     social_auth_provider:
       name: provider
@@ -3663,22 +4191,26 @@ components:
       name: subject_id
       in: query
       explode: false
-      schema:
-        type: array
-        items:
-          type: integer
-          format: int32
-          minimum: 1
+      schema: {type: array, items: {type: integer, format: int32, minimum: 1}}
       description: Фильтр по массиву идентификаторов тематик.
-    user_id:
-      name: user_id
+    team_id:
+      name: team_id
       in: path
       required: true
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-      description: ID пользователя
+      description: ID команды.
+      schema: {type: integer, format: int32}
+    team_person_id:
+      name: team_person_id
+      in: path
+      required: true
+      description: ID участника команды.
+      schema: {type: integer, format: int32}
+    talent_id:
+      name: talent_id
+      in: path
+      required: true
+      description: ID пользователя.
+      schema: {type: integer, format: int32}
     user_consent_kind:
       name: kind
       in: path
@@ -3689,16 +4221,12 @@ components:
     X-Count:
       required: true
       description: Общее количество объектов, входящих в выборку без учета пагинации.
-      schema:
-        type: integer
-        format: int64
+      schema: {type: integer, format: int64}
+
     SetCookie:
       required: true
       explode: true
-      schema:
-        type: array
-        items:
-          type: string
+      schema: {type: array, items: {type: string}}
 
   securitySchemes:
     TalentOAuth:
@@ -3706,7 +4234,197 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: Аутентификация токеном TalentOAuth пользователем Таланта.
+
     ClientCredentials:
       type: http
       scheme: basic
       description: Аутентификация учетными данными OAuth2 клиента TalentOAuth.
+
+tags:
+  - name: auth
+    x-displayName: Аутентификация
+    description: |-
+      ## TalentOAuth
+
+      Аутентификация токеном TalentOAuth пользователем Таланта.
+      Передается в заголовке `Authorization: Bearer` в формате JWT.
+
+      При использовании этой аутентификации,
+      авторизация сервисом выполняется в отношении пользователя,
+      авторизовавшего переданный токен.
+
+      Для получения токена нужно воспользоваться [API OAuth2 провайдера](#tag/oauth).
+
+      ## ClientCredentials
+
+      Аутентификация учетными данными OAuth2 клиента TalentOAuth.
+      В качестве `username` используется `client_id`, а в `password` - `client_secret`.
+
+  - name: events-deferred-notification
+    x-displayName: Отложенные уведомления
+    description: Отложенные уведомления для участников мероприятий.
+
+  - name: events-manage
+    x-displayName: Управление мероприятиями
+
+  - name: event-requests
+    x-displayName: Заявки на мероприятия
+
+  - name: events-read
+    x-displayName: Чтение мероприятий
+
+  - name: events-schema
+    x-displayName: Схемы объектов мероприятий
+
+  - name: events-diploma-settings
+    x-displayName: Настройки дипломов для мероприятий
+
+  - name: generic-files
+    x-displayName: Файлы любого формата
+    description: |-
+      Файлы пользователей могут быть как приватными так и публичными.
+      Публичные файлы доступны всем, в том числе и без аутентификации.
+      Запрос к приватному файлу может осуществляться только от его владельца.
+      Так же как и запросы на какое либо изменение файла.
+
+      Файлы могут быть загружены в хранилище и привязаны к объектам любого сервиса.
+      Как загрузить файл:
+      1. Выполнить запрос на создание файла с указанием пространства имен, где он будет использован. После
+      успешного добавления метаинформации о файле в ответе будет получена ссылка на загрузку файла и ID файла.
+      2. Загрузить файл в хранилище, используя полученный URL и заголовки.
+      3. После успешной загрузки файла сообщить об этом серверу с помощью запроса
+      [/files/{file_id}/confirm-upload](#tag/generic-files/operation/FileConfirmUpload) с указанием ID файла.
+      4. При необходимости можно повторно получить ссылку на загрузку того же или альтернативного файла, отправив
+      запрос на [/files/{file_id}](#tag/generic-files/operation/FileUpload) с указанием его размера.
+      5. Для добавления ссылки на объект (ID в пространстве имен), где файл используется, нужно выполнить запрос
+      [/files/{file_id}/references/{object_id}](#tag/generic-files/operation/FileReferenceCreate). К одному файлу
+      можно добавлять несколько связанных объектов.
+
+      #### Ограничения размера загружаемых файлов
+
+      Допустимый размер одного файла ограничен 10 мегабайтами. При его превышении возвращается 413 ответ.
+
+      Помимо этого, 413 ответ будет возвращен и когда достигается лимит суммы размера файлов пользователя.
+
+  - name: geodata
+    x-displayName: Геоданные
+
+  - name: mutation-locks
+    x-displayName: Блокировки изменений
+    description: |-
+      После загрузки, файл может быть заблокирован от изменений.
+      Каждая блокировка относится к какому-то объекту в системе,
+      для которого файл становится зависимостью.
+      Таких объектов-блокировок на файл может быть назначено несколько.
+      И пока есть хотя бы одна активная блокировка, файл изменить нельзя.
+
+      Блокировка может быть снята только системой,
+      ответственной за объект, на который ссылается блок.
+      Для представления этой ссылки, блок имеет два свойства:
+
+        - `object_key` - символьное представление ключа зависимого объекта;
+        - `object_namespace` - пространство имен ключа, определяющее тип сущности, которую ключ идентифицирует.
+
+  - name: oauth
+    x-displayName: OAuth2 провайдер
+    description: |-
+      Реализация авторизационного сервера OAuth2.
+      [RFC6749](https://tools.ietf.org/html/rfc6749)
+      [RFC7636](https://tools.ietf.org/html/rfc7636)
+
+  - name: offset
+    x-displayName: Пагинация
+    description: |-
+      Пагинация может быть представлена как параметром `offset`, так и параметром `id_offset`.
+      Параметр `offset` позволяет указать кол-во объектов для пропуска из читаемой выборки.
+      В `id_offset` указывается идентификатор, до которого включительно будут пропущены объекты.
+
+      > Предпочтительно, когда есть возможность, использовать `id_offset`.
+      > Также надо учитывать, что допустимое значение для `offset` имеет ограничения.
+
+      > У `id_offset` тоже имеется ограничение - с ним не доступны варианты сортировки результатов,
+      > за исключением вариантов `id_asc` и `id_desc`.
+      > Для иных значений `order_by` будет возвращаться ответ `400 Bad Request`.
+    x-traitTag: true
+
+  - name: organizations
+    x-displayName: Операции организаций
+
+  - name: organization-subjects
+    x-displayName: Операции с тематиками организаций
+
+  - name: persons
+    x-displayName: Персоны пользователей
+
+  - name: social-auths
+    x-displayName: Внешние провайдеры авторизации
+
+  - name: teams
+    x-displayName: Общие операции
+    description: Публичные операции команд для запросов без какой-либо специальной роли пользователя.
+
+  - name: teams-admin
+    x-displayName: Администрирование команд
+
+  - name: teams-organization
+    x-displayName: Команды для организатора мероприятий
+    description: Операции управления командами от администратора организатора мероприятий этих команд.
+
+  - name: teams-user
+    x-displayName: Команды пользователя
+    description: Операции для участников и капитанов команд.
+
+  - name: user-signup
+    x-displayName: Регистрация пользователя
+
+  - name: user-consents
+    x-displayName: Пользовательские согласия
+    description: |-
+      Параметр `talent_id` в запросе должен содержать идентификатор аутентифицированного пользователя.
+
+x-tagGroups:
+  - name: Общие свойства API
+    tags:
+      - auth
+      - offset
+
+  - name: Авторизация
+    tags:
+      - oauth
+
+  - name: Организации
+    tags:
+      - organizations
+      - organization-subjects
+
+  - name: Мероприятия
+    tags:
+      - events-schema
+      - events-read
+      - events-manage
+      - events-deferred-notification
+      - events-diploma-settings
+      - event-requests
+
+  - name: Пользователи
+    tags:
+      - persons
+      - social-auths
+      - user-signup
+      - user-consents
+
+  - name: Команды
+    tags:
+      - teams
+      - teams-user
+      - teams-organization
+      - teams-admin
+
+  - name: Файлы
+    tags:
+      - generic-files
+      - mutation-locks
+
+  - name: Прочие операции
+    tags:
+      - geodata

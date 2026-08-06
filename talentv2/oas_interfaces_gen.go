@@ -17,8 +17,16 @@ type CheckUserConsentRes interface {
 	checkUserConsentRes()
 }
 
+type CityNameRes interface {
+	cityNameRes()
+}
+
 type CompleteSocialAuthRes interface {
 	completeSocialAuthRes()
+}
+
+type ConfirmEventSignupRes interface {
+	confirmEventSignupRes()
 }
 
 type ConfirmFileUploadRes interface {
@@ -45,6 +53,14 @@ type CreateEventRes interface {
 	createEventRes()
 }
 
+type CreateEventTeamPersonRes interface {
+	createEventTeamPersonRes()
+}
+
+type CreateEventTeamRes interface {
+	createEventTeamRes()
+}
+
 type CreateFileMetaRes interface {
 	createFileMetaRes()
 }
@@ -59,6 +75,14 @@ type CreateMutationLockRes interface {
 
 type CreateOrganizationSubjectRes interface {
 	createOrganizationSubjectRes()
+}
+
+type CreateUserTeamPersonRes interface {
+	createUserTeamPersonRes()
+}
+
+type CreateUserTeamRes interface {
+	createUserTeamRes()
 }
 
 type DeleteEventLimitRes interface {
@@ -137,8 +161,8 @@ type ReadEventLimitRes interface {
 	readEventLimitRes()
 }
 
-type ReadEventRes interface {
-	readEventRes()
+type ReadEventRequestRes interface {
+	readEventRequestRes()
 }
 
 type ReadFileMetaRes interface {
@@ -149,12 +173,12 @@ type ReadFileRes interface {
 	readFileRes()
 }
 
-type ReadPersonRes interface {
-	readPersonRes()
+type ReadGeoDataRes interface {
+	readGeoDataRes()
 }
 
-type ReadTeamRes interface {
-	readTeamRes()
+type RegionNameRes interface {
+	regionNameRes()
 }
 
 type SignupInitialDataRes interface {
@@ -169,10 +193,6 @@ type SubmitUserConsentRes interface {
 	submitUserConsentRes()
 }
 
-type UpdateAuthenticatedUserRes interface {
-	updateAuthenticatedUserRes()
-}
-
 type UpdateEventDeferredNotificationRes interface {
 	updateEventDeferredNotificationRes()
 }
@@ -185,12 +205,32 @@ type UpdateEventLimitRes interface {
 	updateEventLimitRes()
 }
 
+type UpdateEventRequestRes interface {
+	updateEventRequestRes()
+}
+
+type UpdateEventRes interface {
+	updateEventRes()
+}
+
+type UpdateEventTeamRes interface {
+	updateEventTeamRes()
+}
+
 type UpdateFileMetaRes interface {
 	updateFileMetaRes()
 }
 
-type UpdateTeamRes interface {
-	updateTeamRes()
+type UpdateOwnerTeamPersonRes interface {
+	updateOwnerTeamPersonRes()
+}
+
+type UpdateUserTeamPersonRes interface {
+	updateUserTeamPersonRes()
+}
+
+type UpdateUserTeamRes interface {
+	updateUserTeamRes()
 }
 
 type UploadFileRes interface {

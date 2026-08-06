@@ -12,42 +12,47 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *DefaultStatusCodeWithHeaders) Error() string {
+func (s *ErrorStatusCode) Error() string {
 	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
 }
 
 // Ref: #/components/schemas/AddAchievementEvent
 type AddAchievementEvent struct {
-	ID               EventID       `json:"id"`
-	Title            EventTitle    `json:"title"`
-	AltTitle         EventAltTitle `json:"alt_title"`
-	Start            NilEventStart `json:"start"`
-	End              NilEventEnd   `json:"end"`
-	AchievementRoles []int32       `json:"achievement_roles"`
+	// ID мероприятия.
+	ID int32 `json:"id"`
+	// Название мероприятия.
+	Title string `json:"title"`
+	// Альтернативное название мероприятия.
+	AltTitle string `json:"alt_title"`
+	// Дата начала мероприятия.
+	Start NilDateTime `json:"start"`
+	// Дата окончания мероприятия.
+	End              NilDateTime `json:"end"`
+	AchievementRoles []int32     `json:"achievement_roles"`
 }
 
 // GetID returns the value of ID.
-func (s *AddAchievementEvent) GetID() EventID {
+func (s *AddAchievementEvent) GetID() int32 {
 	return s.ID
 }
 
 // GetTitle returns the value of Title.
-func (s *AddAchievementEvent) GetTitle() EventTitle {
+func (s *AddAchievementEvent) GetTitle() string {
 	return s.Title
 }
 
 // GetAltTitle returns the value of AltTitle.
-func (s *AddAchievementEvent) GetAltTitle() EventAltTitle {
+func (s *AddAchievementEvent) GetAltTitle() string {
 	return s.AltTitle
 }
 
 // GetStart returns the value of Start.
-func (s *AddAchievementEvent) GetStart() NilEventStart {
+func (s *AddAchievementEvent) GetStart() NilDateTime {
 	return s.Start
 }
 
 // GetEnd returns the value of End.
-func (s *AddAchievementEvent) GetEnd() NilEventEnd {
+func (s *AddAchievementEvent) GetEnd() NilDateTime {
 	return s.End
 }
 
@@ -57,27 +62,27 @@ func (s *AddAchievementEvent) GetAchievementRoles() []int32 {
 }
 
 // SetID sets the value of ID.
-func (s *AddAchievementEvent) SetID(val EventID) {
+func (s *AddAchievementEvent) SetID(val int32) {
 	s.ID = val
 }
 
 // SetTitle sets the value of Title.
-func (s *AddAchievementEvent) SetTitle(val EventTitle) {
+func (s *AddAchievementEvent) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetAltTitle sets the value of AltTitle.
-func (s *AddAchievementEvent) SetAltTitle(val EventAltTitle) {
+func (s *AddAchievementEvent) SetAltTitle(val string) {
 	s.AltTitle = val
 }
 
 // SetStart sets the value of Start.
-func (s *AddAchievementEvent) SetStart(val NilEventStart) {
+func (s *AddAchievementEvent) SetStart(val NilDateTime) {
 	s.Start = val
 }
 
 // SetEnd sets the value of End.
-func (s *AddAchievementEvent) SetEnd(val NilEventEnd) {
+func (s *AddAchievementEvent) SetEnd(val NilDateTime) {
 	s.End = val
 }
 
@@ -171,39 +176,48 @@ func (*BadRequest) eventSignupRes() {}
 
 // Ref: #/components/schemas/CalendarEvent
 type CalendarEvent struct {
-	ID              EventID                      `json:"id"`
-	Canceled        EventCanceled                `json:"canceled"`
-	Title           EventTitle                   `json:"title"`
-	AltTitle        EventAltTitle                `json:"alt_title"`
-	Format          EventFormat                  `json:"format"`
-	Start           NilEventStart                `json:"start"`
-	End             NilEventEnd                  `json:"end"`
-	RequestsAllowed EventRequestsAllowed         `json:"requests_allowed"`
-	ExpectedStart   NilEventExpectedStart        `json:"expected_start"`
-	TimeMatters     EventTimeMatters             `json:"time_matters"`
-	Limits          EventLimitOnlyDateEndRequest `json:"limits"`
-	Cover           EventCover                   `json:"cover"`
-	City            GeodataCity                  `json:"city"`
-	Brands          []int32                      `json:"brands"`
+	// ID мероприятия.
+	ID int32 `json:"id"`
+	// Статус отмены мероприятия.
+	Canceled bool `json:"canceled"`
+	// Название мероприятия.
+	Title string `json:"title"`
+	// Альтернативное название мероприятия.
+	AltTitle string      `json:"alt_title"`
+	Format   EventFormat `json:"format"`
+	// Дата начала мероприятия.
+	Start NilDateTime `json:"start"`
+	// Дата окончания мероприятия.
+	End NilDateTime `json:"end"`
+	// Допуск на создания заявок на мероприятие.
+	RequestsAllowed bool        `json:"requests_allowed"`
+	ExpectedStart   NilDateTime `json:"expected_start"`
+	// Учитывается ли время или только даты в полях `start` и `end`.
+	TimeMatters bool                         `json:"time_matters"`
+	Limits      EventLimitOnlyDateEndRequest `json:"limits"`
+	// Ссылка на обложку мероприятия.
+	Cover  string      `json:"cover"`
+	City   GeodataCity `json:"city"`
+	Brands []int32     `json:"brands"`
 }
 
 // GetID returns the value of ID.
-func (s *CalendarEvent) GetID() EventID {
+func (s *CalendarEvent) GetID() int32 {
 	return s.ID
 }
 
 // GetCanceled returns the value of Canceled.
-func (s *CalendarEvent) GetCanceled() EventCanceled {
+func (s *CalendarEvent) GetCanceled() bool {
 	return s.Canceled
 }
 
 // GetTitle returns the value of Title.
-func (s *CalendarEvent) GetTitle() EventTitle {
+func (s *CalendarEvent) GetTitle() string {
 	return s.Title
 }
 
 // GetAltTitle returns the value of AltTitle.
-func (s *CalendarEvent) GetAltTitle() EventAltTitle {
+func (s *CalendarEvent) GetAltTitle() string {
 	return s.AltTitle
 }
 
@@ -213,27 +227,27 @@ func (s *CalendarEvent) GetFormat() EventFormat {
 }
 
 // GetStart returns the value of Start.
-func (s *CalendarEvent) GetStart() NilEventStart {
+func (s *CalendarEvent) GetStart() NilDateTime {
 	return s.Start
 }
 
 // GetEnd returns the value of End.
-func (s *CalendarEvent) GetEnd() NilEventEnd {
+func (s *CalendarEvent) GetEnd() NilDateTime {
 	return s.End
 }
 
 // GetRequestsAllowed returns the value of RequestsAllowed.
-func (s *CalendarEvent) GetRequestsAllowed() EventRequestsAllowed {
+func (s *CalendarEvent) GetRequestsAllowed() bool {
 	return s.RequestsAllowed
 }
 
 // GetExpectedStart returns the value of ExpectedStart.
-func (s *CalendarEvent) GetExpectedStart() NilEventExpectedStart {
+func (s *CalendarEvent) GetExpectedStart() NilDateTime {
 	return s.ExpectedStart
 }
 
 // GetTimeMatters returns the value of TimeMatters.
-func (s *CalendarEvent) GetTimeMatters() EventTimeMatters {
+func (s *CalendarEvent) GetTimeMatters() bool {
 	return s.TimeMatters
 }
 
@@ -243,7 +257,7 @@ func (s *CalendarEvent) GetLimits() EventLimitOnlyDateEndRequest {
 }
 
 // GetCover returns the value of Cover.
-func (s *CalendarEvent) GetCover() EventCover {
+func (s *CalendarEvent) GetCover() string {
 	return s.Cover
 }
 
@@ -258,22 +272,22 @@ func (s *CalendarEvent) GetBrands() []int32 {
 }
 
 // SetID sets the value of ID.
-func (s *CalendarEvent) SetID(val EventID) {
+func (s *CalendarEvent) SetID(val int32) {
 	s.ID = val
 }
 
 // SetCanceled sets the value of Canceled.
-func (s *CalendarEvent) SetCanceled(val EventCanceled) {
+func (s *CalendarEvent) SetCanceled(val bool) {
 	s.Canceled = val
 }
 
 // SetTitle sets the value of Title.
-func (s *CalendarEvent) SetTitle(val EventTitle) {
+func (s *CalendarEvent) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetAltTitle sets the value of AltTitle.
-func (s *CalendarEvent) SetAltTitle(val EventAltTitle) {
+func (s *CalendarEvent) SetAltTitle(val string) {
 	s.AltTitle = val
 }
 
@@ -283,27 +297,27 @@ func (s *CalendarEvent) SetFormat(val EventFormat) {
 }
 
 // SetStart sets the value of Start.
-func (s *CalendarEvent) SetStart(val NilEventStart) {
+func (s *CalendarEvent) SetStart(val NilDateTime) {
 	s.Start = val
 }
 
 // SetEnd sets the value of End.
-func (s *CalendarEvent) SetEnd(val NilEventEnd) {
+func (s *CalendarEvent) SetEnd(val NilDateTime) {
 	s.End = val
 }
 
 // SetRequestsAllowed sets the value of RequestsAllowed.
-func (s *CalendarEvent) SetRequestsAllowed(val EventRequestsAllowed) {
+func (s *CalendarEvent) SetRequestsAllowed(val bool) {
 	s.RequestsAllowed = val
 }
 
 // SetExpectedStart sets the value of ExpectedStart.
-func (s *CalendarEvent) SetExpectedStart(val NilEventExpectedStart) {
+func (s *CalendarEvent) SetExpectedStart(val NilDateTime) {
 	s.ExpectedStart = val
 }
 
 // SetTimeMatters sets the value of TimeMatters.
-func (s *CalendarEvent) SetTimeMatters(val EventTimeMatters) {
+func (s *CalendarEvent) SetTimeMatters(val bool) {
 	s.TimeMatters = val
 }
 
@@ -313,7 +327,7 @@ func (s *CalendarEvent) SetLimits(val EventLimitOnlyDateEndRequest) {
 }
 
 // SetCover sets the value of Cover.
-func (s *CalendarEvent) SetCover(val EventCover) {
+func (s *CalendarEvent) SetCover(val string) {
 	s.Cover = val
 }
 
@@ -336,6 +350,33 @@ func (*CheckUserConsentNoContent) checkUserConsentRes() {}
 type CheckUserConsentOK struct{}
 
 func (*CheckUserConsentOK) checkUserConsentRes() {}
+
+type CityNameOK struct {
+	Name       string    `json:"name"`
+	RegionFias uuid.UUID `json:"region_fias"`
+}
+
+// GetName returns the value of Name.
+func (s *CityNameOK) GetName() string {
+	return s.Name
+}
+
+// GetRegionFias returns the value of RegionFias.
+func (s *CityNameOK) GetRegionFias() uuid.UUID {
+	return s.RegionFias
+}
+
+// SetName sets the value of Name.
+func (s *CityNameOK) SetName(val string) {
+	s.Name = val
+}
+
+// SetRegionFias sets the value of RegionFias.
+func (s *CityNameOK) SetRegionFias(val uuid.UUID) {
+	s.RegionFias = val
+}
+
+func (*CityNameOK) cityNameRes() {}
 
 type ClientCredentials struct {
 	Username string
@@ -400,6 +441,54 @@ func (s *CompleteSocialAuthFound) SetSetCookie(val []string) {
 }
 
 func (*CompleteSocialAuthFound) completeSocialAuthRes() {}
+
+// ConfirmEventSignupAccepted is response for ConfirmEventSignup operation.
+type ConfirmEventSignupAccepted struct{}
+
+func (*ConfirmEventSignupAccepted) confirmEventSignupRes() {}
+
+// ConfirmEventSignupAlreadyReported is response for ConfirmEventSignup operation.
+type ConfirmEventSignupAlreadyReported struct{}
+
+func (*ConfirmEventSignupAlreadyReported) confirmEventSignupRes() {}
+
+type ConfirmEventSignupCreated EventSignupConfirmed
+
+func (*ConfirmEventSignupCreated) confirmEventSignupRes() {}
+
+// ConfirmEventSignupNoContent is response for ConfirmEventSignup operation.
+type ConfirmEventSignupNoContent struct{}
+
+func (*ConfirmEventSignupNoContent) confirmEventSignupRes() {}
+
+type ConfirmEventSignupOK EventSignupConfirmed
+
+func (*ConfirmEventSignupOK) confirmEventSignupRes() {}
+
+type ConfirmEventSignupReq struct {
+	NewPassword1 string `json:"new_password1"`
+	NewPassword2 string `json:"new_password2"`
+}
+
+// GetNewPassword1 returns the value of NewPassword1.
+func (s *ConfirmEventSignupReq) GetNewPassword1() string {
+	return s.NewPassword1
+}
+
+// GetNewPassword2 returns the value of NewPassword2.
+func (s *ConfirmEventSignupReq) GetNewPassword2() string {
+	return s.NewPassword2
+}
+
+// SetNewPassword1 sets the value of NewPassword1.
+func (s *ConfirmEventSignupReq) SetNewPassword1(val string) {
+	s.NewPassword1 = val
+}
+
+// SetNewPassword2 sets the value of NewPassword2.
+func (s *ConfirmEventSignupReq) SetNewPassword2(val string) {
+	s.NewPassword2 = val
+}
 
 // ConfirmSignupEmailCreated is response for ConfirmSignupEmail operation.
 type ConfirmSignupEmailCreated struct {
@@ -561,289 +650,109 @@ func (s *CreateEventDiplomaSettingsReq) SetDiplomaIssueMode(val OptDiplomaIssueM
 	s.DiplomaIssueMode = val
 }
 
-type CreateEventLimitReq struct {
-	AutoApprove      OptEventLimitAutoApprove         `json:"auto_approve"`
-	CollectSnils     OptEventLimitCollectSNILS        `json:"collect_snils"`
-	CollectPhones    OptEventLimitCollectPhones       `json:"collect_phones"`
-	ParticipantLimit OptNilEventLimitParticipantLimit `json:"participant_limit"`
-	DateEndRequest   OptNilEventLimitDateEndRequest   `json:"date_end_request"`
-	DateEndUpdate    OptNilEventLimitDateEndUpdate    `json:"date_end_update"`
-	UserAgeStart     OptNilEventLimitUserAgeStart     `json:"user_age_start"`
-	UserAgeEnd       OptNilEventLimitUserAgeEnd       `json:"user_age_end"`
-	RequiresProject  OptEventLimitRequiresProject     `json:"requires_project"`
-	RequiresStepik   OptEventLimitRequiresStepik      `json:"requires_stepik"`
-	RequiresGithub   OptEventLimitRequiresGitHub      `json:"requires_github"`
-	RequiresYandex   OptEventLimitRequiresYandex      `json:"requires_yandex"`
-	RequiresKaggle   OptEventLimitRequiresKaggle      `json:"requires_kaggle"`
-	RequiresLeader   OptEventLimitRequiresLeader      `json:"requires_leader"`
-	RequiresVk       OptEventLimitRequiresVK          `json:"requires_vk"`
-	RequiresTelegram OptEventLimitRequiresTelegram    `json:"requires_telegram"`
-	Countries        EventLimitCountries              `json:"countries"`
-	Regions          EventLimitRegions                `json:"regions"`
-	Cities           EventLimitCities                 `json:"cities"`
-	Description      OptEventLimitDescription         `json:"description"`
-}
-
-// GetAutoApprove returns the value of AutoApprove.
-func (s *CreateEventLimitReq) GetAutoApprove() OptEventLimitAutoApprove {
-	return s.AutoApprove
-}
-
-// GetCollectSnils returns the value of CollectSnils.
-func (s *CreateEventLimitReq) GetCollectSnils() OptEventLimitCollectSNILS {
-	return s.CollectSnils
-}
-
-// GetCollectPhones returns the value of CollectPhones.
-func (s *CreateEventLimitReq) GetCollectPhones() OptEventLimitCollectPhones {
-	return s.CollectPhones
-}
-
-// GetParticipantLimit returns the value of ParticipantLimit.
-func (s *CreateEventLimitReq) GetParticipantLimit() OptNilEventLimitParticipantLimit {
-	return s.ParticipantLimit
-}
-
-// GetDateEndRequest returns the value of DateEndRequest.
-func (s *CreateEventLimitReq) GetDateEndRequest() OptNilEventLimitDateEndRequest {
-	return s.DateEndRequest
-}
-
-// GetDateEndUpdate returns the value of DateEndUpdate.
-func (s *CreateEventLimitReq) GetDateEndUpdate() OptNilEventLimitDateEndUpdate {
-	return s.DateEndUpdate
-}
-
-// GetUserAgeStart returns the value of UserAgeStart.
-func (s *CreateEventLimitReq) GetUserAgeStart() OptNilEventLimitUserAgeStart {
-	return s.UserAgeStart
-}
-
-// GetUserAgeEnd returns the value of UserAgeEnd.
-func (s *CreateEventLimitReq) GetUserAgeEnd() OptNilEventLimitUserAgeEnd {
-	return s.UserAgeEnd
-}
-
-// GetRequiresProject returns the value of RequiresProject.
-func (s *CreateEventLimitReq) GetRequiresProject() OptEventLimitRequiresProject {
-	return s.RequiresProject
-}
-
-// GetRequiresStepik returns the value of RequiresStepik.
-func (s *CreateEventLimitReq) GetRequiresStepik() OptEventLimitRequiresStepik {
-	return s.RequiresStepik
-}
-
-// GetRequiresGithub returns the value of RequiresGithub.
-func (s *CreateEventLimitReq) GetRequiresGithub() OptEventLimitRequiresGitHub {
-	return s.RequiresGithub
-}
-
-// GetRequiresYandex returns the value of RequiresYandex.
-func (s *CreateEventLimitReq) GetRequiresYandex() OptEventLimitRequiresYandex {
-	return s.RequiresYandex
-}
-
-// GetRequiresKaggle returns the value of RequiresKaggle.
-func (s *CreateEventLimitReq) GetRequiresKaggle() OptEventLimitRequiresKaggle {
-	return s.RequiresKaggle
-}
-
-// GetRequiresLeader returns the value of RequiresLeader.
-func (s *CreateEventLimitReq) GetRequiresLeader() OptEventLimitRequiresLeader {
-	return s.RequiresLeader
-}
-
-// GetRequiresVk returns the value of RequiresVk.
-func (s *CreateEventLimitReq) GetRequiresVk() OptEventLimitRequiresVK {
-	return s.RequiresVk
-}
-
-// GetRequiresTelegram returns the value of RequiresTelegram.
-func (s *CreateEventLimitReq) GetRequiresTelegram() OptEventLimitRequiresTelegram {
-	return s.RequiresTelegram
-}
-
-// GetCountries returns the value of Countries.
-func (s *CreateEventLimitReq) GetCountries() EventLimitCountries {
-	return s.Countries
-}
-
-// GetRegions returns the value of Regions.
-func (s *CreateEventLimitReq) GetRegions() EventLimitRegions {
-	return s.Regions
-}
-
-// GetCities returns the value of Cities.
-func (s *CreateEventLimitReq) GetCities() EventLimitCities {
-	return s.Cities
-}
-
-// GetDescription returns the value of Description.
-func (s *CreateEventLimitReq) GetDescription() OptEventLimitDescription {
-	return s.Description
-}
-
-// SetAutoApprove sets the value of AutoApprove.
-func (s *CreateEventLimitReq) SetAutoApprove(val OptEventLimitAutoApprove) {
-	s.AutoApprove = val
-}
-
-// SetCollectSnils sets the value of CollectSnils.
-func (s *CreateEventLimitReq) SetCollectSnils(val OptEventLimitCollectSNILS) {
-	s.CollectSnils = val
-}
-
-// SetCollectPhones sets the value of CollectPhones.
-func (s *CreateEventLimitReq) SetCollectPhones(val OptEventLimitCollectPhones) {
-	s.CollectPhones = val
-}
-
-// SetParticipantLimit sets the value of ParticipantLimit.
-func (s *CreateEventLimitReq) SetParticipantLimit(val OptNilEventLimitParticipantLimit) {
-	s.ParticipantLimit = val
-}
-
-// SetDateEndRequest sets the value of DateEndRequest.
-func (s *CreateEventLimitReq) SetDateEndRequest(val OptNilEventLimitDateEndRequest) {
-	s.DateEndRequest = val
-}
-
-// SetDateEndUpdate sets the value of DateEndUpdate.
-func (s *CreateEventLimitReq) SetDateEndUpdate(val OptNilEventLimitDateEndUpdate) {
-	s.DateEndUpdate = val
-}
-
-// SetUserAgeStart sets the value of UserAgeStart.
-func (s *CreateEventLimitReq) SetUserAgeStart(val OptNilEventLimitUserAgeStart) {
-	s.UserAgeStart = val
-}
-
-// SetUserAgeEnd sets the value of UserAgeEnd.
-func (s *CreateEventLimitReq) SetUserAgeEnd(val OptNilEventLimitUserAgeEnd) {
-	s.UserAgeEnd = val
-}
-
-// SetRequiresProject sets the value of RequiresProject.
-func (s *CreateEventLimitReq) SetRequiresProject(val OptEventLimitRequiresProject) {
-	s.RequiresProject = val
-}
-
-// SetRequiresStepik sets the value of RequiresStepik.
-func (s *CreateEventLimitReq) SetRequiresStepik(val OptEventLimitRequiresStepik) {
-	s.RequiresStepik = val
-}
-
-// SetRequiresGithub sets the value of RequiresGithub.
-func (s *CreateEventLimitReq) SetRequiresGithub(val OptEventLimitRequiresGitHub) {
-	s.RequiresGithub = val
-}
-
-// SetRequiresYandex sets the value of RequiresYandex.
-func (s *CreateEventLimitReq) SetRequiresYandex(val OptEventLimitRequiresYandex) {
-	s.RequiresYandex = val
-}
-
-// SetRequiresKaggle sets the value of RequiresKaggle.
-func (s *CreateEventLimitReq) SetRequiresKaggle(val OptEventLimitRequiresKaggle) {
-	s.RequiresKaggle = val
-}
-
-// SetRequiresLeader sets the value of RequiresLeader.
-func (s *CreateEventLimitReq) SetRequiresLeader(val OptEventLimitRequiresLeader) {
-	s.RequiresLeader = val
-}
-
-// SetRequiresVk sets the value of RequiresVk.
-func (s *CreateEventLimitReq) SetRequiresVk(val OptEventLimitRequiresVK) {
-	s.RequiresVk = val
-}
-
-// SetRequiresTelegram sets the value of RequiresTelegram.
-func (s *CreateEventLimitReq) SetRequiresTelegram(val OptEventLimitRequiresTelegram) {
-	s.RequiresTelegram = val
-}
-
-// SetCountries sets the value of Countries.
-func (s *CreateEventLimitReq) SetCountries(val EventLimitCountries) {
-	s.Countries = val
-}
-
-// SetRegions sets the value of Regions.
-func (s *CreateEventLimitReq) SetRegions(val EventLimitRegions) {
-	s.Regions = val
-}
-
-// SetCities sets the value of Cities.
-func (s *CreateEventLimitReq) SetCities(val EventLimitCities) {
-	s.Cities = val
-}
-
-// SetDescription sets the value of Description.
-func (s *CreateEventLimitReq) SetDescription(val OptEventLimitDescription) {
-	s.Description = val
-}
-
+// Merged schema.
 type CreateEventReq struct {
+	// ID мета-мероприятия.
+	MetaEventID OptNilInt32 `json:"meta_event_id"`
+	// Мероприятие находится в статусе черновика. На такое
+	// мероприятие нельзя зарегистрироваться.
+	Draft OptBool `json:"draft"`
+	// Статус публичности мероприятия.
+	Public OptBool `json:"public"`
+	// Исключение мероприятия из календаря.
+	Hidden OptBool `json:"hidden"`
+	// Название мероприятия.
+	Title string `json:"title"`
+	// Дата начала мероприятия.
+	Start OptNilDateTime `json:"start"`
+	// Дата окончания мероприятия.
+	End    OptNilDateTime `json:"end"`
+	Format OptEventFormat `json:"format"`
+	// ID [площадки] на которой проводится мероприятие.
+	//
+	// [площадки]: /venue-api/docs/
+	VenueID OptNilInt32 `json:"venue_id"`
+	// Доступность упрощенной регистрации на мероприятие.
+	SimplifiedRegistration OptBool `json:"simplified_registration"`
+	// Автоматическое добавление в участники организации
+	// пользователя с подтвержденной заявки.
+	AutocreateMember OptBool `json:"autocreate_member"`
+	// Допуск на создания достижений на мероприятие.
+	AchievementsAllowed OptBool `json:"achievements_allowed"`
+	// Допуск на создания заявок на мероприятие.
+	RequestsAllowed OptBool `json:"requests_allowed"`
+	// Доступность чекина.
+	SelfCheckIn         OptBool               `json:"self_check_in"`
+	TeamsInvolved       OptEventTeamsInvolved `json:"teams_involved"`
+	OwnerCanModerate    OptBool               `json:"owner_can_moderate"`
+	UserInMultipleTeams OptBool               `json:"user_in_multiple_teams"`
+	MentorsAllowed      OptBool               `json:"mentors_allowed"`
+	SupportI18n         OptBool               `json:"support_i18n"`
+	GirCollection       OptBool               `json:"gir_collection"`
+	Promoted            OptBool               `json:"promoted"`
+	// Учитывается ли время или только даты в полях `start` и `end`.
+	TimeMatters            OptBool                      `json:"time_matters"`
+	MaxUsers               OptNilInt32                  `json:"max_users"`
+	TeamCreateNotification OptBool                      `json:"team_create_notification"`
+	TeamAssignmentMethod   OptEventTeamAssignmentMethod `json:"team_assignment_method"`
+	ExpectedStart          OptNilDateTime               `json:"expected_start"`
+	// Альтернативное название мероприятия.
+	AltTitle OptString `json:"alt_title"`
+	// Адрес online мероприятия.
+	URL OptURI `json:"url"`
+	// Идентификатор типа мероприятия.
+	TypeID OptNilInt32 `json:"type_id"`
+	// Описание мероприятия.
+	Description OptString `json:"description"`
+	// Сообщение о заполненной анкете.
+	QuestionnaireCompletedMessage OptString `json:"questionnaire_completed_message"`
+	// Дополнительный текст для Email уведомления о
+	// регистрации на мероприятие.
+	//
+	// 	Текст интерпретируется в соответствии с форматом
+	// 	markdown.
+	NotificationEmailMessage OptString `json:"notification_email_message"`
+	// Ссылка на обложку мероприятия.
+	CoverURL OptURI    `json:"cover_url"`
+	Keywords OptString `json:"keywords"`
 	// ID организации мероприятия.
-	OrganizationID                int32                                 `json:"organization_id"`
-	Draft                         OptEventDraft                         `json:"draft"`
-	Public                        OptEventPublic                        `json:"public"`
-	Hidden                        OptEventHidden                        `json:"hidden"`
-	Title                         EventTitleInput                       `json:"title"`
-	Start                         OptNilEventStart                      `json:"start"`
-	End                           OptNilEventEnd                        `json:"end"`
-	Format                        OptEventFormat                        `json:"format"`
-	VenueID                       OptNilEventVenueID                    `json:"venue_id"`
-	AutocreateMember              OptEventAutocreateMember              `json:"autocreate_member"`
-	AchievementsAllowed           OptEventAchievementsAllowed           `json:"achievements_allowed"`
-	RequestsAllowed               OptEventRequestsAllowed               `json:"requests_allowed"`
-	TeamsInvolved                 OptEventTeamsInvolved                 `json:"teams_involved"`
-	UserInMultipleTeams           OptBool                               `json:"user_in_multiple_teams"`
-	TimeMatters                   OptEventTimeMatters                   `json:"time_matters"`
-	TeamAssignmentMethod          OptEventTeamAssignmentMethod          `json:"team_assignment_method"`
-	URL                           OptEventURL                           `json:"url"`
-	TypeID                        OptNilEventTypeID                     `json:"type_id"`
-	Description                   OptEventDescription                   `json:"description"`
-	QuestionnaireCompletedMessage OptEventQuestionnaireCompletedMessage `json:"questionnaire_completed_message"`
-	NotificationEmailMessage      OptEventNotificationEmailMessage      `json:"notification_email_message"`
-	CoverURL                      OptEventCoverURLWrite                 `json:"cover_url"`
-	AchievementRoles              []int32                               `json:"achievement_roles"`
-	Brands                        []int32                               `json:"brands"`
+	OrganizationID   int32   `json:"organization_id"`
+	AchievementRoles []int32 `json:"achievement_roles"`
+	Brands           []int32 `json:"brands"`
 }
 
-// GetOrganizationID returns the value of OrganizationID.
-func (s *CreateEventReq) GetOrganizationID() int32 {
-	return s.OrganizationID
+// GetMetaEventID returns the value of MetaEventID.
+func (s *CreateEventReq) GetMetaEventID() OptNilInt32 {
+	return s.MetaEventID
 }
 
 // GetDraft returns the value of Draft.
-func (s *CreateEventReq) GetDraft() OptEventDraft {
+func (s *CreateEventReq) GetDraft() OptBool {
 	return s.Draft
 }
 
 // GetPublic returns the value of Public.
-func (s *CreateEventReq) GetPublic() OptEventPublic {
+func (s *CreateEventReq) GetPublic() OptBool {
 	return s.Public
 }
 
 // GetHidden returns the value of Hidden.
-func (s *CreateEventReq) GetHidden() OptEventHidden {
+func (s *CreateEventReq) GetHidden() OptBool {
 	return s.Hidden
 }
 
 // GetTitle returns the value of Title.
-func (s *CreateEventReq) GetTitle() EventTitleInput {
+func (s *CreateEventReq) GetTitle() string {
 	return s.Title
 }
 
 // GetStart returns the value of Start.
-func (s *CreateEventReq) GetStart() OptNilEventStart {
+func (s *CreateEventReq) GetStart() OptNilDateTime {
 	return s.Start
 }
 
 // GetEnd returns the value of End.
-func (s *CreateEventReq) GetEnd() OptNilEventEnd {
+func (s *CreateEventReq) GetEnd() OptNilDateTime {
 	return s.End
 }
 
@@ -853,23 +762,33 @@ func (s *CreateEventReq) GetFormat() OptEventFormat {
 }
 
 // GetVenueID returns the value of VenueID.
-func (s *CreateEventReq) GetVenueID() OptNilEventVenueID {
+func (s *CreateEventReq) GetVenueID() OptNilInt32 {
 	return s.VenueID
 }
 
+// GetSimplifiedRegistration returns the value of SimplifiedRegistration.
+func (s *CreateEventReq) GetSimplifiedRegistration() OptBool {
+	return s.SimplifiedRegistration
+}
+
 // GetAutocreateMember returns the value of AutocreateMember.
-func (s *CreateEventReq) GetAutocreateMember() OptEventAutocreateMember {
+func (s *CreateEventReq) GetAutocreateMember() OptBool {
 	return s.AutocreateMember
 }
 
 // GetAchievementsAllowed returns the value of AchievementsAllowed.
-func (s *CreateEventReq) GetAchievementsAllowed() OptEventAchievementsAllowed {
+func (s *CreateEventReq) GetAchievementsAllowed() OptBool {
 	return s.AchievementsAllowed
 }
 
 // GetRequestsAllowed returns the value of RequestsAllowed.
-func (s *CreateEventReq) GetRequestsAllowed() OptEventRequestsAllowed {
+func (s *CreateEventReq) GetRequestsAllowed() OptBool {
 	return s.RequestsAllowed
+}
+
+// GetSelfCheckIn returns the value of SelfCheckIn.
+func (s *CreateEventReq) GetSelfCheckIn() OptBool {
+	return s.SelfCheckIn
 }
 
 // GetTeamsInvolved returns the value of TeamsInvolved.
@@ -877,14 +796,49 @@ func (s *CreateEventReq) GetTeamsInvolved() OptEventTeamsInvolved {
 	return s.TeamsInvolved
 }
 
+// GetOwnerCanModerate returns the value of OwnerCanModerate.
+func (s *CreateEventReq) GetOwnerCanModerate() OptBool {
+	return s.OwnerCanModerate
+}
+
 // GetUserInMultipleTeams returns the value of UserInMultipleTeams.
 func (s *CreateEventReq) GetUserInMultipleTeams() OptBool {
 	return s.UserInMultipleTeams
 }
 
+// GetMentorsAllowed returns the value of MentorsAllowed.
+func (s *CreateEventReq) GetMentorsAllowed() OptBool {
+	return s.MentorsAllowed
+}
+
+// GetSupportI18n returns the value of SupportI18n.
+func (s *CreateEventReq) GetSupportI18n() OptBool {
+	return s.SupportI18n
+}
+
+// GetGirCollection returns the value of GirCollection.
+func (s *CreateEventReq) GetGirCollection() OptBool {
+	return s.GirCollection
+}
+
+// GetPromoted returns the value of Promoted.
+func (s *CreateEventReq) GetPromoted() OptBool {
+	return s.Promoted
+}
+
 // GetTimeMatters returns the value of TimeMatters.
-func (s *CreateEventReq) GetTimeMatters() OptEventTimeMatters {
+func (s *CreateEventReq) GetTimeMatters() OptBool {
 	return s.TimeMatters
+}
+
+// GetMaxUsers returns the value of MaxUsers.
+func (s *CreateEventReq) GetMaxUsers() OptNilInt32 {
+	return s.MaxUsers
+}
+
+// GetTeamCreateNotification returns the value of TeamCreateNotification.
+func (s *CreateEventReq) GetTeamCreateNotification() OptBool {
+	return s.TeamCreateNotification
 }
 
 // GetTeamAssignmentMethod returns the value of TeamAssignmentMethod.
@@ -892,34 +846,54 @@ func (s *CreateEventReq) GetTeamAssignmentMethod() OptEventTeamAssignmentMethod 
 	return s.TeamAssignmentMethod
 }
 
+// GetExpectedStart returns the value of ExpectedStart.
+func (s *CreateEventReq) GetExpectedStart() OptNilDateTime {
+	return s.ExpectedStart
+}
+
+// GetAltTitle returns the value of AltTitle.
+func (s *CreateEventReq) GetAltTitle() OptString {
+	return s.AltTitle
+}
+
 // GetURL returns the value of URL.
-func (s *CreateEventReq) GetURL() OptEventURL {
+func (s *CreateEventReq) GetURL() OptURI {
 	return s.URL
 }
 
 // GetTypeID returns the value of TypeID.
-func (s *CreateEventReq) GetTypeID() OptNilEventTypeID {
+func (s *CreateEventReq) GetTypeID() OptNilInt32 {
 	return s.TypeID
 }
 
 // GetDescription returns the value of Description.
-func (s *CreateEventReq) GetDescription() OptEventDescription {
+func (s *CreateEventReq) GetDescription() OptString {
 	return s.Description
 }
 
 // GetQuestionnaireCompletedMessage returns the value of QuestionnaireCompletedMessage.
-func (s *CreateEventReq) GetQuestionnaireCompletedMessage() OptEventQuestionnaireCompletedMessage {
+func (s *CreateEventReq) GetQuestionnaireCompletedMessage() OptString {
 	return s.QuestionnaireCompletedMessage
 }
 
 // GetNotificationEmailMessage returns the value of NotificationEmailMessage.
-func (s *CreateEventReq) GetNotificationEmailMessage() OptEventNotificationEmailMessage {
+func (s *CreateEventReq) GetNotificationEmailMessage() OptString {
 	return s.NotificationEmailMessage
 }
 
 // GetCoverURL returns the value of CoverURL.
-func (s *CreateEventReq) GetCoverURL() OptEventCoverURLWrite {
+func (s *CreateEventReq) GetCoverURL() OptURI {
 	return s.CoverURL
+}
+
+// GetKeywords returns the value of Keywords.
+func (s *CreateEventReq) GetKeywords() OptString {
+	return s.Keywords
+}
+
+// GetOrganizationID returns the value of OrganizationID.
+func (s *CreateEventReq) GetOrganizationID() int32 {
+	return s.OrganizationID
 }
 
 // GetAchievementRoles returns the value of AchievementRoles.
@@ -932,38 +906,38 @@ func (s *CreateEventReq) GetBrands() []int32 {
 	return s.Brands
 }
 
-// SetOrganizationID sets the value of OrganizationID.
-func (s *CreateEventReq) SetOrganizationID(val int32) {
-	s.OrganizationID = val
+// SetMetaEventID sets the value of MetaEventID.
+func (s *CreateEventReq) SetMetaEventID(val OptNilInt32) {
+	s.MetaEventID = val
 }
 
 // SetDraft sets the value of Draft.
-func (s *CreateEventReq) SetDraft(val OptEventDraft) {
+func (s *CreateEventReq) SetDraft(val OptBool) {
 	s.Draft = val
 }
 
 // SetPublic sets the value of Public.
-func (s *CreateEventReq) SetPublic(val OptEventPublic) {
+func (s *CreateEventReq) SetPublic(val OptBool) {
 	s.Public = val
 }
 
 // SetHidden sets the value of Hidden.
-func (s *CreateEventReq) SetHidden(val OptEventHidden) {
+func (s *CreateEventReq) SetHidden(val OptBool) {
 	s.Hidden = val
 }
 
 // SetTitle sets the value of Title.
-func (s *CreateEventReq) SetTitle(val EventTitleInput) {
+func (s *CreateEventReq) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetStart sets the value of Start.
-func (s *CreateEventReq) SetStart(val OptNilEventStart) {
+func (s *CreateEventReq) SetStart(val OptNilDateTime) {
 	s.Start = val
 }
 
 // SetEnd sets the value of End.
-func (s *CreateEventReq) SetEnd(val OptNilEventEnd) {
+func (s *CreateEventReq) SetEnd(val OptNilDateTime) {
 	s.End = val
 }
 
@@ -973,23 +947,33 @@ func (s *CreateEventReq) SetFormat(val OptEventFormat) {
 }
 
 // SetVenueID sets the value of VenueID.
-func (s *CreateEventReq) SetVenueID(val OptNilEventVenueID) {
+func (s *CreateEventReq) SetVenueID(val OptNilInt32) {
 	s.VenueID = val
 }
 
+// SetSimplifiedRegistration sets the value of SimplifiedRegistration.
+func (s *CreateEventReq) SetSimplifiedRegistration(val OptBool) {
+	s.SimplifiedRegistration = val
+}
+
 // SetAutocreateMember sets the value of AutocreateMember.
-func (s *CreateEventReq) SetAutocreateMember(val OptEventAutocreateMember) {
+func (s *CreateEventReq) SetAutocreateMember(val OptBool) {
 	s.AutocreateMember = val
 }
 
 // SetAchievementsAllowed sets the value of AchievementsAllowed.
-func (s *CreateEventReq) SetAchievementsAllowed(val OptEventAchievementsAllowed) {
+func (s *CreateEventReq) SetAchievementsAllowed(val OptBool) {
 	s.AchievementsAllowed = val
 }
 
 // SetRequestsAllowed sets the value of RequestsAllowed.
-func (s *CreateEventReq) SetRequestsAllowed(val OptEventRequestsAllowed) {
+func (s *CreateEventReq) SetRequestsAllowed(val OptBool) {
 	s.RequestsAllowed = val
+}
+
+// SetSelfCheckIn sets the value of SelfCheckIn.
+func (s *CreateEventReq) SetSelfCheckIn(val OptBool) {
+	s.SelfCheckIn = val
 }
 
 // SetTeamsInvolved sets the value of TeamsInvolved.
@@ -997,14 +981,49 @@ func (s *CreateEventReq) SetTeamsInvolved(val OptEventTeamsInvolved) {
 	s.TeamsInvolved = val
 }
 
+// SetOwnerCanModerate sets the value of OwnerCanModerate.
+func (s *CreateEventReq) SetOwnerCanModerate(val OptBool) {
+	s.OwnerCanModerate = val
+}
+
 // SetUserInMultipleTeams sets the value of UserInMultipleTeams.
 func (s *CreateEventReq) SetUserInMultipleTeams(val OptBool) {
 	s.UserInMultipleTeams = val
 }
 
+// SetMentorsAllowed sets the value of MentorsAllowed.
+func (s *CreateEventReq) SetMentorsAllowed(val OptBool) {
+	s.MentorsAllowed = val
+}
+
+// SetSupportI18n sets the value of SupportI18n.
+func (s *CreateEventReq) SetSupportI18n(val OptBool) {
+	s.SupportI18n = val
+}
+
+// SetGirCollection sets the value of GirCollection.
+func (s *CreateEventReq) SetGirCollection(val OptBool) {
+	s.GirCollection = val
+}
+
+// SetPromoted sets the value of Promoted.
+func (s *CreateEventReq) SetPromoted(val OptBool) {
+	s.Promoted = val
+}
+
 // SetTimeMatters sets the value of TimeMatters.
-func (s *CreateEventReq) SetTimeMatters(val OptEventTimeMatters) {
+func (s *CreateEventReq) SetTimeMatters(val OptBool) {
 	s.TimeMatters = val
+}
+
+// SetMaxUsers sets the value of MaxUsers.
+func (s *CreateEventReq) SetMaxUsers(val OptNilInt32) {
+	s.MaxUsers = val
+}
+
+// SetTeamCreateNotification sets the value of TeamCreateNotification.
+func (s *CreateEventReq) SetTeamCreateNotification(val OptBool) {
+	s.TeamCreateNotification = val
 }
 
 // SetTeamAssignmentMethod sets the value of TeamAssignmentMethod.
@@ -1012,34 +1031,54 @@ func (s *CreateEventReq) SetTeamAssignmentMethod(val OptEventTeamAssignmentMetho
 	s.TeamAssignmentMethod = val
 }
 
+// SetExpectedStart sets the value of ExpectedStart.
+func (s *CreateEventReq) SetExpectedStart(val OptNilDateTime) {
+	s.ExpectedStart = val
+}
+
+// SetAltTitle sets the value of AltTitle.
+func (s *CreateEventReq) SetAltTitle(val OptString) {
+	s.AltTitle = val
+}
+
 // SetURL sets the value of URL.
-func (s *CreateEventReq) SetURL(val OptEventURL) {
+func (s *CreateEventReq) SetURL(val OptURI) {
 	s.URL = val
 }
 
 // SetTypeID sets the value of TypeID.
-func (s *CreateEventReq) SetTypeID(val OptNilEventTypeID) {
+func (s *CreateEventReq) SetTypeID(val OptNilInt32) {
 	s.TypeID = val
 }
 
 // SetDescription sets the value of Description.
-func (s *CreateEventReq) SetDescription(val OptEventDescription) {
+func (s *CreateEventReq) SetDescription(val OptString) {
 	s.Description = val
 }
 
 // SetQuestionnaireCompletedMessage sets the value of QuestionnaireCompletedMessage.
-func (s *CreateEventReq) SetQuestionnaireCompletedMessage(val OptEventQuestionnaireCompletedMessage) {
+func (s *CreateEventReq) SetQuestionnaireCompletedMessage(val OptString) {
 	s.QuestionnaireCompletedMessage = val
 }
 
 // SetNotificationEmailMessage sets the value of NotificationEmailMessage.
-func (s *CreateEventReq) SetNotificationEmailMessage(val OptEventNotificationEmailMessage) {
+func (s *CreateEventReq) SetNotificationEmailMessage(val OptString) {
 	s.NotificationEmailMessage = val
 }
 
 // SetCoverURL sets the value of CoverURL.
-func (s *CreateEventReq) SetCoverURL(val OptEventCoverURLWrite) {
+func (s *CreateEventReq) SetCoverURL(val OptURI) {
 	s.CoverURL = val
+}
+
+// SetKeywords sets the value of Keywords.
+func (s *CreateEventReq) SetKeywords(val OptString) {
+	s.Keywords = val
+}
+
+// SetOrganizationID sets the value of OrganizationID.
+func (s *CreateEventReq) SetOrganizationID(val int32) {
+	s.OrganizationID = val
 }
 
 // SetAchievementRoles sets the value of AchievementRoles.
@@ -1050,6 +1089,20 @@ func (s *CreateEventReq) SetAchievementRoles(val []int32) {
 // SetBrands sets the value of Brands.
 func (s *CreateEventReq) SetBrands(val []int32) {
 	s.Brands = val
+}
+
+type CreateEventTeamPersonReq struct {
+	UserID int32 `json:"user_id"`
+}
+
+// GetUserID returns the value of UserID.
+func (s *CreateEventTeamPersonReq) GetUserID() int32 {
+	return s.UserID
+}
+
+// SetUserID sets the value of UserID.
+func (s *CreateEventTeamPersonReq) SetUserID(val int32) {
+	s.UserID = val
 }
 
 // Merged schema.
@@ -1065,10 +1118,9 @@ type CreateFileMetaCreated struct {
 	// Статус публичности файла.
 	IsPublic bool `json:"is_public"`
 	// Пространство имен для объекта, где используется файл,
-	// в формате
-	// <сервис>/<таблица БД>/<поле со ссылкой на файл>
-	// (например, polls/questions/picture, venues/venue/cover, etc.)
-	// Задается при создании.
+	// в формате <сервис>/<таблица БД>/<поле со ссылкой на файл>
+	// (например, polls/questions/picture, venues/venue/cover, etc.) Задается при
+	// создании.
 	Namespace string `json:"namespace"`
 	// Дата добавления информации о файле.
 	CreatedAt time.Time `json:"created_at"`
@@ -1228,8 +1280,7 @@ func (s *CreateFileMetaCreatedHeaders) init() CreateFileMetaCreatedHeaders {
 
 type CreateFileMetaReq struct {
 	// Пространство имен для объекта, где используется файл,
-	// в формате
-	// <сервис>/<таблица БД>/<поле со ссылкой на файл>
+	// в формате <сервис>/<таблица БД>/<поле со ссылкой на файл>
 	// (например, polls/questions/picture, venues/venue/cover, etc.).
 	Namespace string `json:"namespace"`
 	// Статус публичности файла.
@@ -1327,55 +1378,81 @@ type CreateOrganizationSubjectForbidden struct{}
 
 func (*CreateOrganizationSubjectForbidden) createOrganizationSubjectRes() {}
 
-type Default struct {
-	Error string `json:"error"`
+type CreateUserTeamPersonCreated TeamPerson
+
+func (*CreateUserTeamPersonCreated) createUserTeamPersonRes() {}
+
+type CreateUserTeamPersonOK TeamPerson
+
+func (*CreateUserTeamPersonOK) createUserTeamPersonRes() {}
+
+// CreateUserTeamPersonReq represents sum type.
+type CreateUserTeamPersonReq struct {
+	// Type selects the active sum variant, switch on this field.
+	Type                  CreateUserTeamPersonReqType
+	OwnerTeamPersonCreate OwnerTeamPersonCreate
+	UserTeamPersonCreate  UserTeamPersonCreate
 }
 
-// GetError returns the value of Error.
-func (s *Default) GetError() string {
-	return s.Error
+// CreateUserTeamPersonReqType is oneOf type of CreateUserTeamPersonReq.
+type CreateUserTeamPersonReqType string
+
+// Possible values for CreateUserTeamPersonReqType.
+const (
+	OwnerTeamPersonCreateCreateUserTeamPersonReq CreateUserTeamPersonReqType = "OwnerTeamPersonCreate"
+	UserTeamPersonCreateCreateUserTeamPersonReq  CreateUserTeamPersonReqType = "UserTeamPersonCreate"
+)
+
+// IsOwnerTeamPersonCreate reports whether CreateUserTeamPersonReq is OwnerTeamPersonCreate.
+func (s CreateUserTeamPersonReq) IsOwnerTeamPersonCreate() bool {
+	return s.Type == OwnerTeamPersonCreateCreateUserTeamPersonReq
 }
 
-// SetError sets the value of Error.
-func (s *Default) SetError(val string) {
-	s.Error = val
+// IsUserTeamPersonCreate reports whether CreateUserTeamPersonReq is UserTeamPersonCreate.
+func (s CreateUserTeamPersonReq) IsUserTeamPersonCreate() bool {
+	return s.Type == UserTeamPersonCreateCreateUserTeamPersonReq
 }
 
-// DefaultStatusCodeWithHeaders wraps Default with status code and response headers.
-type DefaultStatusCodeWithHeaders struct {
-	StatusCode      int
-	WwwAuthenticate OptString
-	Response        Default
+// SetOwnerTeamPersonCreate sets CreateUserTeamPersonReq to OwnerTeamPersonCreate.
+func (s *CreateUserTeamPersonReq) SetOwnerTeamPersonCreate(v OwnerTeamPersonCreate) {
+	s.Type = OwnerTeamPersonCreateCreateUserTeamPersonReq
+	s.OwnerTeamPersonCreate = v
 }
 
-// GetStatusCode returns the value of StatusCode.
-func (s *DefaultStatusCodeWithHeaders) GetStatusCode() int {
-	return s.StatusCode
+// GetOwnerTeamPersonCreate returns OwnerTeamPersonCreate and true boolean if CreateUserTeamPersonReq is OwnerTeamPersonCreate.
+func (s CreateUserTeamPersonReq) GetOwnerTeamPersonCreate() (v OwnerTeamPersonCreate, ok bool) {
+	if !s.IsOwnerTeamPersonCreate() {
+		return v, false
+	}
+	return s.OwnerTeamPersonCreate, true
 }
 
-// GetWwwAuthenticate returns the value of WwwAuthenticate.
-func (s *DefaultStatusCodeWithHeaders) GetWwwAuthenticate() OptString {
-	return s.WwwAuthenticate
+// NewOwnerTeamPersonCreateCreateUserTeamPersonReq returns new CreateUserTeamPersonReq from OwnerTeamPersonCreate.
+func NewOwnerTeamPersonCreateCreateUserTeamPersonReq(v OwnerTeamPersonCreate) CreateUserTeamPersonReq {
+	var s CreateUserTeamPersonReq
+	s.SetOwnerTeamPersonCreate(v)
+	return s
 }
 
-// GetResponse returns the value of Response.
-func (s *DefaultStatusCodeWithHeaders) GetResponse() Default {
-	return s.Response
+// SetUserTeamPersonCreate sets CreateUserTeamPersonReq to UserTeamPersonCreate.
+func (s *CreateUserTeamPersonReq) SetUserTeamPersonCreate(v UserTeamPersonCreate) {
+	s.Type = UserTeamPersonCreateCreateUserTeamPersonReq
+	s.UserTeamPersonCreate = v
 }
 
-// SetStatusCode sets the value of StatusCode.
-func (s *DefaultStatusCodeWithHeaders) SetStatusCode(val int) {
-	s.StatusCode = val
+// GetUserTeamPersonCreate returns UserTeamPersonCreate and true boolean if CreateUserTeamPersonReq is UserTeamPersonCreate.
+func (s CreateUserTeamPersonReq) GetUserTeamPersonCreate() (v UserTeamPersonCreate, ok bool) {
+	if !s.IsUserTeamPersonCreate() {
+		return v, false
+	}
+	return s.UserTeamPersonCreate, true
 }
 
-// SetWwwAuthenticate sets the value of WwwAuthenticate.
-func (s *DefaultStatusCodeWithHeaders) SetWwwAuthenticate(val OptString) {
-	s.WwwAuthenticate = val
-}
-
-// SetResponse sets the value of Response.
-func (s *DefaultStatusCodeWithHeaders) SetResponse(val Default) {
-	s.Response = val
+// NewUserTeamPersonCreateCreateUserTeamPersonReq returns new CreateUserTeamPersonReq from UserTeamPersonCreate.
+func NewUserTeamPersonCreateCreateUserTeamPersonReq(v UserTeamPersonCreate) CreateUserTeamPersonReq {
+	var s CreateUserTeamPersonReq
+	s.SetUserTeamPersonCreate(v)
+	return s
 }
 
 // DeleteEventDiplomaRoleNoContent is response for DeleteEventDiplomaRole operation.
@@ -1565,104 +1642,161 @@ func (s *Error) SetError(val string) {
 	s.Error = val
 }
 
-func (*Error) updateTeamRes() {}
+// ErrorStatusCode wraps Error with StatusCode.
+type ErrorStatusCode struct {
+	StatusCode int
+	Response   Error
+}
+
+// GetStatusCode returns the value of StatusCode.
+func (s *ErrorStatusCode) GetStatusCode() int {
+	return s.StatusCode
+}
+
+// GetResponse returns the value of Response.
+func (s *ErrorStatusCode) GetResponse() Error {
+	return s.Response
+}
+
+// SetStatusCode sets the value of StatusCode.
+func (s *ErrorStatusCode) SetStatusCode(val int) {
+	s.StatusCode = val
+}
+
+// SetResponse sets the value of Response.
+func (s *ErrorStatusCode) SetResponse(val Error) {
+	s.Response = val
+}
 
 // Merged schema.
 // Ref: #/components/schemas/Event
 type Event struct {
-	ID             EventID                `json:"id"`
-	CreatedAt      EventCreatedAt         `json:"created_at"`
-	UpdatedAt      EventUpdatedAt         `json:"updated_at"`
-	Draft          EventDraft             `json:"draft"`
-	Public         EventPublic            `json:"public"`
-	Hidden         EventHidden            `json:"hidden"`
-	Canceled       EventCanceled          `json:"canceled"`
-	Title          EventTitle             `json:"title"`
-	Start          NilEventStart          `json:"start"`
-	End            NilEventEnd            `json:"end"`
-	Format         EventFormat            `json:"format"`
-	OrganizationID NilEventOrganizationID `json:"organization_id"`
-	MetaEventID    NilEventMetaEventID    `json:"meta_event_id"`
-	CreatedByID    NilEventCreatedByID    `json:"created_by_id"`
-	VenueID        NilEventVenueID        `json:"venue_id"`
+	// ID мероприятия.
+	ID int32 `json:"id"`
+	// Дата создания.
+	CreatedAt time.Time `json:"created_at"`
+	// Дата обновления.
+	UpdatedAt time.Time `json:"updated_at"`
+	// Мероприятие находится в статусе черновика. На такое
+	// мероприятие нельзя зарегистрироваться.
+	Draft bool `json:"draft"`
+	// Статус публичности мероприятия.
+	Public bool `json:"public"`
+	// Исключение мероприятия из календаря.
+	Hidden bool `json:"hidden"`
+	// Статус отмены мероприятия.
+	Canceled bool `json:"canceled"`
+	// Название мероприятия.
+	Title string `json:"title"`
+	// Дата начала мероприятия.
+	Start NilDateTime `json:"start"`
+	// Дата окончания мероприятия.
+	End    NilDateTime `json:"end"`
+	Format EventFormat `json:"format"`
+	// ID организации мероприятия.
+	OrganizationID NilInt32 `json:"organization_id"`
+	// ID мета-мероприятия.
+	MetaEventID NilInt32 `json:"meta_event_id"`
+	// ID автора мероприятия.
+	CreatedByID NilInt32 `json:"created_by_id"`
+	// Опциональный ID [геоданных].
+	//
+	// [геоданных]: #tag/geodata/operation/ReadGeoData
+	GeoDataID NilInt32 `json:"geo_data_id"`
+	// ID [площадки] на которой проводится мероприятие.
+	//
+	// [площадки]: /venue-api/docs/
+	VenueID NilInt32 `json:"venue_id"`
 	// Доступность упрощенной регистрации на мероприятие.
-	SimplifiedRegistration bool                      `json:"simplified_registration"`
-	AutocreateMember       EventAutocreateMember     `json:"autocreate_member"`
-	AchievementsAllowed    EventAchievementsAllowed  `json:"achievements_allowed"`
-	RequestsAllowed        EventRequestsAllowed      `json:"requests_allowed"`
-	SelfCheckIn            EventSelfCheckIn          `json:"self_check_in"`
-	TeamsInvolved          EventTeamsInvolved        `json:"teams_involved"`
-	OwnerCanModerate       bool                      `json:"owner_can_moderate"`
-	UserInMultipleTeams    bool                      `json:"user_in_multiple_teams"`
-	MentorsAllowed         bool                      `json:"mentors_allowed"`
-	SupportI18n            bool                      `json:"support_i18n"`
-	GirCollection          bool                      `json:"gir_collection"`
-	TimeMatters            EventTimeMatters          `json:"time_matters"`
-	Promoted               bool                      `json:"promoted"`
-	MaxUsers               NilEventMaxUsers          `json:"max_users"`
+	SimplifiedRegistration bool `json:"simplified_registration"`
+	// Автоматическое добавление в участники организации
+	// пользователя с подтвержденной заявки.
+	AutocreateMember bool `json:"autocreate_member"`
+	// Допуск на создания достижений на мероприятие.
+	AchievementsAllowed bool `json:"achievements_allowed"`
+	// Допуск на создания заявок на мероприятие.
+	RequestsAllowed bool `json:"requests_allowed"`
+	// Доступность чекина.
+	SelfCheckIn         bool               `json:"self_check_in"`
+	TeamsInvolved       EventTeamsInvolved `json:"teams_involved"`
+	OwnerCanModerate    bool               `json:"owner_can_moderate"`
+	UserInMultipleTeams bool               `json:"user_in_multiple_teams"`
+	MentorsAllowed      bool               `json:"mentors_allowed"`
+	SupportI18n         bool               `json:"support_i18n"`
+	GirCollection       bool               `json:"gir_collection"`
+	Promoted            bool               `json:"promoted"`
+	// Учитывается ли время или только даты в полях `start` и `end`.
+	TimeMatters            bool                      `json:"time_matters"`
+	MaxUsers               NilInt32                  `json:"max_users"`
 	TeamCreateNotification bool                      `json:"team_create_notification"`
 	TeamAssignmentMethod   EventTeamAssignmentMethod `json:"team_assignment_method"`
 	AchievementRolesCount  int32                     `json:"achievement_roles_count"`
-	AchievementsCount      EventAchievementsCount    `json:"achievements_count"`
-	RequestsCount          EventRequestsCount        `json:"requests_count"`
-	ExpectedStart          NilEventExpectedStart     `json:"expected_start"`
-	AltTitle               EventAltTitle             `json:"alt_title"`
-	Cover                  EventCover                `json:"cover"`
-	URL                    EventURL                  `json:"url"`
-	TypeID                 NilEventTypeID            `json:"type_id"`
-	Description            EventDescription          `json:"description"`
+	AchievementsCount      int32                     `json:"achievements_count"`
+	RequestsCount          int32                     `json:"requests_count"`
+	ExpectedStart          NilDateTime               `json:"expected_start"`
+	// Альтернативное название мероприятия.
+	AltTitle string `json:"alt_title"`
+	// Ссылка на обложку мероприятия.
+	Cover string `json:"cover"`
+	// Адрес online мероприятия.
+	URL string `json:"url"`
+	// Идентификатор типа мероприятия.
+	TypeID NilInt32 `json:"type_id"`
+	// Описание мероприятия.
+	Description string `json:"description"`
 	// Причина отмены мероприятия.
-	CancellationReason            string                             `json:"cancellation_reason"`
-	QuestionnaireCompletedMessage EventQuestionnaireCompletedMessage `json:"questionnaire_completed_message"`
+	CancellationReason string `json:"cancellation_reason"`
+	// Сообщение о заполненной анкете.
+	QuestionnaireCompletedMessage string `json:"questionnaire_completed_message"`
 }
 
 // GetID returns the value of ID.
-func (s *Event) GetID() EventID {
+func (s *Event) GetID() int32 {
 	return s.ID
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *Event) GetCreatedAt() EventCreatedAt {
+func (s *Event) GetCreatedAt() time.Time {
 	return s.CreatedAt
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
-func (s *Event) GetUpdatedAt() EventUpdatedAt {
+func (s *Event) GetUpdatedAt() time.Time {
 	return s.UpdatedAt
 }
 
 // GetDraft returns the value of Draft.
-func (s *Event) GetDraft() EventDraft {
+func (s *Event) GetDraft() bool {
 	return s.Draft
 }
 
 // GetPublic returns the value of Public.
-func (s *Event) GetPublic() EventPublic {
+func (s *Event) GetPublic() bool {
 	return s.Public
 }
 
 // GetHidden returns the value of Hidden.
-func (s *Event) GetHidden() EventHidden {
+func (s *Event) GetHidden() bool {
 	return s.Hidden
 }
 
 // GetCanceled returns the value of Canceled.
-func (s *Event) GetCanceled() EventCanceled {
+func (s *Event) GetCanceled() bool {
 	return s.Canceled
 }
 
 // GetTitle returns the value of Title.
-func (s *Event) GetTitle() EventTitle {
+func (s *Event) GetTitle() string {
 	return s.Title
 }
 
 // GetStart returns the value of Start.
-func (s *Event) GetStart() NilEventStart {
+func (s *Event) GetStart() NilDateTime {
 	return s.Start
 }
 
 // GetEnd returns the value of End.
-func (s *Event) GetEnd() NilEventEnd {
+func (s *Event) GetEnd() NilDateTime {
 	return s.End
 }
 
@@ -1672,22 +1806,27 @@ func (s *Event) GetFormat() EventFormat {
 }
 
 // GetOrganizationID returns the value of OrganizationID.
-func (s *Event) GetOrganizationID() NilEventOrganizationID {
+func (s *Event) GetOrganizationID() NilInt32 {
 	return s.OrganizationID
 }
 
 // GetMetaEventID returns the value of MetaEventID.
-func (s *Event) GetMetaEventID() NilEventMetaEventID {
+func (s *Event) GetMetaEventID() NilInt32 {
 	return s.MetaEventID
 }
 
 // GetCreatedByID returns the value of CreatedByID.
-func (s *Event) GetCreatedByID() NilEventCreatedByID {
+func (s *Event) GetCreatedByID() NilInt32 {
 	return s.CreatedByID
 }
 
+// GetGeoDataID returns the value of GeoDataID.
+func (s *Event) GetGeoDataID() NilInt32 {
+	return s.GeoDataID
+}
+
 // GetVenueID returns the value of VenueID.
-func (s *Event) GetVenueID() NilEventVenueID {
+func (s *Event) GetVenueID() NilInt32 {
 	return s.VenueID
 }
 
@@ -1697,22 +1836,22 @@ func (s *Event) GetSimplifiedRegistration() bool {
 }
 
 // GetAutocreateMember returns the value of AutocreateMember.
-func (s *Event) GetAutocreateMember() EventAutocreateMember {
+func (s *Event) GetAutocreateMember() bool {
 	return s.AutocreateMember
 }
 
 // GetAchievementsAllowed returns the value of AchievementsAllowed.
-func (s *Event) GetAchievementsAllowed() EventAchievementsAllowed {
+func (s *Event) GetAchievementsAllowed() bool {
 	return s.AchievementsAllowed
 }
 
 // GetRequestsAllowed returns the value of RequestsAllowed.
-func (s *Event) GetRequestsAllowed() EventRequestsAllowed {
+func (s *Event) GetRequestsAllowed() bool {
 	return s.RequestsAllowed
 }
 
 // GetSelfCheckIn returns the value of SelfCheckIn.
-func (s *Event) GetSelfCheckIn() EventSelfCheckIn {
+func (s *Event) GetSelfCheckIn() bool {
 	return s.SelfCheckIn
 }
 
@@ -1746,18 +1885,18 @@ func (s *Event) GetGirCollection() bool {
 	return s.GirCollection
 }
 
-// GetTimeMatters returns the value of TimeMatters.
-func (s *Event) GetTimeMatters() EventTimeMatters {
-	return s.TimeMatters
-}
-
 // GetPromoted returns the value of Promoted.
 func (s *Event) GetPromoted() bool {
 	return s.Promoted
 }
 
+// GetTimeMatters returns the value of TimeMatters.
+func (s *Event) GetTimeMatters() bool {
+	return s.TimeMatters
+}
+
 // GetMaxUsers returns the value of MaxUsers.
-func (s *Event) GetMaxUsers() NilEventMaxUsers {
+func (s *Event) GetMaxUsers() NilInt32 {
 	return s.MaxUsers
 }
 
@@ -1777,42 +1916,42 @@ func (s *Event) GetAchievementRolesCount() int32 {
 }
 
 // GetAchievementsCount returns the value of AchievementsCount.
-func (s *Event) GetAchievementsCount() EventAchievementsCount {
+func (s *Event) GetAchievementsCount() int32 {
 	return s.AchievementsCount
 }
 
 // GetRequestsCount returns the value of RequestsCount.
-func (s *Event) GetRequestsCount() EventRequestsCount {
+func (s *Event) GetRequestsCount() int32 {
 	return s.RequestsCount
 }
 
 // GetExpectedStart returns the value of ExpectedStart.
-func (s *Event) GetExpectedStart() NilEventExpectedStart {
+func (s *Event) GetExpectedStart() NilDateTime {
 	return s.ExpectedStart
 }
 
 // GetAltTitle returns the value of AltTitle.
-func (s *Event) GetAltTitle() EventAltTitle {
+func (s *Event) GetAltTitle() string {
 	return s.AltTitle
 }
 
 // GetCover returns the value of Cover.
-func (s *Event) GetCover() EventCover {
+func (s *Event) GetCover() string {
 	return s.Cover
 }
 
 // GetURL returns the value of URL.
-func (s *Event) GetURL() EventURL {
+func (s *Event) GetURL() string {
 	return s.URL
 }
 
 // GetTypeID returns the value of TypeID.
-func (s *Event) GetTypeID() NilEventTypeID {
+func (s *Event) GetTypeID() NilInt32 {
 	return s.TypeID
 }
 
 // GetDescription returns the value of Description.
-func (s *Event) GetDescription() EventDescription {
+func (s *Event) GetDescription() string {
 	return s.Description
 }
 
@@ -1822,57 +1961,57 @@ func (s *Event) GetCancellationReason() string {
 }
 
 // GetQuestionnaireCompletedMessage returns the value of QuestionnaireCompletedMessage.
-func (s *Event) GetQuestionnaireCompletedMessage() EventQuestionnaireCompletedMessage {
+func (s *Event) GetQuestionnaireCompletedMessage() string {
 	return s.QuestionnaireCompletedMessage
 }
 
 // SetID sets the value of ID.
-func (s *Event) SetID(val EventID) {
+func (s *Event) SetID(val int32) {
 	s.ID = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
-func (s *Event) SetCreatedAt(val EventCreatedAt) {
+func (s *Event) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.
-func (s *Event) SetUpdatedAt(val EventUpdatedAt) {
+func (s *Event) SetUpdatedAt(val time.Time) {
 	s.UpdatedAt = val
 }
 
 // SetDraft sets the value of Draft.
-func (s *Event) SetDraft(val EventDraft) {
+func (s *Event) SetDraft(val bool) {
 	s.Draft = val
 }
 
 // SetPublic sets the value of Public.
-func (s *Event) SetPublic(val EventPublic) {
+func (s *Event) SetPublic(val bool) {
 	s.Public = val
 }
 
 // SetHidden sets the value of Hidden.
-func (s *Event) SetHidden(val EventHidden) {
+func (s *Event) SetHidden(val bool) {
 	s.Hidden = val
 }
 
 // SetCanceled sets the value of Canceled.
-func (s *Event) SetCanceled(val EventCanceled) {
+func (s *Event) SetCanceled(val bool) {
 	s.Canceled = val
 }
 
 // SetTitle sets the value of Title.
-func (s *Event) SetTitle(val EventTitle) {
+func (s *Event) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetStart sets the value of Start.
-func (s *Event) SetStart(val NilEventStart) {
+func (s *Event) SetStart(val NilDateTime) {
 	s.Start = val
 }
 
 // SetEnd sets the value of End.
-func (s *Event) SetEnd(val NilEventEnd) {
+func (s *Event) SetEnd(val NilDateTime) {
 	s.End = val
 }
 
@@ -1882,22 +2021,27 @@ func (s *Event) SetFormat(val EventFormat) {
 }
 
 // SetOrganizationID sets the value of OrganizationID.
-func (s *Event) SetOrganizationID(val NilEventOrganizationID) {
+func (s *Event) SetOrganizationID(val NilInt32) {
 	s.OrganizationID = val
 }
 
 // SetMetaEventID sets the value of MetaEventID.
-func (s *Event) SetMetaEventID(val NilEventMetaEventID) {
+func (s *Event) SetMetaEventID(val NilInt32) {
 	s.MetaEventID = val
 }
 
 // SetCreatedByID sets the value of CreatedByID.
-func (s *Event) SetCreatedByID(val NilEventCreatedByID) {
+func (s *Event) SetCreatedByID(val NilInt32) {
 	s.CreatedByID = val
 }
 
+// SetGeoDataID sets the value of GeoDataID.
+func (s *Event) SetGeoDataID(val NilInt32) {
+	s.GeoDataID = val
+}
+
 // SetVenueID sets the value of VenueID.
-func (s *Event) SetVenueID(val NilEventVenueID) {
+func (s *Event) SetVenueID(val NilInt32) {
 	s.VenueID = val
 }
 
@@ -1907,22 +2051,22 @@ func (s *Event) SetSimplifiedRegistration(val bool) {
 }
 
 // SetAutocreateMember sets the value of AutocreateMember.
-func (s *Event) SetAutocreateMember(val EventAutocreateMember) {
+func (s *Event) SetAutocreateMember(val bool) {
 	s.AutocreateMember = val
 }
 
 // SetAchievementsAllowed sets the value of AchievementsAllowed.
-func (s *Event) SetAchievementsAllowed(val EventAchievementsAllowed) {
+func (s *Event) SetAchievementsAllowed(val bool) {
 	s.AchievementsAllowed = val
 }
 
 // SetRequestsAllowed sets the value of RequestsAllowed.
-func (s *Event) SetRequestsAllowed(val EventRequestsAllowed) {
+func (s *Event) SetRequestsAllowed(val bool) {
 	s.RequestsAllowed = val
 }
 
 // SetSelfCheckIn sets the value of SelfCheckIn.
-func (s *Event) SetSelfCheckIn(val EventSelfCheckIn) {
+func (s *Event) SetSelfCheckIn(val bool) {
 	s.SelfCheckIn = val
 }
 
@@ -1956,18 +2100,18 @@ func (s *Event) SetGirCollection(val bool) {
 	s.GirCollection = val
 }
 
-// SetTimeMatters sets the value of TimeMatters.
-func (s *Event) SetTimeMatters(val EventTimeMatters) {
-	s.TimeMatters = val
-}
-
 // SetPromoted sets the value of Promoted.
 func (s *Event) SetPromoted(val bool) {
 	s.Promoted = val
 }
 
+// SetTimeMatters sets the value of TimeMatters.
+func (s *Event) SetTimeMatters(val bool) {
+	s.TimeMatters = val
+}
+
 // SetMaxUsers sets the value of MaxUsers.
-func (s *Event) SetMaxUsers(val NilEventMaxUsers) {
+func (s *Event) SetMaxUsers(val NilInt32) {
 	s.MaxUsers = val
 }
 
@@ -1987,42 +2131,42 @@ func (s *Event) SetAchievementRolesCount(val int32) {
 }
 
 // SetAchievementsCount sets the value of AchievementsCount.
-func (s *Event) SetAchievementsCount(val EventAchievementsCount) {
+func (s *Event) SetAchievementsCount(val int32) {
 	s.AchievementsCount = val
 }
 
 // SetRequestsCount sets the value of RequestsCount.
-func (s *Event) SetRequestsCount(val EventRequestsCount) {
+func (s *Event) SetRequestsCount(val int32) {
 	s.RequestsCount = val
 }
 
 // SetExpectedStart sets the value of ExpectedStart.
-func (s *Event) SetExpectedStart(val NilEventExpectedStart) {
+func (s *Event) SetExpectedStart(val NilDateTime) {
 	s.ExpectedStart = val
 }
 
 // SetAltTitle sets the value of AltTitle.
-func (s *Event) SetAltTitle(val EventAltTitle) {
+func (s *Event) SetAltTitle(val string) {
 	s.AltTitle = val
 }
 
 // SetCover sets the value of Cover.
-func (s *Event) SetCover(val EventCover) {
+func (s *Event) SetCover(val string) {
 	s.Cover = val
 }
 
 // SetURL sets the value of URL.
-func (s *Event) SetURL(val EventURL) {
+func (s *Event) SetURL(val string) {
 	s.URL = val
 }
 
 // SetTypeID sets the value of TypeID.
-func (s *Event) SetTypeID(val NilEventTypeID) {
+func (s *Event) SetTypeID(val NilInt32) {
 	s.TypeID = val
 }
 
 // SetDescription sets the value of Description.
-func (s *Event) SetDescription(val EventDescription) {
+func (s *Event) SetDescription(val string) {
 	s.Description = val
 }
 
@@ -2032,25 +2176,19 @@ func (s *Event) SetCancellationReason(val string) {
 }
 
 // SetQuestionnaireCompletedMessage sets the value of QuestionnaireCompletedMessage.
-func (s *Event) SetQuestionnaireCompletedMessage(val EventQuestionnaireCompletedMessage) {
+func (s *Event) SetQuestionnaireCompletedMessage(val string) {
 	s.QuestionnaireCompletedMessage = val
 }
 
 func (*Event) createEventRes() {}
-
-type EventAchievementsAllowed bool
-
-type EventAchievementsCount int32
-
-type EventAltTitle string
-
-type EventAutocreateMember bool
+func (*Event) updateEventRes() {}
 
 // Ref: #/components/schemas/EventBrand
 type EventBrand struct {
-	ID      int32   `json:"id"`
-	EventID EventID `json:"event_id"`
-	BrandID int32   `json:"brand_id"`
+	ID int32 `json:"id"`
+	// ID мероприятия.
+	EventID int32 `json:"event_id"`
+	BrandID int32 `json:"brand_id"`
 }
 
 // GetID returns the value of ID.
@@ -2059,7 +2197,7 @@ func (s *EventBrand) GetID() int32 {
 }
 
 // GetEventID returns the value of EventID.
-func (s *EventBrand) GetEventID() EventID {
+func (s *EventBrand) GetEventID() int32 {
 	return s.EventID
 }
 
@@ -2074,7 +2212,7 @@ func (s *EventBrand) SetID(val int32) {
 }
 
 // SetEventID sets the value of EventID.
-func (s *EventBrand) SetEventID(val EventID) {
+func (s *EventBrand) SetEventID(val int32) {
 	s.EventID = val
 }
 
@@ -2083,20 +2221,11 @@ func (s *EventBrand) SetBrandID(val int32) {
 	s.BrandID = val
 }
 
-type EventCanceled bool
-
-type EventCover string
-
-type EventCoverURLWrite url.URL
-
-type EventCreatedAt time.Time
-
-type EventCreatedByID int32
-
 // Ref: #/components/schemas/EventDeferredNotification
 type EventDeferredNotification struct {
 	Qstatus QueueStatus `json:"qstatus"`
-	EventID EventID     `json:"event_id"`
+	// ID мероприятия.
+	EventID int32 `json:"event_id"`
 	// Дата создания отложенного уведомления.
 	CreatedAt   time.Time                            `json:"created_at"`
 	BeforeStart EventDeferredNotificationBeforeStart `json:"before_start"`
@@ -2117,7 +2246,7 @@ func (s *EventDeferredNotification) GetQstatus() QueueStatus {
 }
 
 // GetEventID returns the value of EventID.
-func (s *EventDeferredNotification) GetEventID() EventID {
+func (s *EventDeferredNotification) GetEventID() int32 {
 	return s.EventID
 }
 
@@ -2162,7 +2291,7 @@ func (s *EventDeferredNotification) SetQstatus(val QueueStatus) {
 }
 
 // SetEventID sets the value of EventID.
-func (s *EventDeferredNotification) SetEventID(val EventID) {
+func (s *EventDeferredNotification) SetEventID(val int32) {
 	s.EventID = val
 }
 
@@ -2206,9 +2335,9 @@ func (*EventDeferredNotification) createEventDeferredNotificationRes() {}
 func (*EventDeferredNotification) readEventDeferredNotificationRes()   {}
 func (*EventDeferredNotification) updateEventDeferredNotificationRes() {}
 
-// Интервал до начала мероприятия.
-// Вычисляемая дата является границей,
-// до которой не отправляются уведомления.
+// Интервал до начала мероприятия. Вычисляемая дата
+// является границей, до которой не отправляются
+// уведомления.
 // Ref: #/components/schemas/EventDeferredNotificationBeforeStart
 type EventDeferredNotificationBeforeStart struct {
 	Microseconds int64 `json:"microseconds"`
@@ -2266,8 +2395,6 @@ func (*EventDeferredNotificationLocked) updateEventDeferredNotificationRes() {}
 type EventDeferredNotificationTemplateID int16
 
 func (*EventDeferredNotificationTemplateID) eventDeferredNotificationTemplateIDRes() {}
-
-type EventDescription string
 
 // Ref: #/components/schemas/EventDiplomaSettings
 type EventDiplomaSettings struct {
@@ -2365,8 +2492,6 @@ func (s *EventDiplomaSettingsWithRoles) SetRoleIds(val []int32) {
 
 func (*EventDiplomaSettingsWithRoles) readEventDiplomaSettingsRes() {}
 
-type EventDraft bool
-
 // Ref: #/components/schemas/EventEdge
 type EventEdge struct {
 	// Идентификатор связи/ребра.
@@ -2434,10 +2559,6 @@ func (EventEdgeType) AllValues() []EventEdgeType {
 		EventEdgeType2,
 	}
 }
-
-type EventEnd time.Time
-
-type EventExpectedStart time.Time
 
 // Ref: #/components/schemas/EventFieldListed
 type EventFieldListed struct {
@@ -2603,34 +2724,57 @@ func (s *EventFormat) UnmarshalText(data []byte) error {
 	}
 }
 
-type EventHidden bool
-
-type EventID int32
-
 // Ref: #/components/schemas/EventLimit
 type EventLimit struct {
-	ID               int32                         `json:"id"`
-	EventID          EventID                       `json:"event_id"`
-	AutoApprove      EventLimitAutoApprove         `json:"auto_approve"`
-	CollectSnils     EventLimitCollectSNILS        `json:"collect_snils"`
-	CollectPhones    EventLimitCollectPhones       `json:"collect_phones"`
-	ParticipantLimit NilEventLimitParticipantLimit `json:"participant_limit"`
-	DateEndRequest   NilEventLimitDateEndRequest   `json:"date_end_request"`
-	DateEndUpdate    NilEventLimitDateEndUpdate    `json:"date_end_update"`
-	UserAgeStart     NilEventLimitUserAgeStart     `json:"user_age_start"`
-	UserAgeEnd       NilEventLimitUserAgeEnd       `json:"user_age_end"`
-	RequiresProject  EventLimitRequiresProject     `json:"requires_project"`
-	RequiresStepik   EventLimitRequiresStepik      `json:"requires_stepik"`
-	RequiresGithub   EventLimitRequiresGitHub      `json:"requires_github"`
-	RequiresYandex   EventLimitRequiresYandex      `json:"requires_yandex"`
-	RequiresKaggle   EventLimitRequiresKaggle      `json:"requires_kaggle"`
-	RequiresLeader   EventLimitRequiresLeader      `json:"requires_leader"`
-	RequiresVk       EventLimitRequiresVK          `json:"requires_vk"`
-	RequiresTelegram EventLimitRequiresTelegram    `json:"requires_telegram"`
-	Countries        EventLimitCountries           `json:"countries"`
-	Regions          EventLimitRegions             `json:"regions"`
-	Cities           EventLimitCities              `json:"cities"`
-	Description      EventLimitDescription         `json:"description"`
+	ID int32 `json:"id"`
+	// ID мероприятия.
+	EventID int32 `json:"event_id"`
+	// Автосогласование заявок.
+	AutoApprove bool `json:"auto_approve"`
+	// Собирать СНИЛС в заявках.
+	CollectSnils bool `json:"collect_snils"`
+	// Собирать номера телефонов в заявках.
+	CollectPhones bool `json:"collect_phones"`
+	// Максимальное количество участников.
+	ParticipantLimit NilInt32 `json:"participant_limit"`
+	// Крайний срок подачи заявки.
+	DateEndRequest NilDateTime `json:"date_end_request"`
+	// Крайний срок обновления заявки.
+	DateEndUpdate NilDateTime `json:"date_end_update"`
+	// Минимальный возраст участника. Рассчитывается от даты
+	// начала мероприятия.
+	UserAgeStart NilInt32 `json:"user_age_start"`
+	// Максимальный возраст участника. Рассчитывается от
+	// даты начала мероприятия.
+	UserAgeEnd NilInt32 `json:"user_age_end"`
+	// Требуется проект.
+	RequiresProject bool `json:"requires_project"`
+	// Требуется учетная запись Stepik.
+	RequiresStepik bool `json:"requires_stepik"`
+	// Требуется учетная запись GitHub.
+	RequiresGithub bool `json:"requires_github"`
+	// Требуется учетная запись Yandex.
+	RequiresYandex bool `json:"requires_yandex"`
+	// Требуется учетная запись Kaggle.
+	RequiresKaggle bool `json:"requires_kaggle"`
+	// Требуется учетная запись Leader.
+	RequiresLeader bool `json:"requires_leader"`
+	// Требуется учетная запись VK.
+	RequiresVk bool `json:"requires_vk"`
+	// Требуется учетная запись Telegram.
+	RequiresTelegram bool `json:"requires_telegram"`
+	// ФИАС ID допускаемых к регистрации регионов.
+	RegionsFias []uuid.UUID `json:"regions_fias"`
+	// ФИАС ID допускаемых к регистрации городов.
+	CitiesFias []uuid.UUID `json:"cities_fias"`
+	// Допускаемые к регистрации страны.
+	Countries []string `json:"countries"`
+	// Допускаемые к регистрации регионы.
+	Regions []string `json:"regions"`
+	// Допускаемые к регистрации города.
+	Cities []string `json:"cities"`
+	// Текстовое описание ограничений по регистрации.
+	Description string `json:"description"`
 }
 
 // GetID returns the value of ID.
@@ -2639,107 +2783,117 @@ func (s *EventLimit) GetID() int32 {
 }
 
 // GetEventID returns the value of EventID.
-func (s *EventLimit) GetEventID() EventID {
+func (s *EventLimit) GetEventID() int32 {
 	return s.EventID
 }
 
 // GetAutoApprove returns the value of AutoApprove.
-func (s *EventLimit) GetAutoApprove() EventLimitAutoApprove {
+func (s *EventLimit) GetAutoApprove() bool {
 	return s.AutoApprove
 }
 
 // GetCollectSnils returns the value of CollectSnils.
-func (s *EventLimit) GetCollectSnils() EventLimitCollectSNILS {
+func (s *EventLimit) GetCollectSnils() bool {
 	return s.CollectSnils
 }
 
 // GetCollectPhones returns the value of CollectPhones.
-func (s *EventLimit) GetCollectPhones() EventLimitCollectPhones {
+func (s *EventLimit) GetCollectPhones() bool {
 	return s.CollectPhones
 }
 
 // GetParticipantLimit returns the value of ParticipantLimit.
-func (s *EventLimit) GetParticipantLimit() NilEventLimitParticipantLimit {
+func (s *EventLimit) GetParticipantLimit() NilInt32 {
 	return s.ParticipantLimit
 }
 
 // GetDateEndRequest returns the value of DateEndRequest.
-func (s *EventLimit) GetDateEndRequest() NilEventLimitDateEndRequest {
+func (s *EventLimit) GetDateEndRequest() NilDateTime {
 	return s.DateEndRequest
 }
 
 // GetDateEndUpdate returns the value of DateEndUpdate.
-func (s *EventLimit) GetDateEndUpdate() NilEventLimitDateEndUpdate {
+func (s *EventLimit) GetDateEndUpdate() NilDateTime {
 	return s.DateEndUpdate
 }
 
 // GetUserAgeStart returns the value of UserAgeStart.
-func (s *EventLimit) GetUserAgeStart() NilEventLimitUserAgeStart {
+func (s *EventLimit) GetUserAgeStart() NilInt32 {
 	return s.UserAgeStart
 }
 
 // GetUserAgeEnd returns the value of UserAgeEnd.
-func (s *EventLimit) GetUserAgeEnd() NilEventLimitUserAgeEnd {
+func (s *EventLimit) GetUserAgeEnd() NilInt32 {
 	return s.UserAgeEnd
 }
 
 // GetRequiresProject returns the value of RequiresProject.
-func (s *EventLimit) GetRequiresProject() EventLimitRequiresProject {
+func (s *EventLimit) GetRequiresProject() bool {
 	return s.RequiresProject
 }
 
 // GetRequiresStepik returns the value of RequiresStepik.
-func (s *EventLimit) GetRequiresStepik() EventLimitRequiresStepik {
+func (s *EventLimit) GetRequiresStepik() bool {
 	return s.RequiresStepik
 }
 
 // GetRequiresGithub returns the value of RequiresGithub.
-func (s *EventLimit) GetRequiresGithub() EventLimitRequiresGitHub {
+func (s *EventLimit) GetRequiresGithub() bool {
 	return s.RequiresGithub
 }
 
 // GetRequiresYandex returns the value of RequiresYandex.
-func (s *EventLimit) GetRequiresYandex() EventLimitRequiresYandex {
+func (s *EventLimit) GetRequiresYandex() bool {
 	return s.RequiresYandex
 }
 
 // GetRequiresKaggle returns the value of RequiresKaggle.
-func (s *EventLimit) GetRequiresKaggle() EventLimitRequiresKaggle {
+func (s *EventLimit) GetRequiresKaggle() bool {
 	return s.RequiresKaggle
 }
 
 // GetRequiresLeader returns the value of RequiresLeader.
-func (s *EventLimit) GetRequiresLeader() EventLimitRequiresLeader {
+func (s *EventLimit) GetRequiresLeader() bool {
 	return s.RequiresLeader
 }
 
 // GetRequiresVk returns the value of RequiresVk.
-func (s *EventLimit) GetRequiresVk() EventLimitRequiresVK {
+func (s *EventLimit) GetRequiresVk() bool {
 	return s.RequiresVk
 }
 
 // GetRequiresTelegram returns the value of RequiresTelegram.
-func (s *EventLimit) GetRequiresTelegram() EventLimitRequiresTelegram {
+func (s *EventLimit) GetRequiresTelegram() bool {
 	return s.RequiresTelegram
 }
 
+// GetRegionsFias returns the value of RegionsFias.
+func (s *EventLimit) GetRegionsFias() []uuid.UUID {
+	return s.RegionsFias
+}
+
+// GetCitiesFias returns the value of CitiesFias.
+func (s *EventLimit) GetCitiesFias() []uuid.UUID {
+	return s.CitiesFias
+}
+
 // GetCountries returns the value of Countries.
-func (s *EventLimit) GetCountries() EventLimitCountries {
+func (s *EventLimit) GetCountries() []string {
 	return s.Countries
 }
 
 // GetRegions returns the value of Regions.
-func (s *EventLimit) GetRegions() EventLimitRegions {
+func (s *EventLimit) GetRegions() []string {
 	return s.Regions
 }
 
 // GetCities returns the value of Cities.
-func (s *EventLimit) GetCities() EventLimitCities {
+func (s *EventLimit) GetCities() []string {
 	return s.Cities
 }
 
 // GetDescription returns the value of Description.
-func (s *EventLimit) GetDescription() EventLimitDescription {
+func (s *EventLimit) GetDescription() string {
 	return s.Description
 }
 
@@ -2749,107 +2903,117 @@ func (s *EventLimit) SetID(val int32) {
 }
 
 // SetEventID sets the value of EventID.
-func (s *EventLimit) SetEventID(val EventID) {
+func (s *EventLimit) SetEventID(val int32) {
 	s.EventID = val
 }
 
 // SetAutoApprove sets the value of AutoApprove.
-func (s *EventLimit) SetAutoApprove(val EventLimitAutoApprove) {
+func (s *EventLimit) SetAutoApprove(val bool) {
 	s.AutoApprove = val
 }
 
 // SetCollectSnils sets the value of CollectSnils.
-func (s *EventLimit) SetCollectSnils(val EventLimitCollectSNILS) {
+func (s *EventLimit) SetCollectSnils(val bool) {
 	s.CollectSnils = val
 }
 
 // SetCollectPhones sets the value of CollectPhones.
-func (s *EventLimit) SetCollectPhones(val EventLimitCollectPhones) {
+func (s *EventLimit) SetCollectPhones(val bool) {
 	s.CollectPhones = val
 }
 
 // SetParticipantLimit sets the value of ParticipantLimit.
-func (s *EventLimit) SetParticipantLimit(val NilEventLimitParticipantLimit) {
+func (s *EventLimit) SetParticipantLimit(val NilInt32) {
 	s.ParticipantLimit = val
 }
 
 // SetDateEndRequest sets the value of DateEndRequest.
-func (s *EventLimit) SetDateEndRequest(val NilEventLimitDateEndRequest) {
+func (s *EventLimit) SetDateEndRequest(val NilDateTime) {
 	s.DateEndRequest = val
 }
 
 // SetDateEndUpdate sets the value of DateEndUpdate.
-func (s *EventLimit) SetDateEndUpdate(val NilEventLimitDateEndUpdate) {
+func (s *EventLimit) SetDateEndUpdate(val NilDateTime) {
 	s.DateEndUpdate = val
 }
 
 // SetUserAgeStart sets the value of UserAgeStart.
-func (s *EventLimit) SetUserAgeStart(val NilEventLimitUserAgeStart) {
+func (s *EventLimit) SetUserAgeStart(val NilInt32) {
 	s.UserAgeStart = val
 }
 
 // SetUserAgeEnd sets the value of UserAgeEnd.
-func (s *EventLimit) SetUserAgeEnd(val NilEventLimitUserAgeEnd) {
+func (s *EventLimit) SetUserAgeEnd(val NilInt32) {
 	s.UserAgeEnd = val
 }
 
 // SetRequiresProject sets the value of RequiresProject.
-func (s *EventLimit) SetRequiresProject(val EventLimitRequiresProject) {
+func (s *EventLimit) SetRequiresProject(val bool) {
 	s.RequiresProject = val
 }
 
 // SetRequiresStepik sets the value of RequiresStepik.
-func (s *EventLimit) SetRequiresStepik(val EventLimitRequiresStepik) {
+func (s *EventLimit) SetRequiresStepik(val bool) {
 	s.RequiresStepik = val
 }
 
 // SetRequiresGithub sets the value of RequiresGithub.
-func (s *EventLimit) SetRequiresGithub(val EventLimitRequiresGitHub) {
+func (s *EventLimit) SetRequiresGithub(val bool) {
 	s.RequiresGithub = val
 }
 
 // SetRequiresYandex sets the value of RequiresYandex.
-func (s *EventLimit) SetRequiresYandex(val EventLimitRequiresYandex) {
+func (s *EventLimit) SetRequiresYandex(val bool) {
 	s.RequiresYandex = val
 }
 
 // SetRequiresKaggle sets the value of RequiresKaggle.
-func (s *EventLimit) SetRequiresKaggle(val EventLimitRequiresKaggle) {
+func (s *EventLimit) SetRequiresKaggle(val bool) {
 	s.RequiresKaggle = val
 }
 
 // SetRequiresLeader sets the value of RequiresLeader.
-func (s *EventLimit) SetRequiresLeader(val EventLimitRequiresLeader) {
+func (s *EventLimit) SetRequiresLeader(val bool) {
 	s.RequiresLeader = val
 }
 
 // SetRequiresVk sets the value of RequiresVk.
-func (s *EventLimit) SetRequiresVk(val EventLimitRequiresVK) {
+func (s *EventLimit) SetRequiresVk(val bool) {
 	s.RequiresVk = val
 }
 
 // SetRequiresTelegram sets the value of RequiresTelegram.
-func (s *EventLimit) SetRequiresTelegram(val EventLimitRequiresTelegram) {
+func (s *EventLimit) SetRequiresTelegram(val bool) {
 	s.RequiresTelegram = val
 }
 
+// SetRegionsFias sets the value of RegionsFias.
+func (s *EventLimit) SetRegionsFias(val []uuid.UUID) {
+	s.RegionsFias = val
+}
+
+// SetCitiesFias sets the value of CitiesFias.
+func (s *EventLimit) SetCitiesFias(val []uuid.UUID) {
+	s.CitiesFias = val
+}
+
 // SetCountries sets the value of Countries.
-func (s *EventLimit) SetCountries(val EventLimitCountries) {
+func (s *EventLimit) SetCountries(val []string) {
 	s.Countries = val
 }
 
 // SetRegions sets the value of Regions.
-func (s *EventLimit) SetRegions(val EventLimitRegions) {
+func (s *EventLimit) SetRegions(val []string) {
 	s.Regions = val
 }
 
 // SetCities sets the value of Cities.
-func (s *EventLimit) SetCities(val EventLimitCities) {
+func (s *EventLimit) SetCities(val []string) {
 	s.Cities = val
 }
 
 // SetDescription sets the value of Description.
-func (s *EventLimit) SetDescription(val EventLimitDescription) {
+func (s *EventLimit) SetDescription(val string) {
 	s.Description = val
 }
 
@@ -2857,129 +3021,379 @@ func (*EventLimit) createEventLimitRes() {}
 func (*EventLimit) readEventLimitRes()   {}
 func (*EventLimit) updateEventLimitRes() {}
 
-type EventLimitAutoApprove bool
-
-type EventLimitCities []string
-
-type EventLimitCollectPhones bool
-
-type EventLimitCollectSNILS bool
-
-type EventLimitCountries []string
-
-type EventLimitDateEndRequest time.Time
-
-type EventLimitDateEndUpdate time.Time
-
-type EventLimitDescription string
-
 // Ref: #/components/schemas/EventLimitOnlyDateEndRequest
 type EventLimitOnlyDateEndRequest struct {
-	DateEndRequest NilEventLimitDateEndRequest `json:"date_end_request"`
+	// Крайний срок подачи заявки.
+	DateEndRequest NilDateTime `json:"date_end_request"`
 }
 
 // GetDateEndRequest returns the value of DateEndRequest.
-func (s *EventLimitOnlyDateEndRequest) GetDateEndRequest() NilEventLimitDateEndRequest {
+func (s *EventLimitOnlyDateEndRequest) GetDateEndRequest() NilDateTime {
 	return s.DateEndRequest
 }
 
 // SetDateEndRequest sets the value of DateEndRequest.
-func (s *EventLimitOnlyDateEndRequest) SetDateEndRequest(val NilEventLimitDateEndRequest) {
+func (s *EventLimitOnlyDateEndRequest) SetDateEndRequest(val NilDateTime) {
 	s.DateEndRequest = val
 }
 
-type EventLimitParticipantLimit int
+// Ref: #/components/schemas/EventLimitWrite
+type EventLimitWrite struct {
+	// Автосогласование заявок.
+	AutoApprove OptBool `json:"auto_approve"`
+	// Собирать СНИЛС в заявках.
+	CollectSnils OptBool `json:"collect_snils"`
+	// Собирать номера телефонов в заявках.
+	CollectPhones OptBool `json:"collect_phones"`
+	// Максимальное количество участников.
+	ParticipantLimit OptNilInt32 `json:"participant_limit"`
+	// Крайний срок подачи заявки.
+	DateEndRequest OptNilDateTime `json:"date_end_request"`
+	// Крайний срок обновления заявки.
+	DateEndUpdate OptNilDateTime `json:"date_end_update"`
+	// Минимальный возраст участника. Рассчитывается от даты
+	// начала мероприятия.
+	UserAgeStart OptNilInt32 `json:"user_age_start"`
+	// Максимальный возраст участника. Рассчитывается от
+	// даты начала мероприятия.
+	UserAgeEnd OptNilInt32 `json:"user_age_end"`
+	// Требуется проект.
+	RequiresProject OptBool `json:"requires_project"`
+	// Требуется учетная запись Stepik.
+	RequiresStepik OptBool `json:"requires_stepik"`
+	// Требуется учетная запись GitHub.
+	RequiresGithub OptBool `json:"requires_github"`
+	// Требуется учетная запись Yandex.
+	RequiresYandex OptBool `json:"requires_yandex"`
+	// Требуется учетная запись Kaggle.
+	RequiresKaggle OptBool `json:"requires_kaggle"`
+	// Требуется учетная запись Leader.
+	RequiresLeader OptBool `json:"requires_leader"`
+	// Требуется учетная запись VK.
+	RequiresVk OptBool `json:"requires_vk"`
+	// Требуется учетная запись Telegram.
+	RequiresTelegram OptBool `json:"requires_telegram"`
+	// ФИАС ID допускаемых к регистрации регионов.
+	RegionsFias []uuid.UUID `json:"regions_fias"`
+	// ФИАС ID допускаемых к регистрации городов.
+	CitiesFias []uuid.UUID `json:"cities_fias"`
+	// Допускаемые к регистрации страны.
+	Countries []string `json:"countries"`
+	// Допускаемые к регистрации регионы.
+	Regions []string `json:"regions"`
+	// Допускаемые к регистрации города.
+	Cities []string `json:"cities"`
+	// Текстовое описание ограничений по регистрации.
+	Description OptString `json:"description"`
+}
 
-type EventLimitRegions []string
+// GetAutoApprove returns the value of AutoApprove.
+func (s *EventLimitWrite) GetAutoApprove() OptBool {
+	return s.AutoApprove
+}
 
-type EventLimitRequiresGitHub bool
+// GetCollectSnils returns the value of CollectSnils.
+func (s *EventLimitWrite) GetCollectSnils() OptBool {
+	return s.CollectSnils
+}
 
-type EventLimitRequiresKaggle bool
+// GetCollectPhones returns the value of CollectPhones.
+func (s *EventLimitWrite) GetCollectPhones() OptBool {
+	return s.CollectPhones
+}
 
-type EventLimitRequiresLeader bool
+// GetParticipantLimit returns the value of ParticipantLimit.
+func (s *EventLimitWrite) GetParticipantLimit() OptNilInt32 {
+	return s.ParticipantLimit
+}
 
-type EventLimitRequiresProject bool
+// GetDateEndRequest returns the value of DateEndRequest.
+func (s *EventLimitWrite) GetDateEndRequest() OptNilDateTime {
+	return s.DateEndRequest
+}
 
-type EventLimitRequiresStepik bool
+// GetDateEndUpdate returns the value of DateEndUpdate.
+func (s *EventLimitWrite) GetDateEndUpdate() OptNilDateTime {
+	return s.DateEndUpdate
+}
 
-type EventLimitRequiresTelegram bool
+// GetUserAgeStart returns the value of UserAgeStart.
+func (s *EventLimitWrite) GetUserAgeStart() OptNilInt32 {
+	return s.UserAgeStart
+}
 
-type EventLimitRequiresVK bool
+// GetUserAgeEnd returns the value of UserAgeEnd.
+func (s *EventLimitWrite) GetUserAgeEnd() OptNilInt32 {
+	return s.UserAgeEnd
+}
 
-type EventLimitRequiresYandex bool
+// GetRequiresProject returns the value of RequiresProject.
+func (s *EventLimitWrite) GetRequiresProject() OptBool {
+	return s.RequiresProject
+}
 
-type EventLimitUserAgeEnd int32
+// GetRequiresStepik returns the value of RequiresStepik.
+func (s *EventLimitWrite) GetRequiresStepik() OptBool {
+	return s.RequiresStepik
+}
 
-type EventLimitUserAgeStart int32
+// GetRequiresGithub returns the value of RequiresGithub.
+func (s *EventLimitWrite) GetRequiresGithub() OptBool {
+	return s.RequiresGithub
+}
 
-type EventMaxUsers int
+// GetRequiresYandex returns the value of RequiresYandex.
+func (s *EventLimitWrite) GetRequiresYandex() OptBool {
+	return s.RequiresYandex
+}
+
+// GetRequiresKaggle returns the value of RequiresKaggle.
+func (s *EventLimitWrite) GetRequiresKaggle() OptBool {
+	return s.RequiresKaggle
+}
+
+// GetRequiresLeader returns the value of RequiresLeader.
+func (s *EventLimitWrite) GetRequiresLeader() OptBool {
+	return s.RequiresLeader
+}
+
+// GetRequiresVk returns the value of RequiresVk.
+func (s *EventLimitWrite) GetRequiresVk() OptBool {
+	return s.RequiresVk
+}
+
+// GetRequiresTelegram returns the value of RequiresTelegram.
+func (s *EventLimitWrite) GetRequiresTelegram() OptBool {
+	return s.RequiresTelegram
+}
+
+// GetRegionsFias returns the value of RegionsFias.
+func (s *EventLimitWrite) GetRegionsFias() []uuid.UUID {
+	return s.RegionsFias
+}
+
+// GetCitiesFias returns the value of CitiesFias.
+func (s *EventLimitWrite) GetCitiesFias() []uuid.UUID {
+	return s.CitiesFias
+}
+
+// GetCountries returns the value of Countries.
+func (s *EventLimitWrite) GetCountries() []string {
+	return s.Countries
+}
+
+// GetRegions returns the value of Regions.
+func (s *EventLimitWrite) GetRegions() []string {
+	return s.Regions
+}
+
+// GetCities returns the value of Cities.
+func (s *EventLimitWrite) GetCities() []string {
+	return s.Cities
+}
+
+// GetDescription returns the value of Description.
+func (s *EventLimitWrite) GetDescription() OptString {
+	return s.Description
+}
+
+// SetAutoApprove sets the value of AutoApprove.
+func (s *EventLimitWrite) SetAutoApprove(val OptBool) {
+	s.AutoApprove = val
+}
+
+// SetCollectSnils sets the value of CollectSnils.
+func (s *EventLimitWrite) SetCollectSnils(val OptBool) {
+	s.CollectSnils = val
+}
+
+// SetCollectPhones sets the value of CollectPhones.
+func (s *EventLimitWrite) SetCollectPhones(val OptBool) {
+	s.CollectPhones = val
+}
+
+// SetParticipantLimit sets the value of ParticipantLimit.
+func (s *EventLimitWrite) SetParticipantLimit(val OptNilInt32) {
+	s.ParticipantLimit = val
+}
+
+// SetDateEndRequest sets the value of DateEndRequest.
+func (s *EventLimitWrite) SetDateEndRequest(val OptNilDateTime) {
+	s.DateEndRequest = val
+}
+
+// SetDateEndUpdate sets the value of DateEndUpdate.
+func (s *EventLimitWrite) SetDateEndUpdate(val OptNilDateTime) {
+	s.DateEndUpdate = val
+}
+
+// SetUserAgeStart sets the value of UserAgeStart.
+func (s *EventLimitWrite) SetUserAgeStart(val OptNilInt32) {
+	s.UserAgeStart = val
+}
+
+// SetUserAgeEnd sets the value of UserAgeEnd.
+func (s *EventLimitWrite) SetUserAgeEnd(val OptNilInt32) {
+	s.UserAgeEnd = val
+}
+
+// SetRequiresProject sets the value of RequiresProject.
+func (s *EventLimitWrite) SetRequiresProject(val OptBool) {
+	s.RequiresProject = val
+}
+
+// SetRequiresStepik sets the value of RequiresStepik.
+func (s *EventLimitWrite) SetRequiresStepik(val OptBool) {
+	s.RequiresStepik = val
+}
+
+// SetRequiresGithub sets the value of RequiresGithub.
+func (s *EventLimitWrite) SetRequiresGithub(val OptBool) {
+	s.RequiresGithub = val
+}
+
+// SetRequiresYandex sets the value of RequiresYandex.
+func (s *EventLimitWrite) SetRequiresYandex(val OptBool) {
+	s.RequiresYandex = val
+}
+
+// SetRequiresKaggle sets the value of RequiresKaggle.
+func (s *EventLimitWrite) SetRequiresKaggle(val OptBool) {
+	s.RequiresKaggle = val
+}
+
+// SetRequiresLeader sets the value of RequiresLeader.
+func (s *EventLimitWrite) SetRequiresLeader(val OptBool) {
+	s.RequiresLeader = val
+}
+
+// SetRequiresVk sets the value of RequiresVk.
+func (s *EventLimitWrite) SetRequiresVk(val OptBool) {
+	s.RequiresVk = val
+}
+
+// SetRequiresTelegram sets the value of RequiresTelegram.
+func (s *EventLimitWrite) SetRequiresTelegram(val OptBool) {
+	s.RequiresTelegram = val
+}
+
+// SetRegionsFias sets the value of RegionsFias.
+func (s *EventLimitWrite) SetRegionsFias(val []uuid.UUID) {
+	s.RegionsFias = val
+}
+
+// SetCitiesFias sets the value of CitiesFias.
+func (s *EventLimitWrite) SetCitiesFias(val []uuid.UUID) {
+	s.CitiesFias = val
+}
+
+// SetCountries sets the value of Countries.
+func (s *EventLimitWrite) SetCountries(val []string) {
+	s.Countries = val
+}
+
+// SetRegions sets the value of Regions.
+func (s *EventLimitWrite) SetRegions(val []string) {
+	s.Regions = val
+}
+
+// SetCities sets the value of Cities.
+func (s *EventLimitWrite) SetCities(val []string) {
+	s.Cities = val
+}
+
+// SetDescription sets the value of Description.
+func (s *EventLimitWrite) SetDescription(val OptString) {
+	s.Description = val
+}
 
 // Ref: #/components/schemas/EventMeta
 type EventMeta struct {
-	ID             EventID                `json:"id"`
-	CreatedAt      EventCreatedAt         `json:"created_at"`
-	UpdatedAt      EventUpdatedAt         `json:"updated_at"`
-	Draft          EventDraft             `json:"draft"`
-	Public         EventPublic            `json:"public"`
-	Hidden         EventHidden            `json:"hidden"`
-	Canceled       EventCanceled          `json:"canceled"`
-	Title          EventTitle             `json:"title"`
-	Start          NilEventStart          `json:"start"`
-	End            NilEventEnd            `json:"end"`
-	Format         EventFormat            `json:"format"`
-	OrganizationID NilEventOrganizationID `json:"organization_id"`
-	MetaEventID    NilEventMetaEventID    `json:"meta_event_id"`
-	CreatedByID    NilEventCreatedByID    `json:"created_by_id"`
-	VenueID        NilEventVenueID        `json:"venue_id"`
+	// ID мероприятия.
+	ID int32 `json:"id"`
+	// Дата создания.
+	CreatedAt time.Time `json:"created_at"`
+	// Дата обновления.
+	UpdatedAt time.Time `json:"updated_at"`
+	// Мероприятие находится в статусе черновика. На такое
+	// мероприятие нельзя зарегистрироваться.
+	Draft bool `json:"draft"`
+	// Статус публичности мероприятия.
+	Public bool `json:"public"`
+	// Исключение мероприятия из календаря.
+	Hidden bool `json:"hidden"`
+	// Статус отмены мероприятия.
+	Canceled bool `json:"canceled"`
+	// Название мероприятия.
+	Title string `json:"title"`
+	// Дата начала мероприятия.
+	Start NilDateTime `json:"start"`
+	// Дата окончания мероприятия.
+	End    NilDateTime `json:"end"`
+	Format EventFormat `json:"format"`
+	// ID организации мероприятия.
+	OrganizationID NilInt32 `json:"organization_id"`
+	// ID мета-мероприятия.
+	MetaEventID NilInt32 `json:"meta_event_id"`
+	// ID автора мероприятия.
+	CreatedByID NilInt32 `json:"created_by_id"`
+	// Опциональный ID [геоданных].
+	//
+	// [геоданных]: #tag/geodata/operation/ReadGeoData
+	GeoDataID NilInt32 `json:"geo_data_id"`
+	// ID [площадки] на которой проводится мероприятие.
+	//
+	// [площадки]: /venue-api/docs/
+	VenueID NilInt32 `json:"venue_id"`
 }
 
 // GetID returns the value of ID.
-func (s *EventMeta) GetID() EventID {
+func (s *EventMeta) GetID() int32 {
 	return s.ID
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *EventMeta) GetCreatedAt() EventCreatedAt {
+func (s *EventMeta) GetCreatedAt() time.Time {
 	return s.CreatedAt
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
-func (s *EventMeta) GetUpdatedAt() EventUpdatedAt {
+func (s *EventMeta) GetUpdatedAt() time.Time {
 	return s.UpdatedAt
 }
 
 // GetDraft returns the value of Draft.
-func (s *EventMeta) GetDraft() EventDraft {
+func (s *EventMeta) GetDraft() bool {
 	return s.Draft
 }
 
 // GetPublic returns the value of Public.
-func (s *EventMeta) GetPublic() EventPublic {
+func (s *EventMeta) GetPublic() bool {
 	return s.Public
 }
 
 // GetHidden returns the value of Hidden.
-func (s *EventMeta) GetHidden() EventHidden {
+func (s *EventMeta) GetHidden() bool {
 	return s.Hidden
 }
 
 // GetCanceled returns the value of Canceled.
-func (s *EventMeta) GetCanceled() EventCanceled {
+func (s *EventMeta) GetCanceled() bool {
 	return s.Canceled
 }
 
 // GetTitle returns the value of Title.
-func (s *EventMeta) GetTitle() EventTitle {
+func (s *EventMeta) GetTitle() string {
 	return s.Title
 }
 
 // GetStart returns the value of Start.
-func (s *EventMeta) GetStart() NilEventStart {
+func (s *EventMeta) GetStart() NilDateTime {
 	return s.Start
 }
 
 // GetEnd returns the value of End.
-func (s *EventMeta) GetEnd() NilEventEnd {
+func (s *EventMeta) GetEnd() NilDateTime {
 	return s.End
 }
 
@@ -2989,72 +3403,77 @@ func (s *EventMeta) GetFormat() EventFormat {
 }
 
 // GetOrganizationID returns the value of OrganizationID.
-func (s *EventMeta) GetOrganizationID() NilEventOrganizationID {
+func (s *EventMeta) GetOrganizationID() NilInt32 {
 	return s.OrganizationID
 }
 
 // GetMetaEventID returns the value of MetaEventID.
-func (s *EventMeta) GetMetaEventID() NilEventMetaEventID {
+func (s *EventMeta) GetMetaEventID() NilInt32 {
 	return s.MetaEventID
 }
 
 // GetCreatedByID returns the value of CreatedByID.
-func (s *EventMeta) GetCreatedByID() NilEventCreatedByID {
+func (s *EventMeta) GetCreatedByID() NilInt32 {
 	return s.CreatedByID
 }
 
+// GetGeoDataID returns the value of GeoDataID.
+func (s *EventMeta) GetGeoDataID() NilInt32 {
+	return s.GeoDataID
+}
+
 // GetVenueID returns the value of VenueID.
-func (s *EventMeta) GetVenueID() NilEventVenueID {
+func (s *EventMeta) GetVenueID() NilInt32 {
 	return s.VenueID
 }
 
 // SetID sets the value of ID.
-func (s *EventMeta) SetID(val EventID) {
+func (s *EventMeta) SetID(val int32) {
 	s.ID = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
-func (s *EventMeta) SetCreatedAt(val EventCreatedAt) {
+func (s *EventMeta) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.
-func (s *EventMeta) SetUpdatedAt(val EventUpdatedAt) {
+func (s *EventMeta) SetUpdatedAt(val time.Time) {
 	s.UpdatedAt = val
 }
 
 // SetDraft sets the value of Draft.
-func (s *EventMeta) SetDraft(val EventDraft) {
+func (s *EventMeta) SetDraft(val bool) {
 	s.Draft = val
 }
 
 // SetPublic sets the value of Public.
-func (s *EventMeta) SetPublic(val EventPublic) {
+func (s *EventMeta) SetPublic(val bool) {
 	s.Public = val
 }
 
 // SetHidden sets the value of Hidden.
-func (s *EventMeta) SetHidden(val EventHidden) {
+func (s *EventMeta) SetHidden(val bool) {
 	s.Hidden = val
 }
 
 // SetCanceled sets the value of Canceled.
-func (s *EventMeta) SetCanceled(val EventCanceled) {
+func (s *EventMeta) SetCanceled(val bool) {
 	s.Canceled = val
 }
 
 // SetTitle sets the value of Title.
-func (s *EventMeta) SetTitle(val EventTitle) {
+func (s *EventMeta) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetStart sets the value of Start.
-func (s *EventMeta) SetStart(val NilEventStart) {
+func (s *EventMeta) SetStart(val NilDateTime) {
 	s.Start = val
 }
 
 // SetEnd sets the value of End.
-func (s *EventMeta) SetEnd(val NilEventEnd) {
+func (s *EventMeta) SetEnd(val NilDateTime) {
 	s.End = val
 }
 
@@ -3064,44 +3483,332 @@ func (s *EventMeta) SetFormat(val EventFormat) {
 }
 
 // SetOrganizationID sets the value of OrganizationID.
-func (s *EventMeta) SetOrganizationID(val NilEventOrganizationID) {
+func (s *EventMeta) SetOrganizationID(val NilInt32) {
 	s.OrganizationID = val
 }
 
 // SetMetaEventID sets the value of MetaEventID.
-func (s *EventMeta) SetMetaEventID(val NilEventMetaEventID) {
+func (s *EventMeta) SetMetaEventID(val NilInt32) {
 	s.MetaEventID = val
 }
 
 // SetCreatedByID sets the value of CreatedByID.
-func (s *EventMeta) SetCreatedByID(val NilEventCreatedByID) {
+func (s *EventMeta) SetCreatedByID(val NilInt32) {
 	s.CreatedByID = val
 }
 
+// SetGeoDataID sets the value of GeoDataID.
+func (s *EventMeta) SetGeoDataID(val NilInt32) {
+	s.GeoDataID = val
+}
+
 // SetVenueID sets the value of VenueID.
-func (s *EventMeta) SetVenueID(val NilEventVenueID) {
+func (s *EventMeta) SetVenueID(val NilInt32) {
 	s.VenueID = val
 }
 
-type EventMetaEventID int32
+// Merged schema.
+type EventRequest struct {
+	ID                int32                    `json:"id"`
+	CreatedAt         time.Time                `json:"created_at"`
+	UpdatedAt         time.Time                `json:"updated_at"`
+	EventID           int32                    `json:"event_id"`
+	TeamID            NilInt32                 `json:"team_id"`
+	UserID            NilInt32                 `json:"user_id"`
+	UnconfirmedUserID NilInt32                 `json:"unconfirmed_user_id"`
+	Status            int32                    `json:"status"`
+	Removed           bool                     `json:"removed"`
+	RejectedAt        NilDateTime              `json:"rejected_at"`
+	RejectionReason   string                   `json:"rejection_reason"`
+	Comment           string                   `json:"comment"`
+	CommentUpdatedAt  NilDateTime              `json:"comment_updated_at"`
+	GithubUID         string                   `json:"github_uid"`
+	KaggleUsername    string                   `json:"kaggle_username"`
+	LeaderUID         string                   `json:"leader_uid"`
+	StepikUID         string                   `json:"stepik_uid"`
+	TelegramID        NilInt64                 `json:"telegram_id"`
+	VkUID             string                   `json:"vk_uid"`
+	YandexUID         string                   `json:"yandex_uid"`
+	Fields            []EventRequestFieldsItem `json:"fields"`
+}
 
-type EventNotificationEmailMessage string
+// GetID returns the value of ID.
+func (s *EventRequest) GetID() int32 {
+	return s.ID
+}
 
-type EventOrganizationID int32
+// GetCreatedAt returns the value of CreatedAt.
+func (s *EventRequest) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
 
-type EventPublic bool
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *EventRequest) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
 
-type EventQuestionnaireCompletedMessage string
+// GetEventID returns the value of EventID.
+func (s *EventRequest) GetEventID() int32 {
+	return s.EventID
+}
 
-type EventRequestsAllowed bool
+// GetTeamID returns the value of TeamID.
+func (s *EventRequest) GetTeamID() NilInt32 {
+	return s.TeamID
+}
 
-type EventRequestsCount int32
+// GetUserID returns the value of UserID.
+func (s *EventRequest) GetUserID() NilInt32 {
+	return s.UserID
+}
+
+// GetUnconfirmedUserID returns the value of UnconfirmedUserID.
+func (s *EventRequest) GetUnconfirmedUserID() NilInt32 {
+	return s.UnconfirmedUserID
+}
+
+// GetStatus returns the value of Status.
+func (s *EventRequest) GetStatus() int32 {
+	return s.Status
+}
+
+// GetRemoved returns the value of Removed.
+func (s *EventRequest) GetRemoved() bool {
+	return s.Removed
+}
+
+// GetRejectedAt returns the value of RejectedAt.
+func (s *EventRequest) GetRejectedAt() NilDateTime {
+	return s.RejectedAt
+}
+
+// GetRejectionReason returns the value of RejectionReason.
+func (s *EventRequest) GetRejectionReason() string {
+	return s.RejectionReason
+}
+
+// GetComment returns the value of Comment.
+func (s *EventRequest) GetComment() string {
+	return s.Comment
+}
+
+// GetCommentUpdatedAt returns the value of CommentUpdatedAt.
+func (s *EventRequest) GetCommentUpdatedAt() NilDateTime {
+	return s.CommentUpdatedAt
+}
+
+// GetGithubUID returns the value of GithubUID.
+func (s *EventRequest) GetGithubUID() string {
+	return s.GithubUID
+}
+
+// GetKaggleUsername returns the value of KaggleUsername.
+func (s *EventRequest) GetKaggleUsername() string {
+	return s.KaggleUsername
+}
+
+// GetLeaderUID returns the value of LeaderUID.
+func (s *EventRequest) GetLeaderUID() string {
+	return s.LeaderUID
+}
+
+// GetStepikUID returns the value of StepikUID.
+func (s *EventRequest) GetStepikUID() string {
+	return s.StepikUID
+}
+
+// GetTelegramID returns the value of TelegramID.
+func (s *EventRequest) GetTelegramID() NilInt64 {
+	return s.TelegramID
+}
+
+// GetVkUID returns the value of VkUID.
+func (s *EventRequest) GetVkUID() string {
+	return s.VkUID
+}
+
+// GetYandexUID returns the value of YandexUID.
+func (s *EventRequest) GetYandexUID() string {
+	return s.YandexUID
+}
+
+// GetFields returns the value of Fields.
+func (s *EventRequest) GetFields() []EventRequestFieldsItem {
+	return s.Fields
+}
+
+// SetID sets the value of ID.
+func (s *EventRequest) SetID(val int32) {
+	s.ID = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *EventRequest) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *EventRequest) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetEventID sets the value of EventID.
+func (s *EventRequest) SetEventID(val int32) {
+	s.EventID = val
+}
+
+// SetTeamID sets the value of TeamID.
+func (s *EventRequest) SetTeamID(val NilInt32) {
+	s.TeamID = val
+}
+
+// SetUserID sets the value of UserID.
+func (s *EventRequest) SetUserID(val NilInt32) {
+	s.UserID = val
+}
+
+// SetUnconfirmedUserID sets the value of UnconfirmedUserID.
+func (s *EventRequest) SetUnconfirmedUserID(val NilInt32) {
+	s.UnconfirmedUserID = val
+}
+
+// SetStatus sets the value of Status.
+func (s *EventRequest) SetStatus(val int32) {
+	s.Status = val
+}
+
+// SetRemoved sets the value of Removed.
+func (s *EventRequest) SetRemoved(val bool) {
+	s.Removed = val
+}
+
+// SetRejectedAt sets the value of RejectedAt.
+func (s *EventRequest) SetRejectedAt(val NilDateTime) {
+	s.RejectedAt = val
+}
+
+// SetRejectionReason sets the value of RejectionReason.
+func (s *EventRequest) SetRejectionReason(val string) {
+	s.RejectionReason = val
+}
+
+// SetComment sets the value of Comment.
+func (s *EventRequest) SetComment(val string) {
+	s.Comment = val
+}
+
+// SetCommentUpdatedAt sets the value of CommentUpdatedAt.
+func (s *EventRequest) SetCommentUpdatedAt(val NilDateTime) {
+	s.CommentUpdatedAt = val
+}
+
+// SetGithubUID sets the value of GithubUID.
+func (s *EventRequest) SetGithubUID(val string) {
+	s.GithubUID = val
+}
+
+// SetKaggleUsername sets the value of KaggleUsername.
+func (s *EventRequest) SetKaggleUsername(val string) {
+	s.KaggleUsername = val
+}
+
+// SetLeaderUID sets the value of LeaderUID.
+func (s *EventRequest) SetLeaderUID(val string) {
+	s.LeaderUID = val
+}
+
+// SetStepikUID sets the value of StepikUID.
+func (s *EventRequest) SetStepikUID(val string) {
+	s.StepikUID = val
+}
+
+// SetTelegramID sets the value of TelegramID.
+func (s *EventRequest) SetTelegramID(val NilInt64) {
+	s.TelegramID = val
+}
+
+// SetVkUID sets the value of VkUID.
+func (s *EventRequest) SetVkUID(val string) {
+	s.VkUID = val
+}
+
+// SetYandexUID sets the value of YandexUID.
+func (s *EventRequest) SetYandexUID(val string) {
+	s.YandexUID = val
+}
+
+// SetFields sets the value of Fields.
+func (s *EventRequest) SetFields(val []EventRequestFieldsItem) {
+	s.Fields = val
+}
+
+func (*EventRequest) readEventRequestRes()   {}
+func (*EventRequest) updateEventRequestRes() {}
+
+type EventRequestFieldsItem struct {
+	FieldID     int32       `json:"field_id"`
+	ValueNumber OptInt32    `json:"value_number"`
+	ValueString string      `json:"value_string"`
+	ValueFile   OptUUID     `json:"value_file"`
+	ValueFiles  []uuid.UUID `json:"value_files"`
+}
+
+// GetFieldID returns the value of FieldID.
+func (s *EventRequestFieldsItem) GetFieldID() int32 {
+	return s.FieldID
+}
+
+// GetValueNumber returns the value of ValueNumber.
+func (s *EventRequestFieldsItem) GetValueNumber() OptInt32 {
+	return s.ValueNumber
+}
+
+// GetValueString returns the value of ValueString.
+func (s *EventRequestFieldsItem) GetValueString() string {
+	return s.ValueString
+}
+
+// GetValueFile returns the value of ValueFile.
+func (s *EventRequestFieldsItem) GetValueFile() OptUUID {
+	return s.ValueFile
+}
+
+// GetValueFiles returns the value of ValueFiles.
+func (s *EventRequestFieldsItem) GetValueFiles() []uuid.UUID {
+	return s.ValueFiles
+}
+
+// SetFieldID sets the value of FieldID.
+func (s *EventRequestFieldsItem) SetFieldID(val int32) {
+	s.FieldID = val
+}
+
+// SetValueNumber sets the value of ValueNumber.
+func (s *EventRequestFieldsItem) SetValueNumber(val OptInt32) {
+	s.ValueNumber = val
+}
+
+// SetValueString sets the value of ValueString.
+func (s *EventRequestFieldsItem) SetValueString(val string) {
+	s.ValueString = val
+}
+
+// SetValueFile sets the value of ValueFile.
+func (s *EventRequestFieldsItem) SetValueFile(val OptUUID) {
+	s.ValueFile = val
+}
+
+// SetValueFiles sets the value of ValueFiles.
+func (s *EventRequestFieldsItem) SetValueFiles(val []uuid.UUID) {
+	s.ValueFiles = val
+}
 
 // Ref: #/components/schemas/EventRoute
 type EventRoute struct {
-	ID      int32   `json:"id"`
-	EventID EventID `json:"event_id"`
-	RouteID int32   `json:"route_id"`
+	ID int32 `json:"id"`
+	// ID мероприятия.
+	EventID int32 `json:"event_id"`
+	RouteID int32 `json:"route_id"`
 }
 
 // GetID returns the value of ID.
@@ -3110,7 +3817,7 @@ func (s *EventRoute) GetID() int32 {
 }
 
 // GetEventID returns the value of EventID.
-func (s *EventRoute) GetEventID() EventID {
+func (s *EventRoute) GetEventID() int32 {
 	return s.EventID
 }
 
@@ -3125,7 +3832,7 @@ func (s *EventRoute) SetID(val int32) {
 }
 
 // SetEventID sets the value of EventID.
-func (s *EventRoute) SetEventID(val EventID) {
+func (s *EventRoute) SetEventID(val int32) {
 	s.EventID = val
 }
 
@@ -3133,8 +3840,6 @@ func (s *EventRoute) SetEventID(val EventID) {
 func (s *EventRoute) SetRouteID(val int32) {
 	s.RouteID = val
 }
-
-type EventSelfCheckIn bool
 
 // Ref: #/components/schemas/EventSignup
 type EventSignup struct {
@@ -3393,11 +4098,73 @@ func (s *EventSignup) SetFields(val OptEventSignupFields) {
 	s.Fields = val
 }
 
-// EventSignupCreated is response for EventSignup operation.
-type EventSignupCreated struct{}
+// Ref: #/components/schemas/EventSignupConfirmed
+type EventSignupConfirmed struct {
+	User EventSignupConfirmedUser `json:"user"`
+}
 
-func (*EventSignupCreated) eventSignupRes() {}
+// GetUser returns the value of User.
+func (s *EventSignupConfirmed) GetUser() EventSignupConfirmedUser {
+	return s.User
+}
 
+// SetUser sets the value of User.
+func (s *EventSignupConfirmed) SetUser(val EventSignupConfirmedUser) {
+	s.User = val
+}
+
+type EventSignupConfirmedUser struct {
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	LastName  string `json:"last_name"`
+	FirstName string `json:"first_name"`
+}
+
+// GetEmail returns the value of Email.
+func (s *EventSignupConfirmedUser) GetEmail() string {
+	return s.Email
+}
+
+// GetPhone returns the value of Phone.
+func (s *EventSignupConfirmedUser) GetPhone() string {
+	return s.Phone
+}
+
+// GetLastName returns the value of LastName.
+func (s *EventSignupConfirmedUser) GetLastName() string {
+	return s.LastName
+}
+
+// GetFirstName returns the value of FirstName.
+func (s *EventSignupConfirmedUser) GetFirstName() string {
+	return s.FirstName
+}
+
+// SetEmail sets the value of Email.
+func (s *EventSignupConfirmedUser) SetEmail(val string) {
+	s.Email = val
+}
+
+// SetPhone sets the value of Phone.
+func (s *EventSignupConfirmedUser) SetPhone(val string) {
+	s.Phone = val
+}
+
+// SetLastName sets the value of LastName.
+func (s *EventSignupConfirmedUser) SetLastName(val string) {
+	s.LastName = val
+}
+
+// SetFirstName sets the value of FirstName.
+func (s *EventSignupConfirmedUser) SetFirstName(val string) {
+	s.FirstName = val
+}
+
+type EventSignupCreatedApplicationJSON int32
+
+func (*EventSignupCreatedApplicationJSON) eventSignupRes() {}
+
+// Ref: #/components/schemas/EventSignupFields
 type EventSignupFields map[string]EventSignupFieldsItem
 
 func (s *EventSignupFields) init() EventSignupFields {
@@ -3411,7 +4178,9 @@ func (s *EventSignupFields) init() EventSignupFields {
 
 // EventSignupFieldsItem represents sum type.
 type EventSignupFieldsItem struct {
-	Type   EventSignupFieldsItemType // switch on this field
+	// Type selects the active sum variant, switch on this field.
+	Type   EventSignupFieldsItemType
+	Null   struct{}
 	String string
 	Int    int
 }
@@ -3421,15 +4190,40 @@ type EventSignupFieldsItemType string
 
 // Possible values for EventSignupFieldsItemType.
 const (
+	NullEventSignupFieldsItem   EventSignupFieldsItemType = "struct{}"
 	StringEventSignupFieldsItem EventSignupFieldsItemType = "string"
 	IntEventSignupFieldsItem    EventSignupFieldsItemType = "int"
 )
+
+// IsNull reports whether EventSignupFieldsItem is struct{}.
+func (s EventSignupFieldsItem) IsNull() bool { return s.Type == NullEventSignupFieldsItem }
 
 // IsString reports whether EventSignupFieldsItem is string.
 func (s EventSignupFieldsItem) IsString() bool { return s.Type == StringEventSignupFieldsItem }
 
 // IsInt reports whether EventSignupFieldsItem is int.
 func (s EventSignupFieldsItem) IsInt() bool { return s.Type == IntEventSignupFieldsItem }
+
+// SetNull sets EventSignupFieldsItem to struct{}.
+func (s *EventSignupFieldsItem) SetNull(v struct{}) {
+	s.Type = NullEventSignupFieldsItem
+	s.Null = v
+}
+
+// GetNull returns struct{} and true boolean if EventSignupFieldsItem is struct{}.
+func (s EventSignupFieldsItem) GetNull() (v struct{}, ok bool) {
+	if !s.IsNull() {
+		return v, false
+	}
+	return s.Null, true
+}
+
+// NewNullEventSignupFieldsItem returns new EventSignupFieldsItem from struct{}.
+func NewNullEventSignupFieldsItem(v struct{}) EventSignupFieldsItem {
+	var s EventSignupFieldsItem
+	s.SetNull(v)
+	return s
+}
 
 // SetString sets EventSignupFieldsItem to string.
 func (s *EventSignupFieldsItem) SetString(v string) {
@@ -3473,7 +4267,113 @@ func NewIntEventSignupFieldsItem(v int) EventSignupFieldsItem {
 	return s
 }
 
-type EventStart time.Time
+// EventSignupNoContent is response for EventSignup operation.
+type EventSignupNoContent struct{}
+
+func (*EventSignupNoContent) eventSignupRes() {}
+
+// Ref: #/components/schemas/EventSignupUpdate
+type EventSignupUpdate struct {
+	TeamID         OptNilInt32          `json:"team_id"`
+	StepikUID      OptString            `json:"stepik_uid"`
+	GithubUID      OptString            `json:"github_uid"`
+	YandexUID      OptString            `json:"yandex_uid"`
+	LeaderUID      OptString            `json:"leader_uid"`
+	VkUID          OptString            `json:"vk_uid"`
+	TelegramID     OptNilInt64          `json:"telegram_id"`
+	KaggleUsername OptString            `json:"kaggle_username"`
+	Fields         OptEventSignupFields `json:"fields"`
+}
+
+// GetTeamID returns the value of TeamID.
+func (s *EventSignupUpdate) GetTeamID() OptNilInt32 {
+	return s.TeamID
+}
+
+// GetStepikUID returns the value of StepikUID.
+func (s *EventSignupUpdate) GetStepikUID() OptString {
+	return s.StepikUID
+}
+
+// GetGithubUID returns the value of GithubUID.
+func (s *EventSignupUpdate) GetGithubUID() OptString {
+	return s.GithubUID
+}
+
+// GetYandexUID returns the value of YandexUID.
+func (s *EventSignupUpdate) GetYandexUID() OptString {
+	return s.YandexUID
+}
+
+// GetLeaderUID returns the value of LeaderUID.
+func (s *EventSignupUpdate) GetLeaderUID() OptString {
+	return s.LeaderUID
+}
+
+// GetVkUID returns the value of VkUID.
+func (s *EventSignupUpdate) GetVkUID() OptString {
+	return s.VkUID
+}
+
+// GetTelegramID returns the value of TelegramID.
+func (s *EventSignupUpdate) GetTelegramID() OptNilInt64 {
+	return s.TelegramID
+}
+
+// GetKaggleUsername returns the value of KaggleUsername.
+func (s *EventSignupUpdate) GetKaggleUsername() OptString {
+	return s.KaggleUsername
+}
+
+// GetFields returns the value of Fields.
+func (s *EventSignupUpdate) GetFields() OptEventSignupFields {
+	return s.Fields
+}
+
+// SetTeamID sets the value of TeamID.
+func (s *EventSignupUpdate) SetTeamID(val OptNilInt32) {
+	s.TeamID = val
+}
+
+// SetStepikUID sets the value of StepikUID.
+func (s *EventSignupUpdate) SetStepikUID(val OptString) {
+	s.StepikUID = val
+}
+
+// SetGithubUID sets the value of GithubUID.
+func (s *EventSignupUpdate) SetGithubUID(val OptString) {
+	s.GithubUID = val
+}
+
+// SetYandexUID sets the value of YandexUID.
+func (s *EventSignupUpdate) SetYandexUID(val OptString) {
+	s.YandexUID = val
+}
+
+// SetLeaderUID sets the value of LeaderUID.
+func (s *EventSignupUpdate) SetLeaderUID(val OptString) {
+	s.LeaderUID = val
+}
+
+// SetVkUID sets the value of VkUID.
+func (s *EventSignupUpdate) SetVkUID(val OptString) {
+	s.VkUID = val
+}
+
+// SetTelegramID sets the value of TelegramID.
+func (s *EventSignupUpdate) SetTelegramID(val OptNilInt64) {
+	s.TelegramID = val
+}
+
+// SetKaggleUsername sets the value of KaggleUsername.
+func (s *EventSignupUpdate) SetKaggleUsername(val OptString) {
+	s.KaggleUsername = val
+}
+
+// SetFields sets the value of Fields.
+func (s *EventSignupUpdate) SetFields(val OptEventSignupFields) {
+	s.Fields = val
+}
 
 // Ref: #/components/schemas/EventTeamAssignmentMethod
 type EventTeamAssignmentMethod string
@@ -3550,20 +4450,6 @@ func (EventTeamsInvolved) AllValues() []EventTeamsInvolved {
 	}
 }
 
-type EventTimeMatters bool
-
-type EventTitle string
-
-type EventTitleInput string
-
-type EventTypeID int32
-
-type EventURL string
-
-type EventUpdatedAt time.Time
-
-type EventVenueID int32
-
 // ExistsEventDeferredNotificationNoContent is response for ExistsEventDeferredNotification operation.
 type ExistsEventDeferredNotificationNoContent struct{}
 
@@ -3587,10 +4473,9 @@ type FileMeta struct {
 	// Статус публичности файла.
 	IsPublic bool `json:"is_public"`
 	// Пространство имен для объекта, где используется файл,
-	// в формате
-	// <сервис>/<таблица БД>/<поле со ссылкой на файл>
-	// (например, polls/questions/picture, venues/venue/cover, etc.)
-	// Задается при создании.
+	// в формате <сервис>/<таблица БД>/<поле со ссылкой на файл>
+	// (например, polls/questions/picture, venues/venue/cover, etc.) Задается при
+	// создании.
 	Namespace string `json:"namespace"`
 	// Дата добавления информации о файле.
 	CreatedAt time.Time `json:"created_at"`
@@ -3800,6 +4685,155 @@ func (s *FileReference) SetCreatedAt(val time.Time) {
 
 func (*FileReference) createFileReferenceRes() {}
 
+// Ref: #/components/schemas/GeoData
+type GeoData struct {
+	Country              string  `json:"country"`
+	FederalDistrict      string  `json:"federal_district"`
+	RegionFias           NilUUID `json:"region_fias"`
+	RegionWithType       string  `json:"region_with_type"`
+	City                 string  `json:"city"`
+	CityFias             NilUUID `json:"city_fias"`
+	CityTypeFull         string  `json:"city_type_full"`
+	Settlement           string  `json:"settlement"`
+	SettlementTypeFull   string  `json:"settlement_type_full"`
+	CityDistrictWithType string  `json:"city_district_with_type"`
+	Address              string  `json:"address"`
+	GeoLat               string  `json:"geo_lat"`
+	GeoLon               string  `json:"geo_lon"`
+}
+
+// GetCountry returns the value of Country.
+func (s *GeoData) GetCountry() string {
+	return s.Country
+}
+
+// GetFederalDistrict returns the value of FederalDistrict.
+func (s *GeoData) GetFederalDistrict() string {
+	return s.FederalDistrict
+}
+
+// GetRegionFias returns the value of RegionFias.
+func (s *GeoData) GetRegionFias() NilUUID {
+	return s.RegionFias
+}
+
+// GetRegionWithType returns the value of RegionWithType.
+func (s *GeoData) GetRegionWithType() string {
+	return s.RegionWithType
+}
+
+// GetCity returns the value of City.
+func (s *GeoData) GetCity() string {
+	return s.City
+}
+
+// GetCityFias returns the value of CityFias.
+func (s *GeoData) GetCityFias() NilUUID {
+	return s.CityFias
+}
+
+// GetCityTypeFull returns the value of CityTypeFull.
+func (s *GeoData) GetCityTypeFull() string {
+	return s.CityTypeFull
+}
+
+// GetSettlement returns the value of Settlement.
+func (s *GeoData) GetSettlement() string {
+	return s.Settlement
+}
+
+// GetSettlementTypeFull returns the value of SettlementTypeFull.
+func (s *GeoData) GetSettlementTypeFull() string {
+	return s.SettlementTypeFull
+}
+
+// GetCityDistrictWithType returns the value of CityDistrictWithType.
+func (s *GeoData) GetCityDistrictWithType() string {
+	return s.CityDistrictWithType
+}
+
+// GetAddress returns the value of Address.
+func (s *GeoData) GetAddress() string {
+	return s.Address
+}
+
+// GetGeoLat returns the value of GeoLat.
+func (s *GeoData) GetGeoLat() string {
+	return s.GeoLat
+}
+
+// GetGeoLon returns the value of GeoLon.
+func (s *GeoData) GetGeoLon() string {
+	return s.GeoLon
+}
+
+// SetCountry sets the value of Country.
+func (s *GeoData) SetCountry(val string) {
+	s.Country = val
+}
+
+// SetFederalDistrict sets the value of FederalDistrict.
+func (s *GeoData) SetFederalDistrict(val string) {
+	s.FederalDistrict = val
+}
+
+// SetRegionFias sets the value of RegionFias.
+func (s *GeoData) SetRegionFias(val NilUUID) {
+	s.RegionFias = val
+}
+
+// SetRegionWithType sets the value of RegionWithType.
+func (s *GeoData) SetRegionWithType(val string) {
+	s.RegionWithType = val
+}
+
+// SetCity sets the value of City.
+func (s *GeoData) SetCity(val string) {
+	s.City = val
+}
+
+// SetCityFias sets the value of CityFias.
+func (s *GeoData) SetCityFias(val NilUUID) {
+	s.CityFias = val
+}
+
+// SetCityTypeFull sets the value of CityTypeFull.
+func (s *GeoData) SetCityTypeFull(val string) {
+	s.CityTypeFull = val
+}
+
+// SetSettlement sets the value of Settlement.
+func (s *GeoData) SetSettlement(val string) {
+	s.Settlement = val
+}
+
+// SetSettlementTypeFull sets the value of SettlementTypeFull.
+func (s *GeoData) SetSettlementTypeFull(val string) {
+	s.SettlementTypeFull = val
+}
+
+// SetCityDistrictWithType sets the value of CityDistrictWithType.
+func (s *GeoData) SetCityDistrictWithType(val string) {
+	s.CityDistrictWithType = val
+}
+
+// SetAddress sets the value of Address.
+func (s *GeoData) SetAddress(val string) {
+	s.Address = val
+}
+
+// SetGeoLat sets the value of GeoLat.
+func (s *GeoData) SetGeoLat(val string) {
+	s.GeoLat = val
+}
+
+// SetGeoLon sets the value of GeoLon.
+func (s *GeoData) SetGeoLon(val string) {
+	s.GeoLon = val
+}
+
+func (*GeoData) readGeoDataRes() {}
+
 type GeodataAddress string
 
 type GeodataCity string
@@ -3818,6 +4852,9 @@ func (*IsOrganizationAdminNotFound) isOrganizationAdminRes() {}
 type IsOrganizationAdminOK struct{}
 
 func (*IsOrganizationAdminOK) isOrganizationAdminRes() {}
+
+// IsTeamOwnerOK is response for IsTeamOwner operation.
+type IsTeamOwnerOK struct{}
 
 type IssueTokenError struct {
 	Error            string    `json:"error"`
@@ -4102,29 +5139,29 @@ func (s *ListEventDiplomaSettingsOKHeaders) SetResponse(val []EventDiplomaSettin
 	s.Response = val
 }
 
-// ListEventRoutesHeaders wraps []EventRoute with response headers.
-type ListEventRoutesHeaders struct {
+// ListEventRoutesOKHeaders wraps []EventRoute with response headers.
+type ListEventRoutesOKHeaders struct {
 	XCount   int64
 	Response []EventRoute
 }
 
 // GetXCount returns the value of XCount.
-func (s *ListEventRoutesHeaders) GetXCount() int64 {
+func (s *ListEventRoutesOKHeaders) GetXCount() int64 {
 	return s.XCount
 }
 
 // GetResponse returns the value of Response.
-func (s *ListEventRoutesHeaders) GetResponse() []EventRoute {
+func (s *ListEventRoutesOKHeaders) GetResponse() []EventRoute {
 	return s.Response
 }
 
 // SetXCount sets the value of XCount.
-func (s *ListEventRoutesHeaders) SetXCount(val int64) {
+func (s *ListEventRoutesOKHeaders) SetXCount(val int64) {
 	s.XCount = val
 }
 
 // SetResponse sets the value of Response.
-func (s *ListEventRoutesHeaders) SetResponse(val []EventRoute) {
+func (s *ListEventRoutesOKHeaders) SetResponse(val []EventRoute) {
 	s.Response = val
 }
 
@@ -4158,71 +5195,93 @@ func (*ListEventsHeaders) listEventsRes() {}
 
 // Merged schema.
 type ListEventsItem struct {
-	ID             EventID                `json:"id"`
-	CreatedAt      EventCreatedAt         `json:"created_at"`
-	UpdatedAt      EventUpdatedAt         `json:"updated_at"`
-	Draft          EventDraft             `json:"draft"`
-	Public         EventPublic            `json:"public"`
-	Hidden         EventHidden            `json:"hidden"`
-	Canceled       EventCanceled          `json:"canceled"`
-	Title          EventTitle             `json:"title"`
-	Start          NilEventStart          `json:"start"`
-	End            NilEventEnd            `json:"end"`
-	Format         EventFormat            `json:"format"`
-	OrganizationID NilEventOrganizationID `json:"organization_id"`
-	MetaEventID    NilEventMetaEventID    `json:"meta_event_id"`
-	CreatedByID    NilEventCreatedByID    `json:"created_by_id"`
-	VenueID        NilEventVenueID        `json:"venue_id"`
-	Cover          EventCover             `json:"cover"`
+	// ID мероприятия.
+	ID int32 `json:"id"`
+	// Дата создания.
+	CreatedAt time.Time `json:"created_at"`
+	// Дата обновления.
+	UpdatedAt time.Time `json:"updated_at"`
+	// Мероприятие находится в статусе черновика. На такое
+	// мероприятие нельзя зарегистрироваться.
+	Draft bool `json:"draft"`
+	// Статус публичности мероприятия.
+	Public bool `json:"public"`
+	// Исключение мероприятия из календаря.
+	Hidden bool `json:"hidden"`
+	// Статус отмены мероприятия.
+	Canceled bool `json:"canceled"`
+	// Название мероприятия.
+	Title string `json:"title"`
+	// Дата начала мероприятия.
+	Start NilDateTime `json:"start"`
+	// Дата окончания мероприятия.
+	End    NilDateTime `json:"end"`
+	Format EventFormat `json:"format"`
+	// ID организации мероприятия.
+	OrganizationID NilInt32 `json:"organization_id"`
+	// ID мета-мероприятия.
+	MetaEventID NilInt32 `json:"meta_event_id"`
+	// ID автора мероприятия.
+	CreatedByID NilInt32 `json:"created_by_id"`
+	// Опциональный ID [геоданных].
+	//
+	// [геоданных]: #tag/geodata/operation/ReadGeoData
+	GeoDataID NilInt32 `json:"geo_data_id"`
+	// ID [площадки] на которой проводится мероприятие.
+	//
+	// [площадки]: /venue-api/docs/
+	VenueID NilInt32 `json:"venue_id"`
+	// Ссылка на обложку мероприятия.
+	Cover string `json:"cover"`
 }
 
 // GetID returns the value of ID.
-func (s *ListEventsItem) GetID() EventID {
+func (s *ListEventsItem) GetID() int32 {
 	return s.ID
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *ListEventsItem) GetCreatedAt() EventCreatedAt {
+func (s *ListEventsItem) GetCreatedAt() time.Time {
 	return s.CreatedAt
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
-func (s *ListEventsItem) GetUpdatedAt() EventUpdatedAt {
+func (s *ListEventsItem) GetUpdatedAt() time.Time {
 	return s.UpdatedAt
 }
 
 // GetDraft returns the value of Draft.
-func (s *ListEventsItem) GetDraft() EventDraft {
+func (s *ListEventsItem) GetDraft() bool {
 	return s.Draft
 }
 
 // GetPublic returns the value of Public.
-func (s *ListEventsItem) GetPublic() EventPublic {
+func (s *ListEventsItem) GetPublic() bool {
 	return s.Public
 }
 
 // GetHidden returns the value of Hidden.
-func (s *ListEventsItem) GetHidden() EventHidden {
+func (s *ListEventsItem) GetHidden() bool {
 	return s.Hidden
 }
 
 // GetCanceled returns the value of Canceled.
-func (s *ListEventsItem) GetCanceled() EventCanceled {
+func (s *ListEventsItem) GetCanceled() bool {
 	return s.Canceled
 }
 
 // GetTitle returns the value of Title.
-func (s *ListEventsItem) GetTitle() EventTitle {
+func (s *ListEventsItem) GetTitle() string {
 	return s.Title
 }
 
 // GetStart returns the value of Start.
-func (s *ListEventsItem) GetStart() NilEventStart {
+func (s *ListEventsItem) GetStart() NilDateTime {
 	return s.Start
 }
 
 // GetEnd returns the value of End.
-func (s *ListEventsItem) GetEnd() NilEventEnd {
+func (s *ListEventsItem) GetEnd() NilDateTime {
 	return s.End
 }
 
@@ -4232,77 +5291,82 @@ func (s *ListEventsItem) GetFormat() EventFormat {
 }
 
 // GetOrganizationID returns the value of OrganizationID.
-func (s *ListEventsItem) GetOrganizationID() NilEventOrganizationID {
+func (s *ListEventsItem) GetOrganizationID() NilInt32 {
 	return s.OrganizationID
 }
 
 // GetMetaEventID returns the value of MetaEventID.
-func (s *ListEventsItem) GetMetaEventID() NilEventMetaEventID {
+func (s *ListEventsItem) GetMetaEventID() NilInt32 {
 	return s.MetaEventID
 }
 
 // GetCreatedByID returns the value of CreatedByID.
-func (s *ListEventsItem) GetCreatedByID() NilEventCreatedByID {
+func (s *ListEventsItem) GetCreatedByID() NilInt32 {
 	return s.CreatedByID
 }
 
+// GetGeoDataID returns the value of GeoDataID.
+func (s *ListEventsItem) GetGeoDataID() NilInt32 {
+	return s.GeoDataID
+}
+
 // GetVenueID returns the value of VenueID.
-func (s *ListEventsItem) GetVenueID() NilEventVenueID {
+func (s *ListEventsItem) GetVenueID() NilInt32 {
 	return s.VenueID
 }
 
 // GetCover returns the value of Cover.
-func (s *ListEventsItem) GetCover() EventCover {
+func (s *ListEventsItem) GetCover() string {
 	return s.Cover
 }
 
 // SetID sets the value of ID.
-func (s *ListEventsItem) SetID(val EventID) {
+func (s *ListEventsItem) SetID(val int32) {
 	s.ID = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
-func (s *ListEventsItem) SetCreatedAt(val EventCreatedAt) {
+func (s *ListEventsItem) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.
-func (s *ListEventsItem) SetUpdatedAt(val EventUpdatedAt) {
+func (s *ListEventsItem) SetUpdatedAt(val time.Time) {
 	s.UpdatedAt = val
 }
 
 // SetDraft sets the value of Draft.
-func (s *ListEventsItem) SetDraft(val EventDraft) {
+func (s *ListEventsItem) SetDraft(val bool) {
 	s.Draft = val
 }
 
 // SetPublic sets the value of Public.
-func (s *ListEventsItem) SetPublic(val EventPublic) {
+func (s *ListEventsItem) SetPublic(val bool) {
 	s.Public = val
 }
 
 // SetHidden sets the value of Hidden.
-func (s *ListEventsItem) SetHidden(val EventHidden) {
+func (s *ListEventsItem) SetHidden(val bool) {
 	s.Hidden = val
 }
 
 // SetCanceled sets the value of Canceled.
-func (s *ListEventsItem) SetCanceled(val EventCanceled) {
+func (s *ListEventsItem) SetCanceled(val bool) {
 	s.Canceled = val
 }
 
 // SetTitle sets the value of Title.
-func (s *ListEventsItem) SetTitle(val EventTitle) {
+func (s *ListEventsItem) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetStart sets the value of Start.
-func (s *ListEventsItem) SetStart(val NilEventStart) {
+func (s *ListEventsItem) SetStart(val NilDateTime) {
 	s.Start = val
 }
 
 // SetEnd sets the value of End.
-func (s *ListEventsItem) SetEnd(val NilEventEnd) {
+func (s *ListEventsItem) SetEnd(val NilDateTime) {
 	s.End = val
 }
 
@@ -4312,27 +5376,32 @@ func (s *ListEventsItem) SetFormat(val EventFormat) {
 }
 
 // SetOrganizationID sets the value of OrganizationID.
-func (s *ListEventsItem) SetOrganizationID(val NilEventOrganizationID) {
+func (s *ListEventsItem) SetOrganizationID(val NilInt32) {
 	s.OrganizationID = val
 }
 
 // SetMetaEventID sets the value of MetaEventID.
-func (s *ListEventsItem) SetMetaEventID(val NilEventMetaEventID) {
+func (s *ListEventsItem) SetMetaEventID(val NilInt32) {
 	s.MetaEventID = val
 }
 
 // SetCreatedByID sets the value of CreatedByID.
-func (s *ListEventsItem) SetCreatedByID(val NilEventCreatedByID) {
+func (s *ListEventsItem) SetCreatedByID(val NilInt32) {
 	s.CreatedByID = val
 }
 
+// SetGeoDataID sets the value of GeoDataID.
+func (s *ListEventsItem) SetGeoDataID(val NilInt32) {
+	s.GeoDataID = val
+}
+
 // SetVenueID sets the value of VenueID.
-func (s *ListEventsItem) SetVenueID(val NilEventVenueID) {
+func (s *ListEventsItem) SetVenueID(val NilInt32) {
 	s.VenueID = val
 }
 
 // SetCover sets the value of Cover.
-func (s *ListEventsItem) SetCover(val EventCover) {
+func (s *ListEventsItem) SetCover(val string) {
 	s.Cover = val
 }
 
@@ -4704,6 +5773,47 @@ func (s *ListSubjectsHeaders) SetResponse(val []Subject) {
 	s.Response = val
 }
 
+type ListTeamsOrderBy string
+
+const (
+	ListTeamsOrderByIDAsc  ListTeamsOrderBy = "id_asc"
+	ListTeamsOrderByIDDesc ListTeamsOrderBy = "id_desc"
+)
+
+// AllValues returns all ListTeamsOrderBy values.
+func (ListTeamsOrderBy) AllValues() []ListTeamsOrderBy {
+	return []ListTeamsOrderBy{
+		ListTeamsOrderByIDAsc,
+		ListTeamsOrderByIDDesc,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ListTeamsOrderBy) MarshalText() ([]byte, error) {
+	switch s {
+	case ListTeamsOrderByIDAsc:
+		return []byte(s), nil
+	case ListTeamsOrderByIDDesc:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ListTeamsOrderBy) UnmarshalText(data []byte) error {
+	switch ListTeamsOrderBy(data) {
+	case ListTeamsOrderByIDAsc:
+		*s = ListTeamsOrderByIDAsc
+		return nil
+	case ListTeamsOrderByIDDesc:
+		*s = ListTeamsOrderByIDDesc
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type ListUserConsentsItem struct {
 	CreatedAt time.Time       `json:"created_at"`
 	Kind      UserConsentKind `json:"kind"`
@@ -4865,636 +5975,6 @@ func (o NilDateTime) Or(d time.Time) time.Time {
 	return d
 }
 
-// NewNilEventCreatedByID returns new NilEventCreatedByID with value set to v.
-func NewNilEventCreatedByID(v EventCreatedByID) NilEventCreatedByID {
-	return NilEventCreatedByID{
-		Value: v,
-	}
-}
-
-// NilEventCreatedByID is nullable EventCreatedByID.
-type NilEventCreatedByID struct {
-	Value EventCreatedByID
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventCreatedByID) SetTo(v EventCreatedByID) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventCreatedByID) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventCreatedByID) SetToNull() {
-	o.Null = true
-	var v EventCreatedByID
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventCreatedByID) Get() (v EventCreatedByID, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventCreatedByID) Or(d EventCreatedByID) EventCreatedByID {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventEnd returns new NilEventEnd with value set to v.
-func NewNilEventEnd(v EventEnd) NilEventEnd {
-	return NilEventEnd{
-		Value: v,
-	}
-}
-
-// NilEventEnd is nullable EventEnd.
-type NilEventEnd struct {
-	Value EventEnd
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventEnd) SetTo(v EventEnd) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventEnd) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventEnd) SetToNull() {
-	o.Null = true
-	var v EventEnd
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventEnd) Get() (v EventEnd, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventEnd) Or(d EventEnd) EventEnd {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventExpectedStart returns new NilEventExpectedStart with value set to v.
-func NewNilEventExpectedStart(v EventExpectedStart) NilEventExpectedStart {
-	return NilEventExpectedStart{
-		Value: v,
-	}
-}
-
-// NilEventExpectedStart is nullable EventExpectedStart.
-type NilEventExpectedStart struct {
-	Value EventExpectedStart
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventExpectedStart) SetTo(v EventExpectedStart) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventExpectedStart) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventExpectedStart) SetToNull() {
-	o.Null = true
-	var v EventExpectedStart
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventExpectedStart) Get() (v EventExpectedStart, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventExpectedStart) Or(d EventExpectedStart) EventExpectedStart {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventLimitDateEndRequest returns new NilEventLimitDateEndRequest with value set to v.
-func NewNilEventLimitDateEndRequest(v EventLimitDateEndRequest) NilEventLimitDateEndRequest {
-	return NilEventLimitDateEndRequest{
-		Value: v,
-	}
-}
-
-// NilEventLimitDateEndRequest is nullable EventLimitDateEndRequest.
-type NilEventLimitDateEndRequest struct {
-	Value EventLimitDateEndRequest
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventLimitDateEndRequest) SetTo(v EventLimitDateEndRequest) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventLimitDateEndRequest) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventLimitDateEndRequest) SetToNull() {
-	o.Null = true
-	var v EventLimitDateEndRequest
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventLimitDateEndRequest) Get() (v EventLimitDateEndRequest, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventLimitDateEndRequest) Or(d EventLimitDateEndRequest) EventLimitDateEndRequest {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventLimitDateEndUpdate returns new NilEventLimitDateEndUpdate with value set to v.
-func NewNilEventLimitDateEndUpdate(v EventLimitDateEndUpdate) NilEventLimitDateEndUpdate {
-	return NilEventLimitDateEndUpdate{
-		Value: v,
-	}
-}
-
-// NilEventLimitDateEndUpdate is nullable EventLimitDateEndUpdate.
-type NilEventLimitDateEndUpdate struct {
-	Value EventLimitDateEndUpdate
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventLimitDateEndUpdate) SetTo(v EventLimitDateEndUpdate) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventLimitDateEndUpdate) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventLimitDateEndUpdate) SetToNull() {
-	o.Null = true
-	var v EventLimitDateEndUpdate
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventLimitDateEndUpdate) Get() (v EventLimitDateEndUpdate, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventLimitDateEndUpdate) Or(d EventLimitDateEndUpdate) EventLimitDateEndUpdate {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventLimitParticipantLimit returns new NilEventLimitParticipantLimit with value set to v.
-func NewNilEventLimitParticipantLimit(v EventLimitParticipantLimit) NilEventLimitParticipantLimit {
-	return NilEventLimitParticipantLimit{
-		Value: v,
-	}
-}
-
-// NilEventLimitParticipantLimit is nullable EventLimitParticipantLimit.
-type NilEventLimitParticipantLimit struct {
-	Value EventLimitParticipantLimit
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventLimitParticipantLimit) SetTo(v EventLimitParticipantLimit) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventLimitParticipantLimit) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventLimitParticipantLimit) SetToNull() {
-	o.Null = true
-	var v EventLimitParticipantLimit
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventLimitParticipantLimit) Get() (v EventLimitParticipantLimit, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventLimitParticipantLimit) Or(d EventLimitParticipantLimit) EventLimitParticipantLimit {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventLimitUserAgeEnd returns new NilEventLimitUserAgeEnd with value set to v.
-func NewNilEventLimitUserAgeEnd(v EventLimitUserAgeEnd) NilEventLimitUserAgeEnd {
-	return NilEventLimitUserAgeEnd{
-		Value: v,
-	}
-}
-
-// NilEventLimitUserAgeEnd is nullable EventLimitUserAgeEnd.
-type NilEventLimitUserAgeEnd struct {
-	Value EventLimitUserAgeEnd
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventLimitUserAgeEnd) SetTo(v EventLimitUserAgeEnd) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventLimitUserAgeEnd) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventLimitUserAgeEnd) SetToNull() {
-	o.Null = true
-	var v EventLimitUserAgeEnd
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventLimitUserAgeEnd) Get() (v EventLimitUserAgeEnd, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventLimitUserAgeEnd) Or(d EventLimitUserAgeEnd) EventLimitUserAgeEnd {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventLimitUserAgeStart returns new NilEventLimitUserAgeStart with value set to v.
-func NewNilEventLimitUserAgeStart(v EventLimitUserAgeStart) NilEventLimitUserAgeStart {
-	return NilEventLimitUserAgeStart{
-		Value: v,
-	}
-}
-
-// NilEventLimitUserAgeStart is nullable EventLimitUserAgeStart.
-type NilEventLimitUserAgeStart struct {
-	Value EventLimitUserAgeStart
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventLimitUserAgeStart) SetTo(v EventLimitUserAgeStart) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventLimitUserAgeStart) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventLimitUserAgeStart) SetToNull() {
-	o.Null = true
-	var v EventLimitUserAgeStart
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventLimitUserAgeStart) Get() (v EventLimitUserAgeStart, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventLimitUserAgeStart) Or(d EventLimitUserAgeStart) EventLimitUserAgeStart {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventMaxUsers returns new NilEventMaxUsers with value set to v.
-func NewNilEventMaxUsers(v EventMaxUsers) NilEventMaxUsers {
-	return NilEventMaxUsers{
-		Value: v,
-	}
-}
-
-// NilEventMaxUsers is nullable EventMaxUsers.
-type NilEventMaxUsers struct {
-	Value EventMaxUsers
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventMaxUsers) SetTo(v EventMaxUsers) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventMaxUsers) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventMaxUsers) SetToNull() {
-	o.Null = true
-	var v EventMaxUsers
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventMaxUsers) Get() (v EventMaxUsers, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventMaxUsers) Or(d EventMaxUsers) EventMaxUsers {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventMetaEventID returns new NilEventMetaEventID with value set to v.
-func NewNilEventMetaEventID(v EventMetaEventID) NilEventMetaEventID {
-	return NilEventMetaEventID{
-		Value: v,
-	}
-}
-
-// NilEventMetaEventID is nullable EventMetaEventID.
-type NilEventMetaEventID struct {
-	Value EventMetaEventID
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventMetaEventID) SetTo(v EventMetaEventID) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventMetaEventID) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventMetaEventID) SetToNull() {
-	o.Null = true
-	var v EventMetaEventID
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventMetaEventID) Get() (v EventMetaEventID, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventMetaEventID) Or(d EventMetaEventID) EventMetaEventID {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventOrganizationID returns new NilEventOrganizationID with value set to v.
-func NewNilEventOrganizationID(v EventOrganizationID) NilEventOrganizationID {
-	return NilEventOrganizationID{
-		Value: v,
-	}
-}
-
-// NilEventOrganizationID is nullable EventOrganizationID.
-type NilEventOrganizationID struct {
-	Value EventOrganizationID
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventOrganizationID) SetTo(v EventOrganizationID) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventOrganizationID) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventOrganizationID) SetToNull() {
-	o.Null = true
-	var v EventOrganizationID
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventOrganizationID) Get() (v EventOrganizationID, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventOrganizationID) Or(d EventOrganizationID) EventOrganizationID {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventStart returns new NilEventStart with value set to v.
-func NewNilEventStart(v EventStart) NilEventStart {
-	return NilEventStart{
-		Value: v,
-	}
-}
-
-// NilEventStart is nullable EventStart.
-type NilEventStart struct {
-	Value EventStart
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventStart) SetTo(v EventStart) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventStart) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventStart) SetToNull() {
-	o.Null = true
-	var v EventStart
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventStart) Get() (v EventStart, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventStart) Or(d EventStart) EventStart {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventTypeID returns new NilEventTypeID with value set to v.
-func NewNilEventTypeID(v EventTypeID) NilEventTypeID {
-	return NilEventTypeID{
-		Value: v,
-	}
-}
-
-// NilEventTypeID is nullable EventTypeID.
-type NilEventTypeID struct {
-	Value EventTypeID
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventTypeID) SetTo(v EventTypeID) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventTypeID) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventTypeID) SetToNull() {
-	o.Null = true
-	var v EventTypeID
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventTypeID) Get() (v EventTypeID, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventTypeID) Or(d EventTypeID) EventTypeID {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilEventVenueID returns new NilEventVenueID with value set to v.
-func NewNilEventVenueID(v EventVenueID) NilEventVenueID {
-	return NilEventVenueID{
-		Value: v,
-	}
-}
-
-// NilEventVenueID is nullable EventVenueID.
-type NilEventVenueID struct {
-	Value EventVenueID
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventVenueID) SetTo(v EventVenueID) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilEventVenueID) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilEventVenueID) SetToNull() {
-	o.Null = true
-	var v EventVenueID
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventVenueID) Get() (v EventVenueID, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventVenueID) Or(d EventVenueID) EventVenueID {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewNilInt32 returns new NilInt32 with value set to v.
 func NewNilInt32(v int32) NilInt32 {
 	return NilInt32{
@@ -5540,6 +6020,141 @@ func (o NilInt32) Or(d int32) int32 {
 	return d
 }
 
+// NewNilInt64 returns new NilInt64 with value set to v.
+func NewNilInt64(v int64) NilInt64 {
+	return NilInt64{
+		Value: v,
+	}
+}
+
+// NilInt64 is nullable int64.
+type NilInt64 struct {
+	Value int64
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilInt64) SetTo(v int64) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilInt64) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilInt64) SetToNull() {
+	o.Null = true
+	var v int64
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilInt64) Get() (v int64, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilInt64) Or(d int64) int64 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilTeamPersonWithUserPersonUser returns new NilTeamPersonWithUserPersonUser with value set to v.
+func NewNilTeamPersonWithUserPersonUser(v TeamPersonWithUserPersonUser) NilTeamPersonWithUserPersonUser {
+	return NilTeamPersonWithUserPersonUser{
+		Value: v,
+	}
+}
+
+// NilTeamPersonWithUserPersonUser is nullable TeamPersonWithUserPersonUser.
+type NilTeamPersonWithUserPersonUser struct {
+	Value TeamPersonWithUserPersonUser
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilTeamPersonWithUserPersonUser) SetTo(v TeamPersonWithUserPersonUser) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilTeamPersonWithUserPersonUser) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilTeamPersonWithUserPersonUser) SetToNull() {
+	o.Null = true
+	var v TeamPersonWithUserPersonUser
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilTeamPersonWithUserPersonUser) Get() (v TeamPersonWithUserPersonUser, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilTeamPersonWithUserPersonUser) Or(d TeamPersonWithUserPersonUser) TeamPersonWithUserPersonUser {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilUUID returns new NilUUID with value set to v.
+func NewNilUUID(v uuid.UUID) NilUUID {
+	return NilUUID{
+		Value: v,
+	}
+}
+
+// NilUUID is nullable uuid.UUID.
+type NilUUID struct {
+	Value uuid.UUID
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilUUID) SetTo(v uuid.UUID) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilUUID) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilUUID) SetToNull() {
+	o.Null = true
+	var v uuid.UUID
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilUUID) Get() (v uuid.UUID, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilUUID) Or(d uuid.UUID) uuid.UUID {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // Ref: #/components/schemas/NotFound
 type NotFound struct {
 	Error string `json:"error"`
@@ -5558,6 +6173,8 @@ func (s *NotFound) SetError(val string) {
 func (*NotFound) addEventDiplomaRoleRes()                 {}
 func (*NotFound) archiveEventRequestsFilesRes()           {}
 func (*NotFound) cancelEventDeferredNotificationRes()     {}
+func (*NotFound) cityNameRes()                            {}
+func (*NotFound) confirmEventSignupRes()                  {}
 func (*NotFound) confirmFileUploadRes()                   {}
 func (*NotFound) createEventDeferredNotificationRes()     {}
 func (*NotFound) createEventDiplomaSettingsRes()          {}
@@ -5572,16 +6189,17 @@ func (*NotFound) patchMutationLockRes()                   {}
 func (*NotFound) readEventDeferredNotificationRes()       {}
 func (*NotFound) readEventDiplomaSettingsRes()            {}
 func (*NotFound) readEventLimitRes()                      {}
-func (*NotFound) readEventRes()                           {}
+func (*NotFound) readEventRequestRes()                    {}
 func (*NotFound) readFileMetaRes()                        {}
 func (*NotFound) readFileRes()                            {}
-func (*NotFound) readPersonRes()                          {}
-func (*NotFound) readTeamRes()                            {}
+func (*NotFound) readGeoDataRes()                         {}
+func (*NotFound) regionNameRes()                          {}
 func (*NotFound) updateEventDeferredNotificationRes()     {}
 func (*NotFound) updateEventDiplomaSettingsRes()          {}
 func (*NotFound) updateEventLimitRes()                    {}
+func (*NotFound) updateEventRequestRes()                  {}
+func (*NotFound) updateEventRes()                         {}
 func (*NotFound) updateFileMetaRes()                      {}
-func (*NotFound) updateTeamRes()                          {}
 func (*NotFound) uploadFileRes()                          {}
 
 type NotImplemented struct {
@@ -5641,6 +6259,52 @@ func (o OptBool) Get() (v bool, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptBool) Or(d bool) bool {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptConfirmEventSignupReq returns new OptConfirmEventSignupReq with value set to v.
+func NewOptConfirmEventSignupReq(v ConfirmEventSignupReq) OptConfirmEventSignupReq {
+	return OptConfirmEventSignupReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptConfirmEventSignupReq is optional ConfirmEventSignupReq.
+type OptConfirmEventSignupReq struct {
+	Value ConfirmEventSignupReq
+	Set   bool
+}
+
+// IsSet returns true if OptConfirmEventSignupReq was set.
+func (o OptConfirmEventSignupReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptConfirmEventSignupReq) Reset() {
+	var v ConfirmEventSignupReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptConfirmEventSignupReq) SetTo(v ConfirmEventSignupReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptConfirmEventSignupReq) Get() (v ConfirmEventSignupReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptConfirmEventSignupReq) Or(d ConfirmEventSignupReq) ConfirmEventSignupReq {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -5831,144 +6495,6 @@ func (o OptDiplomaTemplate) Or(d DiplomaTemplate) DiplomaTemplate {
 	return d
 }
 
-// NewOptEventAchievementsAllowed returns new OptEventAchievementsAllowed with value set to v.
-func NewOptEventAchievementsAllowed(v EventAchievementsAllowed) OptEventAchievementsAllowed {
-	return OptEventAchievementsAllowed{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventAchievementsAllowed is optional EventAchievementsAllowed.
-type OptEventAchievementsAllowed struct {
-	Value EventAchievementsAllowed
-	Set   bool
-}
-
-// IsSet returns true if OptEventAchievementsAllowed was set.
-func (o OptEventAchievementsAllowed) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventAchievementsAllowed) Reset() {
-	var v EventAchievementsAllowed
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventAchievementsAllowed) SetTo(v EventAchievementsAllowed) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventAchievementsAllowed) Get() (v EventAchievementsAllowed, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventAchievementsAllowed) Or(d EventAchievementsAllowed) EventAchievementsAllowed {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventAutocreateMember returns new OptEventAutocreateMember with value set to v.
-func NewOptEventAutocreateMember(v EventAutocreateMember) OptEventAutocreateMember {
-	return OptEventAutocreateMember{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventAutocreateMember is optional EventAutocreateMember.
-type OptEventAutocreateMember struct {
-	Value EventAutocreateMember
-	Set   bool
-}
-
-// IsSet returns true if OptEventAutocreateMember was set.
-func (o OptEventAutocreateMember) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventAutocreateMember) Reset() {
-	var v EventAutocreateMember
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventAutocreateMember) SetTo(v EventAutocreateMember) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventAutocreateMember) Get() (v EventAutocreateMember, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventAutocreateMember) Or(d EventAutocreateMember) EventAutocreateMember {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventCoverURLWrite returns new OptEventCoverURLWrite with value set to v.
-func NewOptEventCoverURLWrite(v EventCoverURLWrite) OptEventCoverURLWrite {
-	return OptEventCoverURLWrite{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventCoverURLWrite is optional EventCoverURLWrite.
-type OptEventCoverURLWrite struct {
-	Value EventCoverURLWrite
-	Set   bool
-}
-
-// IsSet returns true if OptEventCoverURLWrite was set.
-func (o OptEventCoverURLWrite) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventCoverURLWrite) Reset() {
-	var v EventCoverURLWrite
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventCoverURLWrite) SetTo(v EventCoverURLWrite) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventCoverURLWrite) Get() (v EventCoverURLWrite, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventCoverURLWrite) Or(d EventCoverURLWrite) EventCoverURLWrite {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptEventDeferredNotificationBeforeStart returns new OptEventDeferredNotificationBeforeStart with value set to v.
 func NewOptEventDeferredNotificationBeforeStart(v EventDeferredNotificationBeforeStart) OptEventDeferredNotificationBeforeStart {
 	return OptEventDeferredNotificationBeforeStart{
@@ -6061,98 +6587,6 @@ func (o OptEventDeferredNotificationTemplateID) Or(d EventDeferredNotificationTe
 	return d
 }
 
-// NewOptEventDescription returns new OptEventDescription with value set to v.
-func NewOptEventDescription(v EventDescription) OptEventDescription {
-	return OptEventDescription{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventDescription is optional EventDescription.
-type OptEventDescription struct {
-	Value EventDescription
-	Set   bool
-}
-
-// IsSet returns true if OptEventDescription was set.
-func (o OptEventDescription) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventDescription) Reset() {
-	var v EventDescription
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventDescription) SetTo(v EventDescription) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventDescription) Get() (v EventDescription, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventDescription) Or(d EventDescription) EventDescription {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventDraft returns new OptEventDraft with value set to v.
-func NewOptEventDraft(v EventDraft) OptEventDraft {
-	return OptEventDraft{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventDraft is optional EventDraft.
-type OptEventDraft struct {
-	Value EventDraft
-	Set   bool
-}
-
-// IsSet returns true if OptEventDraft was set.
-func (o OptEventDraft) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventDraft) Reset() {
-	var v EventDraft
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventDraft) SetTo(v EventDraft) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventDraft) Get() (v EventDraft, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventDraft) Or(d EventDraft) EventDraft {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptEventFormat returns new OptEventFormat with value set to v.
 func NewOptEventFormat(v EventFormat) OptEventFormat {
 	return OptEventFormat{
@@ -6193,788 +6627,6 @@ func (o OptEventFormat) Get() (v EventFormat, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptEventFormat) Or(d EventFormat) EventFormat {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventHidden returns new OptEventHidden with value set to v.
-func NewOptEventHidden(v EventHidden) OptEventHidden {
-	return OptEventHidden{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventHidden is optional EventHidden.
-type OptEventHidden struct {
-	Value EventHidden
-	Set   bool
-}
-
-// IsSet returns true if OptEventHidden was set.
-func (o OptEventHidden) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventHidden) Reset() {
-	var v EventHidden
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventHidden) SetTo(v EventHidden) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventHidden) Get() (v EventHidden, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventHidden) Or(d EventHidden) EventHidden {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventLimitAutoApprove returns new OptEventLimitAutoApprove with value set to v.
-func NewOptEventLimitAutoApprove(v EventLimitAutoApprove) OptEventLimitAutoApprove {
-	return OptEventLimitAutoApprove{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventLimitAutoApprove is optional EventLimitAutoApprove.
-type OptEventLimitAutoApprove struct {
-	Value EventLimitAutoApprove
-	Set   bool
-}
-
-// IsSet returns true if OptEventLimitAutoApprove was set.
-func (o OptEventLimitAutoApprove) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventLimitAutoApprove) Reset() {
-	var v EventLimitAutoApprove
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventLimitAutoApprove) SetTo(v EventLimitAutoApprove) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventLimitAutoApprove) Get() (v EventLimitAutoApprove, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventLimitAutoApprove) Or(d EventLimitAutoApprove) EventLimitAutoApprove {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventLimitCollectPhones returns new OptEventLimitCollectPhones with value set to v.
-func NewOptEventLimitCollectPhones(v EventLimitCollectPhones) OptEventLimitCollectPhones {
-	return OptEventLimitCollectPhones{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventLimitCollectPhones is optional EventLimitCollectPhones.
-type OptEventLimitCollectPhones struct {
-	Value EventLimitCollectPhones
-	Set   bool
-}
-
-// IsSet returns true if OptEventLimitCollectPhones was set.
-func (o OptEventLimitCollectPhones) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventLimitCollectPhones) Reset() {
-	var v EventLimitCollectPhones
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventLimitCollectPhones) SetTo(v EventLimitCollectPhones) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventLimitCollectPhones) Get() (v EventLimitCollectPhones, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventLimitCollectPhones) Or(d EventLimitCollectPhones) EventLimitCollectPhones {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventLimitCollectSNILS returns new OptEventLimitCollectSNILS with value set to v.
-func NewOptEventLimitCollectSNILS(v EventLimitCollectSNILS) OptEventLimitCollectSNILS {
-	return OptEventLimitCollectSNILS{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventLimitCollectSNILS is optional EventLimitCollectSNILS.
-type OptEventLimitCollectSNILS struct {
-	Value EventLimitCollectSNILS
-	Set   bool
-}
-
-// IsSet returns true if OptEventLimitCollectSNILS was set.
-func (o OptEventLimitCollectSNILS) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventLimitCollectSNILS) Reset() {
-	var v EventLimitCollectSNILS
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventLimitCollectSNILS) SetTo(v EventLimitCollectSNILS) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventLimitCollectSNILS) Get() (v EventLimitCollectSNILS, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventLimitCollectSNILS) Or(d EventLimitCollectSNILS) EventLimitCollectSNILS {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventLimitDescription returns new OptEventLimitDescription with value set to v.
-func NewOptEventLimitDescription(v EventLimitDescription) OptEventLimitDescription {
-	return OptEventLimitDescription{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventLimitDescription is optional EventLimitDescription.
-type OptEventLimitDescription struct {
-	Value EventLimitDescription
-	Set   bool
-}
-
-// IsSet returns true if OptEventLimitDescription was set.
-func (o OptEventLimitDescription) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventLimitDescription) Reset() {
-	var v EventLimitDescription
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventLimitDescription) SetTo(v EventLimitDescription) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventLimitDescription) Get() (v EventLimitDescription, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventLimitDescription) Or(d EventLimitDescription) EventLimitDescription {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventLimitRequiresGitHub returns new OptEventLimitRequiresGitHub with value set to v.
-func NewOptEventLimitRequiresGitHub(v EventLimitRequiresGitHub) OptEventLimitRequiresGitHub {
-	return OptEventLimitRequiresGitHub{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventLimitRequiresGitHub is optional EventLimitRequiresGitHub.
-type OptEventLimitRequiresGitHub struct {
-	Value EventLimitRequiresGitHub
-	Set   bool
-}
-
-// IsSet returns true if OptEventLimitRequiresGitHub was set.
-func (o OptEventLimitRequiresGitHub) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventLimitRequiresGitHub) Reset() {
-	var v EventLimitRequiresGitHub
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventLimitRequiresGitHub) SetTo(v EventLimitRequiresGitHub) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventLimitRequiresGitHub) Get() (v EventLimitRequiresGitHub, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventLimitRequiresGitHub) Or(d EventLimitRequiresGitHub) EventLimitRequiresGitHub {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventLimitRequiresKaggle returns new OptEventLimitRequiresKaggle with value set to v.
-func NewOptEventLimitRequiresKaggle(v EventLimitRequiresKaggle) OptEventLimitRequiresKaggle {
-	return OptEventLimitRequiresKaggle{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventLimitRequiresKaggle is optional EventLimitRequiresKaggle.
-type OptEventLimitRequiresKaggle struct {
-	Value EventLimitRequiresKaggle
-	Set   bool
-}
-
-// IsSet returns true if OptEventLimitRequiresKaggle was set.
-func (o OptEventLimitRequiresKaggle) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventLimitRequiresKaggle) Reset() {
-	var v EventLimitRequiresKaggle
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventLimitRequiresKaggle) SetTo(v EventLimitRequiresKaggle) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventLimitRequiresKaggle) Get() (v EventLimitRequiresKaggle, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventLimitRequiresKaggle) Or(d EventLimitRequiresKaggle) EventLimitRequiresKaggle {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventLimitRequiresLeader returns new OptEventLimitRequiresLeader with value set to v.
-func NewOptEventLimitRequiresLeader(v EventLimitRequiresLeader) OptEventLimitRequiresLeader {
-	return OptEventLimitRequiresLeader{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventLimitRequiresLeader is optional EventLimitRequiresLeader.
-type OptEventLimitRequiresLeader struct {
-	Value EventLimitRequiresLeader
-	Set   bool
-}
-
-// IsSet returns true if OptEventLimitRequiresLeader was set.
-func (o OptEventLimitRequiresLeader) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventLimitRequiresLeader) Reset() {
-	var v EventLimitRequiresLeader
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventLimitRequiresLeader) SetTo(v EventLimitRequiresLeader) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventLimitRequiresLeader) Get() (v EventLimitRequiresLeader, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventLimitRequiresLeader) Or(d EventLimitRequiresLeader) EventLimitRequiresLeader {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventLimitRequiresProject returns new OptEventLimitRequiresProject with value set to v.
-func NewOptEventLimitRequiresProject(v EventLimitRequiresProject) OptEventLimitRequiresProject {
-	return OptEventLimitRequiresProject{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventLimitRequiresProject is optional EventLimitRequiresProject.
-type OptEventLimitRequiresProject struct {
-	Value EventLimitRequiresProject
-	Set   bool
-}
-
-// IsSet returns true if OptEventLimitRequiresProject was set.
-func (o OptEventLimitRequiresProject) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventLimitRequiresProject) Reset() {
-	var v EventLimitRequiresProject
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventLimitRequiresProject) SetTo(v EventLimitRequiresProject) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventLimitRequiresProject) Get() (v EventLimitRequiresProject, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventLimitRequiresProject) Or(d EventLimitRequiresProject) EventLimitRequiresProject {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventLimitRequiresStepik returns new OptEventLimitRequiresStepik with value set to v.
-func NewOptEventLimitRequiresStepik(v EventLimitRequiresStepik) OptEventLimitRequiresStepik {
-	return OptEventLimitRequiresStepik{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventLimitRequiresStepik is optional EventLimitRequiresStepik.
-type OptEventLimitRequiresStepik struct {
-	Value EventLimitRequiresStepik
-	Set   bool
-}
-
-// IsSet returns true if OptEventLimitRequiresStepik was set.
-func (o OptEventLimitRequiresStepik) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventLimitRequiresStepik) Reset() {
-	var v EventLimitRequiresStepik
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventLimitRequiresStepik) SetTo(v EventLimitRequiresStepik) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventLimitRequiresStepik) Get() (v EventLimitRequiresStepik, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventLimitRequiresStepik) Or(d EventLimitRequiresStepik) EventLimitRequiresStepik {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventLimitRequiresTelegram returns new OptEventLimitRequiresTelegram with value set to v.
-func NewOptEventLimitRequiresTelegram(v EventLimitRequiresTelegram) OptEventLimitRequiresTelegram {
-	return OptEventLimitRequiresTelegram{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventLimitRequiresTelegram is optional EventLimitRequiresTelegram.
-type OptEventLimitRequiresTelegram struct {
-	Value EventLimitRequiresTelegram
-	Set   bool
-}
-
-// IsSet returns true if OptEventLimitRequiresTelegram was set.
-func (o OptEventLimitRequiresTelegram) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventLimitRequiresTelegram) Reset() {
-	var v EventLimitRequiresTelegram
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventLimitRequiresTelegram) SetTo(v EventLimitRequiresTelegram) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventLimitRequiresTelegram) Get() (v EventLimitRequiresTelegram, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventLimitRequiresTelegram) Or(d EventLimitRequiresTelegram) EventLimitRequiresTelegram {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventLimitRequiresVK returns new OptEventLimitRequiresVK with value set to v.
-func NewOptEventLimitRequiresVK(v EventLimitRequiresVK) OptEventLimitRequiresVK {
-	return OptEventLimitRequiresVK{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventLimitRequiresVK is optional EventLimitRequiresVK.
-type OptEventLimitRequiresVK struct {
-	Value EventLimitRequiresVK
-	Set   bool
-}
-
-// IsSet returns true if OptEventLimitRequiresVK was set.
-func (o OptEventLimitRequiresVK) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventLimitRequiresVK) Reset() {
-	var v EventLimitRequiresVK
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventLimitRequiresVK) SetTo(v EventLimitRequiresVK) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventLimitRequiresVK) Get() (v EventLimitRequiresVK, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventLimitRequiresVK) Or(d EventLimitRequiresVK) EventLimitRequiresVK {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventLimitRequiresYandex returns new OptEventLimitRequiresYandex with value set to v.
-func NewOptEventLimitRequiresYandex(v EventLimitRequiresYandex) OptEventLimitRequiresYandex {
-	return OptEventLimitRequiresYandex{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventLimitRequiresYandex is optional EventLimitRequiresYandex.
-type OptEventLimitRequiresYandex struct {
-	Value EventLimitRequiresYandex
-	Set   bool
-}
-
-// IsSet returns true if OptEventLimitRequiresYandex was set.
-func (o OptEventLimitRequiresYandex) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventLimitRequiresYandex) Reset() {
-	var v EventLimitRequiresYandex
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventLimitRequiresYandex) SetTo(v EventLimitRequiresYandex) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventLimitRequiresYandex) Get() (v EventLimitRequiresYandex, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventLimitRequiresYandex) Or(d EventLimitRequiresYandex) EventLimitRequiresYandex {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventNotificationEmailMessage returns new OptEventNotificationEmailMessage with value set to v.
-func NewOptEventNotificationEmailMessage(v EventNotificationEmailMessage) OptEventNotificationEmailMessage {
-	return OptEventNotificationEmailMessage{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventNotificationEmailMessage is optional EventNotificationEmailMessage.
-type OptEventNotificationEmailMessage struct {
-	Value EventNotificationEmailMessage
-	Set   bool
-}
-
-// IsSet returns true if OptEventNotificationEmailMessage was set.
-func (o OptEventNotificationEmailMessage) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventNotificationEmailMessage) Reset() {
-	var v EventNotificationEmailMessage
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventNotificationEmailMessage) SetTo(v EventNotificationEmailMessage) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventNotificationEmailMessage) Get() (v EventNotificationEmailMessage, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventNotificationEmailMessage) Or(d EventNotificationEmailMessage) EventNotificationEmailMessage {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventPublic returns new OptEventPublic with value set to v.
-func NewOptEventPublic(v EventPublic) OptEventPublic {
-	return OptEventPublic{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventPublic is optional EventPublic.
-type OptEventPublic struct {
-	Value EventPublic
-	Set   bool
-}
-
-// IsSet returns true if OptEventPublic was set.
-func (o OptEventPublic) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventPublic) Reset() {
-	var v EventPublic
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventPublic) SetTo(v EventPublic) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventPublic) Get() (v EventPublic, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventPublic) Or(d EventPublic) EventPublic {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventQuestionnaireCompletedMessage returns new OptEventQuestionnaireCompletedMessage with value set to v.
-func NewOptEventQuestionnaireCompletedMessage(v EventQuestionnaireCompletedMessage) OptEventQuestionnaireCompletedMessage {
-	return OptEventQuestionnaireCompletedMessage{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventQuestionnaireCompletedMessage is optional EventQuestionnaireCompletedMessage.
-type OptEventQuestionnaireCompletedMessage struct {
-	Value EventQuestionnaireCompletedMessage
-	Set   bool
-}
-
-// IsSet returns true if OptEventQuestionnaireCompletedMessage was set.
-func (o OptEventQuestionnaireCompletedMessage) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventQuestionnaireCompletedMessage) Reset() {
-	var v EventQuestionnaireCompletedMessage
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventQuestionnaireCompletedMessage) SetTo(v EventQuestionnaireCompletedMessage) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventQuestionnaireCompletedMessage) Get() (v EventQuestionnaireCompletedMessage, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventQuestionnaireCompletedMessage) Or(d EventQuestionnaireCompletedMessage) EventQuestionnaireCompletedMessage {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventRequestsAllowed returns new OptEventRequestsAllowed with value set to v.
-func NewOptEventRequestsAllowed(v EventRequestsAllowed) OptEventRequestsAllowed {
-	return OptEventRequestsAllowed{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventRequestsAllowed is optional EventRequestsAllowed.
-type OptEventRequestsAllowed struct {
-	Value EventRequestsAllowed
-	Set   bool
-}
-
-// IsSet returns true if OptEventRequestsAllowed was set.
-func (o OptEventRequestsAllowed) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventRequestsAllowed) Reset() {
-	var v EventRequestsAllowed
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventRequestsAllowed) SetTo(v EventRequestsAllowed) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventRequestsAllowed) Get() (v EventRequestsAllowed, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventRequestsAllowed) Or(d EventRequestsAllowed) EventRequestsAllowed {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -7119,98 +6771,6 @@ func (o OptEventTeamsInvolved) Or(d EventTeamsInvolved) EventTeamsInvolved {
 	return d
 }
 
-// NewOptEventTimeMatters returns new OptEventTimeMatters with value set to v.
-func NewOptEventTimeMatters(v EventTimeMatters) OptEventTimeMatters {
-	return OptEventTimeMatters{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventTimeMatters is optional EventTimeMatters.
-type OptEventTimeMatters struct {
-	Value EventTimeMatters
-	Set   bool
-}
-
-// IsSet returns true if OptEventTimeMatters was set.
-func (o OptEventTimeMatters) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventTimeMatters) Reset() {
-	var v EventTimeMatters
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventTimeMatters) SetTo(v EventTimeMatters) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventTimeMatters) Get() (v EventTimeMatters, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventTimeMatters) Or(d EventTimeMatters) EventTimeMatters {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEventURL returns new OptEventURL with value set to v.
-func NewOptEventURL(v EventURL) OptEventURL {
-	return OptEventURL{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEventURL is optional EventURL.
-type OptEventURL struct {
-	Value EventURL
-	Set   bool
-}
-
-// IsSet returns true if OptEventURL was set.
-func (o OptEventURL) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEventURL) Reset() {
-	var v EventURL
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEventURL) SetTo(v EventURL) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEventURL) Get() (v EventURL, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEventURL) Or(d EventURL) EventURL {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptFileMetaName returns new OptFileMetaName with value set to v.
 func NewOptFileMetaName(v FileMetaName) OptFileMetaName {
 	return OptFileMetaName{
@@ -7251,52 +6811,6 @@ func (o OptFileMetaName) Get() (v FileMetaName, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptFileMetaName) Or(d FileMetaName) FileMetaName {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptInt16 returns new OptInt16 with value set to v.
-func NewOptInt16(v int16) OptInt16 {
-	return OptInt16{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptInt16 is optional int16.
-type OptInt16 struct {
-	Value int16
-	Set   bool
-}
-
-// IsSet returns true if OptInt16 was set.
-func (o OptInt16) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptInt16) Reset() {
-	var v int16
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptInt16) SetTo(v int16) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptInt16) Get() (v int16, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptInt16) Or(d int16) int16 {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -7671,55 +7185,38 @@ func (o OptListOrganizationsOrderBy) Or(d ListOrganizationsOrderBy) ListOrganiza
 	return d
 }
 
-// NewOptNilEventEnd returns new OptNilEventEnd with value set to v.
-func NewOptNilEventEnd(v EventEnd) OptNilEventEnd {
-	return OptNilEventEnd{
+// NewOptListTeamsOrderBy returns new OptListTeamsOrderBy with value set to v.
+func NewOptListTeamsOrderBy(v ListTeamsOrderBy) OptListTeamsOrderBy {
+	return OptListTeamsOrderBy{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptNilEventEnd is optional nullable EventEnd.
-type OptNilEventEnd struct {
-	Value EventEnd
+// OptListTeamsOrderBy is optional ListTeamsOrderBy.
+type OptListTeamsOrderBy struct {
+	Value ListTeamsOrderBy
 	Set   bool
-	Null  bool
 }
 
-// IsSet returns true if OptNilEventEnd was set.
-func (o OptNilEventEnd) IsSet() bool { return o.Set }
+// IsSet returns true if OptListTeamsOrderBy was set.
+func (o OptListTeamsOrderBy) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptNilEventEnd) Reset() {
-	var v EventEnd
+func (o *OptListTeamsOrderBy) Reset() {
+	var v ListTeamsOrderBy
 	o.Value = v
 	o.Set = false
-	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptNilEventEnd) SetTo(v EventEnd) {
+func (o *OptListTeamsOrderBy) SetTo(v ListTeamsOrderBy) {
 	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilEventEnd) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilEventEnd) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v EventEnd
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptNilEventEnd) Get() (v EventEnd, ok bool) {
-	if o.Null {
-		return v, false
-	}
+func (o OptListTeamsOrderBy) Get() (v ListTeamsOrderBy, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -7727,59 +7224,64 @@ func (o OptNilEventEnd) Get() (v EventEnd, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptNilEventEnd) Or(d EventEnd) EventEnd {
+func (o OptListTeamsOrderBy) Or(d ListTeamsOrderBy) ListTeamsOrderBy {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptNilEventLimitDateEndRequest returns new OptNilEventLimitDateEndRequest with value set to v.
-func NewOptNilEventLimitDateEndRequest(v EventLimitDateEndRequest) OptNilEventLimitDateEndRequest {
-	return OptNilEventLimitDateEndRequest{
+// NewOptNilDateTime returns new OptNilDateTime with value set to v.
+func NewOptNilDateTime(v time.Time) OptNilDateTime {
+	return OptNilDateTime{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptNilEventLimitDateEndRequest is optional nullable EventLimitDateEndRequest.
-type OptNilEventLimitDateEndRequest struct {
-	Value EventLimitDateEndRequest
+// OptNilDateTime is optional nullable time.Time.
+type OptNilDateTime struct {
+	Value time.Time
 	Set   bool
 	Null  bool
 }
 
-// IsSet returns true if OptNilEventLimitDateEndRequest was set.
-func (o OptNilEventLimitDateEndRequest) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilDateTime was set.
+func (o OptNilDateTime) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptNilEventLimitDateEndRequest) Reset() {
-	var v EventLimitDateEndRequest
+func (o *OptNilDateTime) Reset() {
+	var v time.Time
 	o.Value = v
 	o.Set = false
 	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptNilEventLimitDateEndRequest) SetTo(v EventLimitDateEndRequest) {
+func (o *OptNilDateTime) SetTo(v time.Time) {
 	o.Set = true
 	o.Null = false
 	o.Value = v
 }
 
 // IsNull returns true if value is Null.
-func (o OptNilEventLimitDateEndRequest) IsNull() bool { return o.Null }
+func (o OptNilDateTime) IsNull() bool { return o.Null }
 
 // SetToNull sets value to null.
-func (o *OptNilEventLimitDateEndRequest) SetToNull() {
+func (o *OptNilDateTime) SetToNull() {
 	o.Set = true
 	o.Null = true
-	var v EventLimitDateEndRequest
+	var v time.Time
 	o.Value = v
 }
 
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilDateTime) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
 // Get returns value and boolean that denotes whether value was set.
-func (o OptNilEventLimitDateEndRequest) Get() (v EventLimitDateEndRequest, ok bool) {
+func (o OptNilDateTime) Get() (v time.Time, ok bool) {
 	if o.Null {
 		return v, false
 	}
@@ -7790,59 +7292,64 @@ func (o OptNilEventLimitDateEndRequest) Get() (v EventLimitDateEndRequest, ok bo
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptNilEventLimitDateEndRequest) Or(d EventLimitDateEndRequest) EventLimitDateEndRequest {
+func (o OptNilDateTime) Or(d time.Time) time.Time {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptNilEventLimitDateEndUpdate returns new OptNilEventLimitDateEndUpdate with value set to v.
-func NewOptNilEventLimitDateEndUpdate(v EventLimitDateEndUpdate) OptNilEventLimitDateEndUpdate {
-	return OptNilEventLimitDateEndUpdate{
+// NewOptNilInt32 returns new OptNilInt32 with value set to v.
+func NewOptNilInt32(v int32) OptNilInt32 {
+	return OptNilInt32{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptNilEventLimitDateEndUpdate is optional nullable EventLimitDateEndUpdate.
-type OptNilEventLimitDateEndUpdate struct {
-	Value EventLimitDateEndUpdate
+// OptNilInt32 is optional nullable int32.
+type OptNilInt32 struct {
+	Value int32
 	Set   bool
 	Null  bool
 }
 
-// IsSet returns true if OptNilEventLimitDateEndUpdate was set.
-func (o OptNilEventLimitDateEndUpdate) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilInt32 was set.
+func (o OptNilInt32) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptNilEventLimitDateEndUpdate) Reset() {
-	var v EventLimitDateEndUpdate
+func (o *OptNilInt32) Reset() {
+	var v int32
 	o.Value = v
 	o.Set = false
 	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptNilEventLimitDateEndUpdate) SetTo(v EventLimitDateEndUpdate) {
+func (o *OptNilInt32) SetTo(v int32) {
 	o.Set = true
 	o.Null = false
 	o.Value = v
 }
 
 // IsNull returns true if value is Null.
-func (o OptNilEventLimitDateEndUpdate) IsNull() bool { return o.Null }
+func (o OptNilInt32) IsNull() bool { return o.Null }
 
 // SetToNull sets value to null.
-func (o *OptNilEventLimitDateEndUpdate) SetToNull() {
+func (o *OptNilInt32) SetToNull() {
 	o.Set = true
 	o.Null = true
-	var v EventLimitDateEndUpdate
+	var v int32
 	o.Value = v
 }
 
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilInt32) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
 // Get returns value and boolean that denotes whether value was set.
-func (o OptNilEventLimitDateEndUpdate) Get() (v EventLimitDateEndUpdate, ok bool) {
+func (o OptNilInt32) Get() (v int32, ok bool) {
 	if o.Null {
 		return v, false
 	}
@@ -7853,59 +7360,64 @@ func (o OptNilEventLimitDateEndUpdate) Get() (v EventLimitDateEndUpdate, ok bool
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptNilEventLimitDateEndUpdate) Or(d EventLimitDateEndUpdate) EventLimitDateEndUpdate {
+func (o OptNilInt32) Or(d int32) int32 {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptNilEventLimitParticipantLimit returns new OptNilEventLimitParticipantLimit with value set to v.
-func NewOptNilEventLimitParticipantLimit(v EventLimitParticipantLimit) OptNilEventLimitParticipantLimit {
-	return OptNilEventLimitParticipantLimit{
+// NewOptNilInt64 returns new OptNilInt64 with value set to v.
+func NewOptNilInt64(v int64) OptNilInt64 {
+	return OptNilInt64{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptNilEventLimitParticipantLimit is optional nullable EventLimitParticipantLimit.
-type OptNilEventLimitParticipantLimit struct {
-	Value EventLimitParticipantLimit
+// OptNilInt64 is optional nullable int64.
+type OptNilInt64 struct {
+	Value int64
 	Set   bool
 	Null  bool
 }
 
-// IsSet returns true if OptNilEventLimitParticipantLimit was set.
-func (o OptNilEventLimitParticipantLimit) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilInt64 was set.
+func (o OptNilInt64) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptNilEventLimitParticipantLimit) Reset() {
-	var v EventLimitParticipantLimit
+func (o *OptNilInt64) Reset() {
+	var v int64
 	o.Value = v
 	o.Set = false
 	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptNilEventLimitParticipantLimit) SetTo(v EventLimitParticipantLimit) {
+func (o *OptNilInt64) SetTo(v int64) {
 	o.Set = true
 	o.Null = false
 	o.Value = v
 }
 
 // IsNull returns true if value is Null.
-func (o OptNilEventLimitParticipantLimit) IsNull() bool { return o.Null }
+func (o OptNilInt64) IsNull() bool { return o.Null }
 
 // SetToNull sets value to null.
-func (o *OptNilEventLimitParticipantLimit) SetToNull() {
+func (o *OptNilInt64) SetToNull() {
 	o.Set = true
 	o.Null = true
-	var v EventLimitParticipantLimit
+	var v int64
 	o.Value = v
 }
 
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilInt64) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
 // Get returns value and boolean that denotes whether value was set.
-func (o OptNilEventLimitParticipantLimit) Get() (v EventLimitParticipantLimit, ok bool) {
+func (o OptNilInt64) Get() (v int64, ok bool) {
 	if o.Null {
 		return v, false
 	}
@@ -7916,59 +7428,64 @@ func (o OptNilEventLimitParticipantLimit) Get() (v EventLimitParticipantLimit, o
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptNilEventLimitParticipantLimit) Or(d EventLimitParticipantLimit) EventLimitParticipantLimit {
+func (o OptNilInt64) Or(d int64) int64 {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptNilEventLimitUserAgeEnd returns new OptNilEventLimitUserAgeEnd with value set to v.
-func NewOptNilEventLimitUserAgeEnd(v EventLimitUserAgeEnd) OptNilEventLimitUserAgeEnd {
-	return OptNilEventLimitUserAgeEnd{
+// NewOptNilString returns new OptNilString with value set to v.
+func NewOptNilString(v string) OptNilString {
+	return OptNilString{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptNilEventLimitUserAgeEnd is optional nullable EventLimitUserAgeEnd.
-type OptNilEventLimitUserAgeEnd struct {
-	Value EventLimitUserAgeEnd
+// OptNilString is optional nullable string.
+type OptNilString struct {
+	Value string
 	Set   bool
 	Null  bool
 }
 
-// IsSet returns true if OptNilEventLimitUserAgeEnd was set.
-func (o OptNilEventLimitUserAgeEnd) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilString was set.
+func (o OptNilString) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptNilEventLimitUserAgeEnd) Reset() {
-	var v EventLimitUserAgeEnd
+func (o *OptNilString) Reset() {
+	var v string
 	o.Value = v
 	o.Set = false
 	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptNilEventLimitUserAgeEnd) SetTo(v EventLimitUserAgeEnd) {
+func (o *OptNilString) SetTo(v string) {
 	o.Set = true
 	o.Null = false
 	o.Value = v
 }
 
 // IsNull returns true if value is Null.
-func (o OptNilEventLimitUserAgeEnd) IsNull() bool { return o.Null }
+func (o OptNilString) IsNull() bool { return o.Null }
 
 // SetToNull sets value to null.
-func (o *OptNilEventLimitUserAgeEnd) SetToNull() {
+func (o *OptNilString) SetToNull() {
 	o.Set = true
 	o.Null = true
-	var v EventLimitUserAgeEnd
+	var v string
 	o.Value = v
 }
 
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilString) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
 // Get returns value and boolean that denotes whether value was set.
-func (o OptNilEventLimitUserAgeEnd) Get() (v EventLimitUserAgeEnd, ok bool) {
+func (o OptNilString) Get() (v string, ok bool) {
 	if o.Null {
 		return v, false
 	}
@@ -7979,259 +7496,7 @@ func (o OptNilEventLimitUserAgeEnd) Get() (v EventLimitUserAgeEnd, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptNilEventLimitUserAgeEnd) Or(d EventLimitUserAgeEnd) EventLimitUserAgeEnd {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilEventLimitUserAgeStart returns new OptNilEventLimitUserAgeStart with value set to v.
-func NewOptNilEventLimitUserAgeStart(v EventLimitUserAgeStart) OptNilEventLimitUserAgeStart {
-	return OptNilEventLimitUserAgeStart{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilEventLimitUserAgeStart is optional nullable EventLimitUserAgeStart.
-type OptNilEventLimitUserAgeStart struct {
-	Value EventLimitUserAgeStart
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilEventLimitUserAgeStart was set.
-func (o OptNilEventLimitUserAgeStart) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilEventLimitUserAgeStart) Reset() {
-	var v EventLimitUserAgeStart
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilEventLimitUserAgeStart) SetTo(v EventLimitUserAgeStart) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilEventLimitUserAgeStart) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilEventLimitUserAgeStart) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v EventLimitUserAgeStart
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilEventLimitUserAgeStart) Get() (v EventLimitUserAgeStart, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilEventLimitUserAgeStart) Or(d EventLimitUserAgeStart) EventLimitUserAgeStart {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilEventStart returns new OptNilEventStart with value set to v.
-func NewOptNilEventStart(v EventStart) OptNilEventStart {
-	return OptNilEventStart{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilEventStart is optional nullable EventStart.
-type OptNilEventStart struct {
-	Value EventStart
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilEventStart was set.
-func (o OptNilEventStart) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilEventStart) Reset() {
-	var v EventStart
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilEventStart) SetTo(v EventStart) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilEventStart) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilEventStart) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v EventStart
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilEventStart) Get() (v EventStart, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilEventStart) Or(d EventStart) EventStart {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilEventTypeID returns new OptNilEventTypeID with value set to v.
-func NewOptNilEventTypeID(v EventTypeID) OptNilEventTypeID {
-	return OptNilEventTypeID{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilEventTypeID is optional nullable EventTypeID.
-type OptNilEventTypeID struct {
-	Value EventTypeID
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilEventTypeID was set.
-func (o OptNilEventTypeID) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilEventTypeID) Reset() {
-	var v EventTypeID
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilEventTypeID) SetTo(v EventTypeID) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilEventTypeID) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilEventTypeID) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v EventTypeID
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilEventTypeID) Get() (v EventTypeID, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilEventTypeID) Or(d EventTypeID) EventTypeID {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilEventVenueID returns new OptNilEventVenueID with value set to v.
-func NewOptNilEventVenueID(v EventVenueID) OptNilEventVenueID {
-	return OptNilEventVenueID{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilEventVenueID is optional nullable EventVenueID.
-type OptNilEventVenueID struct {
-	Value EventVenueID
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilEventVenueID was set.
-func (o OptNilEventVenueID) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilEventVenueID) Reset() {
-	var v EventVenueID
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilEventVenueID) SetTo(v EventVenueID) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilEventVenueID) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilEventVenueID) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v EventVenueID
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilEventVenueID) Get() (v EventVenueID, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilEventVenueID) Or(d EventVenueID) EventVenueID {
+func (o OptNilString) Or(d string) string {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -8370,6 +7635,98 @@ func (o OptTeamContactLink) Get() (v TeamContactLink, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptTeamContactLink) Or(d TeamContactLink) TeamContactLink {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptTeamPersonAcceptApprove returns new OptTeamPersonAcceptApprove with value set to v.
+func NewOptTeamPersonAcceptApprove(v TeamPersonAcceptApprove) OptTeamPersonAcceptApprove {
+	return OptTeamPersonAcceptApprove{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptTeamPersonAcceptApprove is optional TeamPersonAcceptApprove.
+type OptTeamPersonAcceptApprove struct {
+	Value TeamPersonAcceptApprove
+	Set   bool
+}
+
+// IsSet returns true if OptTeamPersonAcceptApprove was set.
+func (o OptTeamPersonAcceptApprove) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptTeamPersonAcceptApprove) Reset() {
+	var v TeamPersonAcceptApprove
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptTeamPersonAcceptApprove) SetTo(v TeamPersonAcceptApprove) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptTeamPersonAcceptApprove) Get() (v TeamPersonAcceptApprove, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptTeamPersonAcceptApprove) Or(d TeamPersonAcceptApprove) TeamPersonAcceptApprove {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptTeamPersonAcceptValue returns new OptTeamPersonAcceptValue with value set to v.
+func NewOptTeamPersonAcceptValue(v TeamPersonAcceptValue) OptTeamPersonAcceptValue {
+	return OptTeamPersonAcceptValue{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptTeamPersonAcceptValue is optional TeamPersonAcceptValue.
+type OptTeamPersonAcceptValue struct {
+	Value TeamPersonAcceptValue
+	Set   bool
+}
+
+// IsSet returns true if OptTeamPersonAcceptValue was set.
+func (o OptTeamPersonAcceptValue) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptTeamPersonAcceptValue) Reset() {
+	var v TeamPersonAcceptValue
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptTeamPersonAcceptValue) SetTo(v TeamPersonAcceptValue) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptTeamPersonAcceptValue) Get() (v TeamPersonAcceptValue, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptTeamPersonAcceptValue) Or(d TeamPersonAcceptValue) TeamPersonAcceptValue {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -8516,81 +7873,99 @@ func (o OptUserSex) Or(d UserSex) UserSex {
 
 // Ref: #/components/schemas/OrganizationEvent
 type OrganizationEvent struct {
-	ID                  EventID                      `json:"id"`
-	UpdatedAt           EventUpdatedAt               `json:"updated_at"`
-	Draft               EventDraft                   `json:"draft"`
-	Public              EventPublic                  `json:"public"`
-	Hidden              EventHidden                  `json:"hidden"`
-	Canceled            EventCanceled                `json:"canceled"`
-	Title               EventTitle                   `json:"title"`
-	AltTitle            EventAltTitle                `json:"alt_title"`
-	Start               NilEventStart                `json:"start"`
-	End                 NilEventEnd                  `json:"end"`
-	Format              EventFormat                  `json:"format"`
-	OrganizationID      NilEventOrganizationID       `json:"organization_id"`
-	MetaEventID         NilEventMetaEventID          `json:"meta_event_id"`
-	AchievementsAllowed EventAchievementsAllowed     `json:"achievements_allowed"`
-	RequestsAllowed     EventRequestsAllowed         `json:"requests_allowed"`
-	SelfCheckIn         EventSelfCheckIn             `json:"self_check_in"`
-	TeamsInvolved       EventTeamsInvolved           `json:"teams_involved"`
-	MaxUsers            NilEventMaxUsers             `json:"max_users"`
-	Limits              EventLimitOnlyDateEndRequest `json:"limits"`
-	AchievementsCount   EventAchievementsCount       `json:"achievements_count"`
-	RequestsCount       EventRequestsCount           `json:"requests_count"`
-	Cover               EventCover                   `json:"cover"`
-	URL                 EventURL                     `json:"url"`
-	City                GeodataCity                  `json:"city"`
-	Address             GeodataAddress               `json:"address"`
-	EdgesIncoming       []EventEdge                  `json:"edges_incoming"`
+	// ID мероприятия.
+	ID int32 `json:"id"`
+	// Дата обновления.
+	UpdatedAt time.Time `json:"updated_at"`
+	// Мероприятие находится в статусе черновика. На такое
+	// мероприятие нельзя зарегистрироваться.
+	Draft bool `json:"draft"`
+	// Статус публичности мероприятия.
+	Public bool `json:"public"`
+	// Исключение мероприятия из календаря.
+	Hidden bool `json:"hidden"`
+	// Статус отмены мероприятия.
+	Canceled bool `json:"canceled"`
+	// Название мероприятия.
+	Title string `json:"title"`
+	// Альтернативное название мероприятия.
+	AltTitle string `json:"alt_title"`
+	// Дата начала мероприятия.
+	Start NilDateTime `json:"start"`
+	// Дата окончания мероприятия.
+	End    NilDateTime `json:"end"`
+	Format EventFormat `json:"format"`
+	// ID организации мероприятия.
+	OrganizationID NilInt32 `json:"organization_id"`
+	// ID мета-мероприятия.
+	MetaEventID NilInt32 `json:"meta_event_id"`
+	// Допуск на создания достижений на мероприятие.
+	AchievementsAllowed bool `json:"achievements_allowed"`
+	// Допуск на создания заявок на мероприятие.
+	RequestsAllowed bool `json:"requests_allowed"`
+	// Доступность чекина.
+	SelfCheckIn       bool                         `json:"self_check_in"`
+	TeamsInvolved     EventTeamsInvolved           `json:"teams_involved"`
+	MaxUsers          NilInt32                     `json:"max_users"`
+	Limits            EventLimitOnlyDateEndRequest `json:"limits"`
+	AchievementsCount int32                        `json:"achievements_count"`
+	RequestsCount     int32                        `json:"requests_count"`
+	// Ссылка на обложку мероприятия.
+	Cover string `json:"cover"`
+	// Адрес online мероприятия.
+	URL           string         `json:"url"`
+	City          GeodataCity    `json:"city"`
+	Address       GeodataAddress `json:"address"`
+	EdgesIncoming []EventEdge    `json:"edges_incoming"`
 }
 
 // GetID returns the value of ID.
-func (s *OrganizationEvent) GetID() EventID {
+func (s *OrganizationEvent) GetID() int32 {
 	return s.ID
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
-func (s *OrganizationEvent) GetUpdatedAt() EventUpdatedAt {
+func (s *OrganizationEvent) GetUpdatedAt() time.Time {
 	return s.UpdatedAt
 }
 
 // GetDraft returns the value of Draft.
-func (s *OrganizationEvent) GetDraft() EventDraft {
+func (s *OrganizationEvent) GetDraft() bool {
 	return s.Draft
 }
 
 // GetPublic returns the value of Public.
-func (s *OrganizationEvent) GetPublic() EventPublic {
+func (s *OrganizationEvent) GetPublic() bool {
 	return s.Public
 }
 
 // GetHidden returns the value of Hidden.
-func (s *OrganizationEvent) GetHidden() EventHidden {
+func (s *OrganizationEvent) GetHidden() bool {
 	return s.Hidden
 }
 
 // GetCanceled returns the value of Canceled.
-func (s *OrganizationEvent) GetCanceled() EventCanceled {
+func (s *OrganizationEvent) GetCanceled() bool {
 	return s.Canceled
 }
 
 // GetTitle returns the value of Title.
-func (s *OrganizationEvent) GetTitle() EventTitle {
+func (s *OrganizationEvent) GetTitle() string {
 	return s.Title
 }
 
 // GetAltTitle returns the value of AltTitle.
-func (s *OrganizationEvent) GetAltTitle() EventAltTitle {
+func (s *OrganizationEvent) GetAltTitle() string {
 	return s.AltTitle
 }
 
 // GetStart returns the value of Start.
-func (s *OrganizationEvent) GetStart() NilEventStart {
+func (s *OrganizationEvent) GetStart() NilDateTime {
 	return s.Start
 }
 
 // GetEnd returns the value of End.
-func (s *OrganizationEvent) GetEnd() NilEventEnd {
+func (s *OrganizationEvent) GetEnd() NilDateTime {
 	return s.End
 }
 
@@ -8600,27 +7975,27 @@ func (s *OrganizationEvent) GetFormat() EventFormat {
 }
 
 // GetOrganizationID returns the value of OrganizationID.
-func (s *OrganizationEvent) GetOrganizationID() NilEventOrganizationID {
+func (s *OrganizationEvent) GetOrganizationID() NilInt32 {
 	return s.OrganizationID
 }
 
 // GetMetaEventID returns the value of MetaEventID.
-func (s *OrganizationEvent) GetMetaEventID() NilEventMetaEventID {
+func (s *OrganizationEvent) GetMetaEventID() NilInt32 {
 	return s.MetaEventID
 }
 
 // GetAchievementsAllowed returns the value of AchievementsAllowed.
-func (s *OrganizationEvent) GetAchievementsAllowed() EventAchievementsAllowed {
+func (s *OrganizationEvent) GetAchievementsAllowed() bool {
 	return s.AchievementsAllowed
 }
 
 // GetRequestsAllowed returns the value of RequestsAllowed.
-func (s *OrganizationEvent) GetRequestsAllowed() EventRequestsAllowed {
+func (s *OrganizationEvent) GetRequestsAllowed() bool {
 	return s.RequestsAllowed
 }
 
 // GetSelfCheckIn returns the value of SelfCheckIn.
-func (s *OrganizationEvent) GetSelfCheckIn() EventSelfCheckIn {
+func (s *OrganizationEvent) GetSelfCheckIn() bool {
 	return s.SelfCheckIn
 }
 
@@ -8630,7 +8005,7 @@ func (s *OrganizationEvent) GetTeamsInvolved() EventTeamsInvolved {
 }
 
 // GetMaxUsers returns the value of MaxUsers.
-func (s *OrganizationEvent) GetMaxUsers() NilEventMaxUsers {
+func (s *OrganizationEvent) GetMaxUsers() NilInt32 {
 	return s.MaxUsers
 }
 
@@ -8640,22 +8015,22 @@ func (s *OrganizationEvent) GetLimits() EventLimitOnlyDateEndRequest {
 }
 
 // GetAchievementsCount returns the value of AchievementsCount.
-func (s *OrganizationEvent) GetAchievementsCount() EventAchievementsCount {
+func (s *OrganizationEvent) GetAchievementsCount() int32 {
 	return s.AchievementsCount
 }
 
 // GetRequestsCount returns the value of RequestsCount.
-func (s *OrganizationEvent) GetRequestsCount() EventRequestsCount {
+func (s *OrganizationEvent) GetRequestsCount() int32 {
 	return s.RequestsCount
 }
 
 // GetCover returns the value of Cover.
-func (s *OrganizationEvent) GetCover() EventCover {
+func (s *OrganizationEvent) GetCover() string {
 	return s.Cover
 }
 
 // GetURL returns the value of URL.
-func (s *OrganizationEvent) GetURL() EventURL {
+func (s *OrganizationEvent) GetURL() string {
 	return s.URL
 }
 
@@ -8675,52 +8050,52 @@ func (s *OrganizationEvent) GetEdgesIncoming() []EventEdge {
 }
 
 // SetID sets the value of ID.
-func (s *OrganizationEvent) SetID(val EventID) {
+func (s *OrganizationEvent) SetID(val int32) {
 	s.ID = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.
-func (s *OrganizationEvent) SetUpdatedAt(val EventUpdatedAt) {
+func (s *OrganizationEvent) SetUpdatedAt(val time.Time) {
 	s.UpdatedAt = val
 }
 
 // SetDraft sets the value of Draft.
-func (s *OrganizationEvent) SetDraft(val EventDraft) {
+func (s *OrganizationEvent) SetDraft(val bool) {
 	s.Draft = val
 }
 
 // SetPublic sets the value of Public.
-func (s *OrganizationEvent) SetPublic(val EventPublic) {
+func (s *OrganizationEvent) SetPublic(val bool) {
 	s.Public = val
 }
 
 // SetHidden sets the value of Hidden.
-func (s *OrganizationEvent) SetHidden(val EventHidden) {
+func (s *OrganizationEvent) SetHidden(val bool) {
 	s.Hidden = val
 }
 
 // SetCanceled sets the value of Canceled.
-func (s *OrganizationEvent) SetCanceled(val EventCanceled) {
+func (s *OrganizationEvent) SetCanceled(val bool) {
 	s.Canceled = val
 }
 
 // SetTitle sets the value of Title.
-func (s *OrganizationEvent) SetTitle(val EventTitle) {
+func (s *OrganizationEvent) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetAltTitle sets the value of AltTitle.
-func (s *OrganizationEvent) SetAltTitle(val EventAltTitle) {
+func (s *OrganizationEvent) SetAltTitle(val string) {
 	s.AltTitle = val
 }
 
 // SetStart sets the value of Start.
-func (s *OrganizationEvent) SetStart(val NilEventStart) {
+func (s *OrganizationEvent) SetStart(val NilDateTime) {
 	s.Start = val
 }
 
 // SetEnd sets the value of End.
-func (s *OrganizationEvent) SetEnd(val NilEventEnd) {
+func (s *OrganizationEvent) SetEnd(val NilDateTime) {
 	s.End = val
 }
 
@@ -8730,27 +8105,27 @@ func (s *OrganizationEvent) SetFormat(val EventFormat) {
 }
 
 // SetOrganizationID sets the value of OrganizationID.
-func (s *OrganizationEvent) SetOrganizationID(val NilEventOrganizationID) {
+func (s *OrganizationEvent) SetOrganizationID(val NilInt32) {
 	s.OrganizationID = val
 }
 
 // SetMetaEventID sets the value of MetaEventID.
-func (s *OrganizationEvent) SetMetaEventID(val NilEventMetaEventID) {
+func (s *OrganizationEvent) SetMetaEventID(val NilInt32) {
 	s.MetaEventID = val
 }
 
 // SetAchievementsAllowed sets the value of AchievementsAllowed.
-func (s *OrganizationEvent) SetAchievementsAllowed(val EventAchievementsAllowed) {
+func (s *OrganizationEvent) SetAchievementsAllowed(val bool) {
 	s.AchievementsAllowed = val
 }
 
 // SetRequestsAllowed sets the value of RequestsAllowed.
-func (s *OrganizationEvent) SetRequestsAllowed(val EventRequestsAllowed) {
+func (s *OrganizationEvent) SetRequestsAllowed(val bool) {
 	s.RequestsAllowed = val
 }
 
 // SetSelfCheckIn sets the value of SelfCheckIn.
-func (s *OrganizationEvent) SetSelfCheckIn(val EventSelfCheckIn) {
+func (s *OrganizationEvent) SetSelfCheckIn(val bool) {
 	s.SelfCheckIn = val
 }
 
@@ -8760,7 +8135,7 @@ func (s *OrganizationEvent) SetTeamsInvolved(val EventTeamsInvolved) {
 }
 
 // SetMaxUsers sets the value of MaxUsers.
-func (s *OrganizationEvent) SetMaxUsers(val NilEventMaxUsers) {
+func (s *OrganizationEvent) SetMaxUsers(val NilInt32) {
 	s.MaxUsers = val
 }
 
@@ -8770,22 +8145,22 @@ func (s *OrganizationEvent) SetLimits(val EventLimitOnlyDateEndRequest) {
 }
 
 // SetAchievementsCount sets the value of AchievementsCount.
-func (s *OrganizationEvent) SetAchievementsCount(val EventAchievementsCount) {
+func (s *OrganizationEvent) SetAchievementsCount(val int32) {
 	s.AchievementsCount = val
 }
 
 // SetRequestsCount sets the value of RequestsCount.
-func (s *OrganizationEvent) SetRequestsCount(val EventRequestsCount) {
+func (s *OrganizationEvent) SetRequestsCount(val int32) {
 	s.RequestsCount = val
 }
 
 // SetCover sets the value of Cover.
-func (s *OrganizationEvent) SetCover(val EventCover) {
+func (s *OrganizationEvent) SetCover(val string) {
 	s.Cover = val
 }
 
 // SetURL sets the value of URL.
-func (s *OrganizationEvent) SetURL(val EventURL) {
+func (s *OrganizationEvent) SetURL(val string) {
 	s.URL = val
 }
 
@@ -8813,6 +8188,12 @@ type OrganizationMeta struct {
 	LegalEntityID        NilInt32            `json:"legal_entity_id"`
 	ParentOrganizationID NilInt32            `json:"parent_organization_id"`
 	EducationalCategory  EducationalCategory `json:"educational_category"`
+	ShortName            string              `json:"short_name"`
+	FullName             string              `json:"full_name"`
+	// Опциональный ID [геоданных].
+	//
+	// [геоданных]: #tag/geodata/operation/ReadGeoData
+	GeoDataID NilInt32 `json:"geo_data_id"`
 }
 
 // GetID returns the value of ID.
@@ -8850,6 +8231,21 @@ func (s *OrganizationMeta) GetEducationalCategory() EducationalCategory {
 	return s.EducationalCategory
 }
 
+// GetShortName returns the value of ShortName.
+func (s *OrganizationMeta) GetShortName() string {
+	return s.ShortName
+}
+
+// GetFullName returns the value of FullName.
+func (s *OrganizationMeta) GetFullName() string {
+	return s.FullName
+}
+
+// GetGeoDataID returns the value of GeoDataID.
+func (s *OrganizationMeta) GetGeoDataID() NilInt32 {
+	return s.GeoDataID
+}
+
 // SetID sets the value of ID.
 func (s *OrganizationMeta) SetID(val int32) {
 	s.ID = val
@@ -8885,13 +8281,30 @@ func (s *OrganizationMeta) SetEducationalCategory(val EducationalCategory) {
 	s.EducationalCategory = val
 }
 
+// SetShortName sets the value of ShortName.
+func (s *OrganizationMeta) SetShortName(val string) {
+	s.ShortName = val
+}
+
+// SetFullName sets the value of FullName.
+func (s *OrganizationMeta) SetFullName(val string) {
+	s.FullName = val
+}
+
+// SetGeoDataID sets the value of GeoDataID.
+func (s *OrganizationMeta) SetGeoDataID(val NilInt32) {
+	s.GeoDataID = val
+}
+
 // Merged schema.
 // Ref: #/components/schemas/OrganizationSubject
 type OrganizationSubject struct {
 	ID             int32     `json:"id"`
 	CreatedAt      time.Time `json:"created_at"`
 	OrganizationID int32     `json:"organization_id"`
-	// ID [тематики](#tag/organization-subjects/operation/SubjectList).
+	// ID [тематики].
+	//
+	// [тематики]: #tag/organization-subjects/operation/SubjectList
 	SubjectID int32 `json:"subject_id"`
 }
 
@@ -8940,7 +8353,9 @@ func (*OrganizationSubject) createOrganizationSubjectRes() {}
 // Ref: #/components/schemas/OrganizationSubjectBody
 type OrganizationSubjectBody struct {
 	OrganizationID int32 `json:"organization_id"`
-	// ID [тематики](#tag/organization-subjects/operation/SubjectList).
+	// ID [тематики].
+	//
+	// [тематики]: #tag/organization-subjects/operation/SubjectList
 	SubjectID int32 `json:"subject_id"`
 }
 
@@ -8962,6 +8377,353 @@ func (s *OrganizationSubjectBody) SetOrganizationID(val int32) {
 // SetSubjectID sets the value of SubjectID.
 func (s *OrganizationSubjectBody) SetSubjectID(val int32) {
 	s.SubjectID = val
+}
+
+// Merged schema.
+// Ref: #/components/schemas/OrganizationTeamCreate
+type OrganizationTeamCreate struct {
+	// TalentID капитана команды.
+	OwnerID int32 `json:"owner_id"`
+	// Название команды.
+	Title string `json:"title"`
+	// Описание команды.
+	Description OptString `json:"description"`
+	// Команда участвует в автораспределении.
+	AssignmentParticipation OptBool            `json:"assignment_participation"`
+	ContactLink             OptTeamContactLink `json:"contact_link"`
+	// ID мероприятия команды.
+	EventID int32 `json:"event_id"`
+}
+
+// GetOwnerID returns the value of OwnerID.
+func (s *OrganizationTeamCreate) GetOwnerID() int32 {
+	return s.OwnerID
+}
+
+// GetTitle returns the value of Title.
+func (s *OrganizationTeamCreate) GetTitle() string {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *OrganizationTeamCreate) GetDescription() OptString {
+	return s.Description
+}
+
+// GetAssignmentParticipation returns the value of AssignmentParticipation.
+func (s *OrganizationTeamCreate) GetAssignmentParticipation() OptBool {
+	return s.AssignmentParticipation
+}
+
+// GetContactLink returns the value of ContactLink.
+func (s *OrganizationTeamCreate) GetContactLink() OptTeamContactLink {
+	return s.ContactLink
+}
+
+// GetEventID returns the value of EventID.
+func (s *OrganizationTeamCreate) GetEventID() int32 {
+	return s.EventID
+}
+
+// SetOwnerID sets the value of OwnerID.
+func (s *OrganizationTeamCreate) SetOwnerID(val int32) {
+	s.OwnerID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *OrganizationTeamCreate) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *OrganizationTeamCreate) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetAssignmentParticipation sets the value of AssignmentParticipation.
+func (s *OrganizationTeamCreate) SetAssignmentParticipation(val OptBool) {
+	s.AssignmentParticipation = val
+}
+
+// SetContactLink sets the value of ContactLink.
+func (s *OrganizationTeamCreate) SetContactLink(val OptTeamContactLink) {
+	s.ContactLink = val
+}
+
+// SetEventID sets the value of EventID.
+func (s *OrganizationTeamCreate) SetEventID(val int32) {
+	s.EventID = val
+}
+
+// Ref: #/components/schemas/OrganizationTeamPersonUpdate
+type OrganizationTeamPersonUpdate struct {
+	OwnerAccepted OptTeamPersonAcceptValue   `json:"owner_accepted"`
+	UserAccepted  OptTeamPersonAcceptApprove `json:"user_accepted"`
+}
+
+// GetOwnerAccepted returns the value of OwnerAccepted.
+func (s *OrganizationTeamPersonUpdate) GetOwnerAccepted() OptTeamPersonAcceptValue {
+	return s.OwnerAccepted
+}
+
+// GetUserAccepted returns the value of UserAccepted.
+func (s *OrganizationTeamPersonUpdate) GetUserAccepted() OptTeamPersonAcceptApprove {
+	return s.UserAccepted
+}
+
+// SetOwnerAccepted sets the value of OwnerAccepted.
+func (s *OrganizationTeamPersonUpdate) SetOwnerAccepted(val OptTeamPersonAcceptValue) {
+	s.OwnerAccepted = val
+}
+
+// SetUserAccepted sets the value of UserAccepted.
+func (s *OrganizationTeamPersonUpdate) SetUserAccepted(val OptTeamPersonAcceptApprove) {
+	s.UserAccepted = val
+}
+
+// Ref: #/components/schemas/OrganizationTeamUpdate
+type OrganizationTeamUpdate struct {
+	// TalentID капитана команды.
+	OwnerID OptInt32 `json:"owner_id"`
+	// Название команды.
+	Title OptString `json:"title"`
+	// Описание команды.
+	Description OptString `json:"description"`
+	// Команда участвует в автораспределении.
+	AssignmentParticipation OptBool            `json:"assignment_participation"`
+	ContactLink             OptTeamContactLink `json:"contact_link"`
+}
+
+// GetOwnerID returns the value of OwnerID.
+func (s *OrganizationTeamUpdate) GetOwnerID() OptInt32 {
+	return s.OwnerID
+}
+
+// GetTitle returns the value of Title.
+func (s *OrganizationTeamUpdate) GetTitle() OptString {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *OrganizationTeamUpdate) GetDescription() OptString {
+	return s.Description
+}
+
+// GetAssignmentParticipation returns the value of AssignmentParticipation.
+func (s *OrganizationTeamUpdate) GetAssignmentParticipation() OptBool {
+	return s.AssignmentParticipation
+}
+
+// GetContactLink returns the value of ContactLink.
+func (s *OrganizationTeamUpdate) GetContactLink() OptTeamContactLink {
+	return s.ContactLink
+}
+
+// SetOwnerID sets the value of OwnerID.
+func (s *OrganizationTeamUpdate) SetOwnerID(val OptInt32) {
+	s.OwnerID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *OrganizationTeamUpdate) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *OrganizationTeamUpdate) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetAssignmentParticipation sets the value of AssignmentParticipation.
+func (s *OrganizationTeamUpdate) SetAssignmentParticipation(val OptBool) {
+	s.AssignmentParticipation = val
+}
+
+// SetContactLink sets the value of ContactLink.
+func (s *OrganizationTeamUpdate) SetContactLink(val OptTeamContactLink) {
+	s.ContactLink = val
+}
+
+// Merged schema.
+// Ref: #/components/schemas/OwnerTeamCreate
+type OwnerTeamCreate struct {
+	// Название команды.
+	Title string `json:"title"`
+	// Описание команды.
+	Description OptString `json:"description"`
+	// Команда участвует в автораспределении.
+	AssignmentParticipation OptBool            `json:"assignment_participation"`
+	ContactLink             OptTeamContactLink `json:"contact_link"`
+	// ID проекта команды.
+	ProjectID OptNilInt32 `json:"project_id"`
+	// ID мероприятия команды.
+	EventID int32 `json:"event_id"`
+}
+
+// GetTitle returns the value of Title.
+func (s *OwnerTeamCreate) GetTitle() string {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *OwnerTeamCreate) GetDescription() OptString {
+	return s.Description
+}
+
+// GetAssignmentParticipation returns the value of AssignmentParticipation.
+func (s *OwnerTeamCreate) GetAssignmentParticipation() OptBool {
+	return s.AssignmentParticipation
+}
+
+// GetContactLink returns the value of ContactLink.
+func (s *OwnerTeamCreate) GetContactLink() OptTeamContactLink {
+	return s.ContactLink
+}
+
+// GetProjectID returns the value of ProjectID.
+func (s *OwnerTeamCreate) GetProjectID() OptNilInt32 {
+	return s.ProjectID
+}
+
+// GetEventID returns the value of EventID.
+func (s *OwnerTeamCreate) GetEventID() int32 {
+	return s.EventID
+}
+
+// SetTitle sets the value of Title.
+func (s *OwnerTeamCreate) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *OwnerTeamCreate) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetAssignmentParticipation sets the value of AssignmentParticipation.
+func (s *OwnerTeamCreate) SetAssignmentParticipation(val OptBool) {
+	s.AssignmentParticipation = val
+}
+
+// SetContactLink sets the value of ContactLink.
+func (s *OwnerTeamCreate) SetContactLink(val OptTeamContactLink) {
+	s.ContactLink = val
+}
+
+// SetProjectID sets the value of ProjectID.
+func (s *OwnerTeamCreate) SetProjectID(val OptNilInt32) {
+	s.ProjectID = val
+}
+
+// SetEventID sets the value of EventID.
+func (s *OwnerTeamCreate) SetEventID(val int32) {
+	s.EventID = val
+}
+
+// Ref: #/components/schemas/OwnerTeamPersonCreate
+type OwnerTeamPersonCreate struct {
+	UserID int32 `json:"user_id"`
+}
+
+// GetUserID returns the value of UserID.
+func (s *OwnerTeamPersonCreate) GetUserID() int32 {
+	return s.UserID
+}
+
+// SetUserID sets the value of UserID.
+func (s *OwnerTeamPersonCreate) SetUserID(val int32) {
+	s.UserID = val
+}
+
+// Ref: #/components/schemas/OwnerTeamPersonUpdate
+type OwnerTeamPersonUpdate struct {
+	OwnerAccepted TeamPersonAcceptValue `json:"owner_accepted"`
+}
+
+// GetOwnerAccepted returns the value of OwnerAccepted.
+func (s *OwnerTeamPersonUpdate) GetOwnerAccepted() TeamPersonAcceptValue {
+	return s.OwnerAccepted
+}
+
+// SetOwnerAccepted sets the value of OwnerAccepted.
+func (s *OwnerTeamPersonUpdate) SetOwnerAccepted(val TeamPersonAcceptValue) {
+	s.OwnerAccepted = val
+}
+
+// Merged schema.
+// Ref: #/components/schemas/OwnerTeamUpdate
+type OwnerTeamUpdate struct {
+	// Название команды.
+	Title OptString `json:"title"`
+	// Описание команды.
+	Description OptString `json:"description"`
+	// Команда участвует в автораспределении.
+	AssignmentParticipation OptBool            `json:"assignment_participation"`
+	ContactLink             OptTeamContactLink `json:"contact_link"`
+	// ID проекта команды.
+	ProjectID OptNilInt32 `json:"project_id"`
+	// TalentID капитана команды.
+	OwnerID OptInt32 `json:"owner_id"`
+}
+
+// GetTitle returns the value of Title.
+func (s *OwnerTeamUpdate) GetTitle() OptString {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *OwnerTeamUpdate) GetDescription() OptString {
+	return s.Description
+}
+
+// GetAssignmentParticipation returns the value of AssignmentParticipation.
+func (s *OwnerTeamUpdate) GetAssignmentParticipation() OptBool {
+	return s.AssignmentParticipation
+}
+
+// GetContactLink returns the value of ContactLink.
+func (s *OwnerTeamUpdate) GetContactLink() OptTeamContactLink {
+	return s.ContactLink
+}
+
+// GetProjectID returns the value of ProjectID.
+func (s *OwnerTeamUpdate) GetProjectID() OptNilInt32 {
+	return s.ProjectID
+}
+
+// GetOwnerID returns the value of OwnerID.
+func (s *OwnerTeamUpdate) GetOwnerID() OptInt32 {
+	return s.OwnerID
+}
+
+// SetTitle sets the value of Title.
+func (s *OwnerTeamUpdate) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *OwnerTeamUpdate) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetAssignmentParticipation sets the value of AssignmentParticipation.
+func (s *OwnerTeamUpdate) SetAssignmentParticipation(val OptBool) {
+	s.AssignmentParticipation = val
+}
+
+// SetContactLink sets the value of ContactLink.
+func (s *OwnerTeamUpdate) SetContactLink(val OptTeamContactLink) {
+	s.ContactLink = val
+}
+
+// SetProjectID sets the value of ProjectID.
+func (s *OwnerTeamUpdate) SetProjectID(val OptNilInt32) {
+	s.ProjectID = val
+}
+
+// SetOwnerID sets the value of OwnerID.
+func (s *OwnerTeamUpdate) SetOwnerID(val OptInt32) {
+	s.OwnerID = val
 }
 
 type PatchMutationLockReq struct {
@@ -9010,15 +8772,16 @@ func (*PermissionDenied) listSocialAuthsRes()                 {}
 func (*PermissionDenied) listUserConsentsRes()                {}
 func (*PermissionDenied) patchMutationLockRes()               {}
 func (*PermissionDenied) readEventDeferredNotificationRes()   {}
+func (*PermissionDenied) readEventRequestRes()                {}
 func (*PermissionDenied) readFileMetaRes()                    {}
 func (*PermissionDenied) readFileRes()                        {}
 func (*PermissionDenied) signupRes()                          {}
 func (*PermissionDenied) submitUserConsentRes()               {}
-func (*PermissionDenied) updateAuthenticatedUserRes()         {}
 func (*PermissionDenied) updateEventDeferredNotificationRes() {}
 func (*PermissionDenied) updateEventLimitRes()                {}
+func (*PermissionDenied) updateEventRequestRes()              {}
+func (*PermissionDenied) updateEventRes()                     {}
 func (*PermissionDenied) updateFileMetaRes()                  {}
-func (*PermissionDenied) updateTeamRes()                      {}
 func (*PermissionDenied) uploadFileRes()                      {}
 
 // Статус задачи в очереди.
@@ -9085,7 +8848,8 @@ func (*ReadEventDiplomaSettingsNoContent) readEventDiplomaSettingsRes() {}
 
 // ReadEventOK represents sum type.
 type ReadEventOK struct {
-	Type      ReadEventOKType // switch on this field
+	// Type selects the active sum variant, switch on this field.
+	Type      ReadEventOKType
 	EventMeta EventMeta
 	Event     Event
 }
@@ -9147,8 +8911,6 @@ func NewEventReadEventOK(v Event) ReadEventOK {
 	return s
 }
 
-func (*ReadEventOK) readEventRes() {}
-
 type ReadFileOKApplicationJSON url.URL
 
 func (*ReadFileOKApplicationJSON) readFileRes() {}
@@ -9172,20 +8934,34 @@ func (*ReadFileTemporaryRedirect) readFileRes() {}
 
 type ReadPersonOK struct {
 	// TalentID пользователя, которому принадлежит персона.
-	UserID int32 `json:"user_id"`
+	UserID NilInt32 `json:"user_id"`
 }
 
 // GetUserID returns the value of UserID.
-func (s *ReadPersonOK) GetUserID() int32 {
+func (s *ReadPersonOK) GetUserID() NilInt32 {
 	return s.UserID
 }
 
 // SetUserID sets the value of UserID.
-func (s *ReadPersonOK) SetUserID(val int32) {
+func (s *ReadPersonOK) SetUserID(val NilInt32) {
 	s.UserID = val
 }
 
-func (*ReadPersonOK) readPersonRes() {}
+type RegionNameOK struct {
+	Name string `json:"name"`
+}
+
+// GetName returns the value of Name.
+func (s *RegionNameOK) GetName() string {
+	return s.Name
+}
+
+// SetName sets the value of Name.
+func (s *RegionNameOK) SetName(val string) {
+	s.Name = val
+}
+
+func (*RegionNameOK) regionNameRes() {}
 
 // Ref: #/components/schemas/Signup
 type Signup struct {
@@ -9451,7 +9227,8 @@ func (*SignupInitialDataOK) signupInitialDataRes() {}
 
 // SignupInitialDataOKItem represents sum type.
 type SignupInitialDataOKItem struct {
-	Type   SignupInitialDataOKItemType // switch on this field
+	// Type selects the active sum variant, switch on this field.
+	Type   SignupInitialDataOKItemType
 	String string
 	Bool   bool
 }
@@ -9515,9 +9292,15 @@ func NewBoolSignupInitialDataOKItem(v bool) SignupInitialDataOKItem {
 
 // Ref: #/components/schemas/SocialAuth
 type SocialAuth struct {
+	ID       int32              `json:"id"`
 	Provider SocialAuthProvider `json:"provider"`
 	// ID пользователя в провайдере авторизации.
 	UID string `json:"uid"`
+}
+
+// GetID returns the value of ID.
+func (s *SocialAuth) GetID() int32 {
+	return s.ID
 }
 
 // GetProvider returns the value of Provider.
@@ -9528,6 +9311,11 @@ func (s *SocialAuth) GetProvider() SocialAuthProvider {
 // GetUID returns the value of UID.
 func (s *SocialAuth) GetUID() string {
 	return s.UID
+}
+
+// SetID sets the value of ID.
+func (s *SocialAuth) SetID(val int32) {
+	s.ID = val
 }
 
 // SetProvider sets the value of Provider.
@@ -9707,6 +9495,72 @@ type SubmitUserConsentNoContent struct{}
 
 func (*SubmitUserConsentNoContent) submitUserConsentRes() {}
 
+type SuggestGeoFieldField string
+
+const (
+	SuggestGeoFieldFieldRegionWithType SuggestGeoFieldField = "region_with_type"
+	SuggestGeoFieldFieldCity           SuggestGeoFieldField = "city"
+)
+
+// AllValues returns all SuggestGeoFieldField values.
+func (SuggestGeoFieldField) AllValues() []SuggestGeoFieldField {
+	return []SuggestGeoFieldField{
+		SuggestGeoFieldFieldRegionWithType,
+		SuggestGeoFieldFieldCity,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SuggestGeoFieldField) MarshalText() ([]byte, error) {
+	switch s {
+	case SuggestGeoFieldFieldRegionWithType:
+		return []byte(s), nil
+	case SuggestGeoFieldFieldCity:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SuggestGeoFieldField) UnmarshalText(data []byte) error {
+	switch SuggestGeoFieldField(data) {
+	case SuggestGeoFieldFieldRegionWithType:
+		*s = SuggestGeoFieldFieldRegionWithType
+		return nil
+	case SuggestGeoFieldFieldCity:
+		*s = SuggestGeoFieldFieldCity
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type SuggestGeoFieldOKItem struct {
+	Name string  `json:"name"`
+	Fias OptUUID `json:"fias"`
+}
+
+// GetName returns the value of Name.
+func (s *SuggestGeoFieldOKItem) GetName() string {
+	return s.Name
+}
+
+// GetFias returns the value of Fias.
+func (s *SuggestGeoFieldOKItem) GetFias() OptUUID {
+	return s.Fias
+}
+
+// SetName sets the value of Name.
+func (s *SuggestGeoFieldOKItem) SetName(val string) {
+	s.Name = val
+}
+
+// SetFias sets the value of Fias.
+func (s *SuggestGeoFieldOKItem) SetFias(val OptUUID) {
+	s.Fias = val
+}
+
 type TalentOAuth struct {
 	Token string
 	Roles []string
@@ -9732,8 +9586,320 @@ func (s *TalentOAuth) SetRoles(val []string) {
 	s.Roles = val
 }
 
-// Ref: #/components/schemas/Team
-type Team struct {
+type TeamContactLink url.URL
+
+// Ref: #/components/schemas/TeamPerson
+type TeamPerson struct {
+	ID            int32              `json:"id"`
+	UserAccepted  TeamPersonAccepted `json:"user_accepted"`
+	OwnerAccepted TeamPersonAccepted `json:"owner_accepted"`
+	PersonID      int32              `json:"person_id"`
+}
+
+// GetID returns the value of ID.
+func (s *TeamPerson) GetID() int32 {
+	return s.ID
+}
+
+// GetUserAccepted returns the value of UserAccepted.
+func (s *TeamPerson) GetUserAccepted() TeamPersonAccepted {
+	return s.UserAccepted
+}
+
+// GetOwnerAccepted returns the value of OwnerAccepted.
+func (s *TeamPerson) GetOwnerAccepted() TeamPersonAccepted {
+	return s.OwnerAccepted
+}
+
+// GetPersonID returns the value of PersonID.
+func (s *TeamPerson) GetPersonID() int32 {
+	return s.PersonID
+}
+
+// SetID sets the value of ID.
+func (s *TeamPerson) SetID(val int32) {
+	s.ID = val
+}
+
+// SetUserAccepted sets the value of UserAccepted.
+func (s *TeamPerson) SetUserAccepted(val TeamPersonAccepted) {
+	s.UserAccepted = val
+}
+
+// SetOwnerAccepted sets the value of OwnerAccepted.
+func (s *TeamPerson) SetOwnerAccepted(val TeamPersonAccepted) {
+	s.OwnerAccepted = val
+}
+
+// SetPersonID sets the value of PersonID.
+func (s *TeamPerson) SetPersonID(val int32) {
+	s.PersonID = val
+}
+
+func (*TeamPerson) createEventTeamPersonRes() {}
+func (*TeamPerson) updateOwnerTeamPersonRes() {}
+func (*TeamPerson) updateUserTeamPersonRes()  {}
+
+// Ref: #/components/schemas/TeamPersonAcceptApprove
+type TeamPersonAcceptApprove string
+
+const (
+	TeamPersonAcceptApproveA TeamPersonAcceptApprove = "a"
+)
+
+// AllValues returns all TeamPersonAcceptApprove values.
+func (TeamPersonAcceptApprove) AllValues() []TeamPersonAcceptApprove {
+	return []TeamPersonAcceptApprove{
+		TeamPersonAcceptApproveA,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s TeamPersonAcceptApprove) MarshalText() ([]byte, error) {
+	switch s {
+	case TeamPersonAcceptApproveA:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *TeamPersonAcceptApprove) UnmarshalText(data []byte) error {
+	switch TeamPersonAcceptApprove(data) {
+	case TeamPersonAcceptApproveA:
+		*s = TeamPersonAcceptApproveA
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/TeamPersonAcceptValue
+type TeamPersonAcceptValue string
+
+const (
+	TeamPersonAcceptValueA TeamPersonAcceptValue = "a"
+	TeamPersonAcceptValueR TeamPersonAcceptValue = "r"
+)
+
+// AllValues returns all TeamPersonAcceptValue values.
+func (TeamPersonAcceptValue) AllValues() []TeamPersonAcceptValue {
+	return []TeamPersonAcceptValue{
+		TeamPersonAcceptValueA,
+		TeamPersonAcceptValueR,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s TeamPersonAcceptValue) MarshalText() ([]byte, error) {
+	switch s {
+	case TeamPersonAcceptValueA:
+		return []byte(s), nil
+	case TeamPersonAcceptValueR:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *TeamPersonAcceptValue) UnmarshalText(data []byte) error {
+	switch TeamPersonAcceptValue(data) {
+	case TeamPersonAcceptValueA:
+		*s = TeamPersonAcceptValueA
+		return nil
+	case TeamPersonAcceptValueR:
+		*s = TeamPersonAcceptValueR
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/TeamPersonAccepted
+type TeamPersonAccepted string
+
+const (
+	TeamPersonAcceptedEmpty TeamPersonAccepted = ""
+	TeamPersonAcceptedA     TeamPersonAccepted = "a"
+	TeamPersonAcceptedR     TeamPersonAccepted = "r"
+)
+
+// AllValues returns all TeamPersonAccepted values.
+func (TeamPersonAccepted) AllValues() []TeamPersonAccepted {
+	return []TeamPersonAccepted{
+		TeamPersonAcceptedEmpty,
+		TeamPersonAcceptedA,
+		TeamPersonAcceptedR,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s TeamPersonAccepted) MarshalText() ([]byte, error) {
+	switch s {
+	case TeamPersonAcceptedEmpty:
+		return []byte(s), nil
+	case TeamPersonAcceptedA:
+		return []byte(s), nil
+	case TeamPersonAcceptedR:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *TeamPersonAccepted) UnmarshalText(data []byte) error {
+	switch TeamPersonAccepted(data) {
+	case TeamPersonAcceptedEmpty:
+		*s = TeamPersonAcceptedEmpty
+		return nil
+	case TeamPersonAcceptedA:
+		*s = TeamPersonAcceptedA
+		return nil
+	case TeamPersonAcceptedR:
+		*s = TeamPersonAcceptedR
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/TeamPersonWithUser
+type TeamPersonWithUser struct {
+	ID            int32                    `json:"id"`
+	UserAccepted  TeamPersonAccepted       `json:"user_accepted"`
+	OwnerAccepted TeamPersonAccepted       `json:"owner_accepted"`
+	Person        TeamPersonWithUserPerson `json:"person"`
+}
+
+// GetID returns the value of ID.
+func (s *TeamPersonWithUser) GetID() int32 {
+	return s.ID
+}
+
+// GetUserAccepted returns the value of UserAccepted.
+func (s *TeamPersonWithUser) GetUserAccepted() TeamPersonAccepted {
+	return s.UserAccepted
+}
+
+// GetOwnerAccepted returns the value of OwnerAccepted.
+func (s *TeamPersonWithUser) GetOwnerAccepted() TeamPersonAccepted {
+	return s.OwnerAccepted
+}
+
+// GetPerson returns the value of Person.
+func (s *TeamPersonWithUser) GetPerson() TeamPersonWithUserPerson {
+	return s.Person
+}
+
+// SetID sets the value of ID.
+func (s *TeamPersonWithUser) SetID(val int32) {
+	s.ID = val
+}
+
+// SetUserAccepted sets the value of UserAccepted.
+func (s *TeamPersonWithUser) SetUserAccepted(val TeamPersonAccepted) {
+	s.UserAccepted = val
+}
+
+// SetOwnerAccepted sets the value of OwnerAccepted.
+func (s *TeamPersonWithUser) SetOwnerAccepted(val TeamPersonAccepted) {
+	s.OwnerAccepted = val
+}
+
+// SetPerson sets the value of Person.
+func (s *TeamPersonWithUser) SetPerson(val TeamPersonWithUserPerson) {
+	s.Person = val
+}
+
+type TeamPersonWithUserPerson struct {
+	ID   int32                           `json:"id"`
+	User NilTeamPersonWithUserPersonUser `json:"user"`
+}
+
+// GetID returns the value of ID.
+func (s *TeamPersonWithUserPerson) GetID() int32 {
+	return s.ID
+}
+
+// GetUser returns the value of User.
+func (s *TeamPersonWithUserPerson) GetUser() NilTeamPersonWithUserPersonUser {
+	return s.User
+}
+
+// SetID sets the value of ID.
+func (s *TeamPersonWithUserPerson) SetID(val int32) {
+	s.ID = val
+}
+
+// SetUser sets the value of User.
+func (s *TeamPersonWithUserPerson) SetUser(val NilTeamPersonWithUserPersonUser) {
+	s.User = val
+}
+
+type TeamPersonWithUserPersonUser struct {
+	ID         int32        `json:"id"`
+	Avatar     OptNilString `json:"avatar"`
+	LastName   string       `json:"last_name"`
+	FirstName  string       `json:"first_name"`
+	MiddleName OptString    `json:"middle_name"`
+}
+
+// GetID returns the value of ID.
+func (s *TeamPersonWithUserPersonUser) GetID() int32 {
+	return s.ID
+}
+
+// GetAvatar returns the value of Avatar.
+func (s *TeamPersonWithUserPersonUser) GetAvatar() OptNilString {
+	return s.Avatar
+}
+
+// GetLastName returns the value of LastName.
+func (s *TeamPersonWithUserPersonUser) GetLastName() string {
+	return s.LastName
+}
+
+// GetFirstName returns the value of FirstName.
+func (s *TeamPersonWithUserPersonUser) GetFirstName() string {
+	return s.FirstName
+}
+
+// GetMiddleName returns the value of MiddleName.
+func (s *TeamPersonWithUserPersonUser) GetMiddleName() OptString {
+	return s.MiddleName
+}
+
+// SetID sets the value of ID.
+func (s *TeamPersonWithUserPersonUser) SetID(val int32) {
+	s.ID = val
+}
+
+// SetAvatar sets the value of Avatar.
+func (s *TeamPersonWithUserPersonUser) SetAvatar(val OptNilString) {
+	s.Avatar = val
+}
+
+// SetLastName sets the value of LastName.
+func (s *TeamPersonWithUserPersonUser) SetLastName(val string) {
+	s.LastName = val
+}
+
+// SetFirstName sets the value of FirstName.
+func (s *TeamPersonWithUserPersonUser) SetFirstName(val string) {
+	s.FirstName = val
+}
+
+// SetMiddleName sets the value of MiddleName.
+func (s *TeamPersonWithUserPersonUser) SetMiddleName(val OptString) {
+	s.MiddleName = val
+}
+
+// Merged schema.
+// Ref: #/components/schemas/TeamPrivate
+type TeamPrivate struct {
 	// ID команды.
 	ID int32 `json:"id"`
 	// Дата создания.
@@ -9749,146 +9915,561 @@ type Team struct {
 	// Команда создана автораспределением.
 	CreatedByAssignment bool `json:"created_by_assignment"`
 	// ID мероприятия команды.
-	EventID int32 `json:"event_id"`
-	// ID проекта команды.
-	ProjectID int32 `json:"project_id"`
+	EventID NilInt32 `json:"event_id"`
 	// TalentID капитана команды.
-	// > Доступно только для участников команды и
-	// организатора мероприятия.
-	OwnerID OptInt32 `json:"owner_id"`
+	OwnerID NilInt32 `json:"owner_id"`
+	// ID проекта команды.
+	ProjectID NilInt32 `json:"project_id"`
 	// Контактная ссылка команды.
-	// > Доступно только для участников команды и
-	// организатора мероприятия.
-	ContactLink OptString `json:"contact_link"`
+	ContactLink string `json:"contact_link"`
 	// Код для вступления в команду.
-	// > Доступен только капитану команды.
 	InviteCode OptString `json:"invite_code"`
 }
 
 // GetID returns the value of ID.
-func (s *Team) GetID() int32 {
+func (s *TeamPrivate) GetID() int32 {
 	return s.ID
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *Team) GetCreatedAt() time.Time {
+func (s *TeamPrivate) GetCreatedAt() time.Time {
 	return s.CreatedAt
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
-func (s *Team) GetUpdatedAt() time.Time {
+func (s *TeamPrivate) GetUpdatedAt() time.Time {
 	return s.UpdatedAt
 }
 
 // GetTitle returns the value of Title.
-func (s *Team) GetTitle() string {
+func (s *TeamPrivate) GetTitle() string {
 	return s.Title
 }
 
 // GetDescription returns the value of Description.
-func (s *Team) GetDescription() string {
+func (s *TeamPrivate) GetDescription() string {
 	return s.Description
 }
 
 // GetAssignmentParticipation returns the value of AssignmentParticipation.
-func (s *Team) GetAssignmentParticipation() bool {
+func (s *TeamPrivate) GetAssignmentParticipation() bool {
 	return s.AssignmentParticipation
 }
 
 // GetCreatedByAssignment returns the value of CreatedByAssignment.
-func (s *Team) GetCreatedByAssignment() bool {
+func (s *TeamPrivate) GetCreatedByAssignment() bool {
 	return s.CreatedByAssignment
 }
 
 // GetEventID returns the value of EventID.
-func (s *Team) GetEventID() int32 {
+func (s *TeamPrivate) GetEventID() NilInt32 {
 	return s.EventID
 }
 
-// GetProjectID returns the value of ProjectID.
-func (s *Team) GetProjectID() int32 {
-	return s.ProjectID
-}
-
 // GetOwnerID returns the value of OwnerID.
-func (s *Team) GetOwnerID() OptInt32 {
+func (s *TeamPrivate) GetOwnerID() NilInt32 {
 	return s.OwnerID
 }
 
+// GetProjectID returns the value of ProjectID.
+func (s *TeamPrivate) GetProjectID() NilInt32 {
+	return s.ProjectID
+}
+
 // GetContactLink returns the value of ContactLink.
-func (s *Team) GetContactLink() OptString {
+func (s *TeamPrivate) GetContactLink() string {
 	return s.ContactLink
 }
 
 // GetInviteCode returns the value of InviteCode.
-func (s *Team) GetInviteCode() OptString {
+func (s *TeamPrivate) GetInviteCode() OptString {
 	return s.InviteCode
 }
 
 // SetID sets the value of ID.
-func (s *Team) SetID(val int32) {
+func (s *TeamPrivate) SetID(val int32) {
 	s.ID = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
-func (s *Team) SetCreatedAt(val time.Time) {
+func (s *TeamPrivate) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.
-func (s *Team) SetUpdatedAt(val time.Time) {
+func (s *TeamPrivate) SetUpdatedAt(val time.Time) {
 	s.UpdatedAt = val
 }
 
 // SetTitle sets the value of Title.
-func (s *Team) SetTitle(val string) {
+func (s *TeamPrivate) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetDescription sets the value of Description.
-func (s *Team) SetDescription(val string) {
+func (s *TeamPrivate) SetDescription(val string) {
 	s.Description = val
 }
 
 // SetAssignmentParticipation sets the value of AssignmentParticipation.
-func (s *Team) SetAssignmentParticipation(val bool) {
+func (s *TeamPrivate) SetAssignmentParticipation(val bool) {
 	s.AssignmentParticipation = val
 }
 
 // SetCreatedByAssignment sets the value of CreatedByAssignment.
-func (s *Team) SetCreatedByAssignment(val bool) {
+func (s *TeamPrivate) SetCreatedByAssignment(val bool) {
 	s.CreatedByAssignment = val
 }
 
 // SetEventID sets the value of EventID.
-func (s *Team) SetEventID(val int32) {
+func (s *TeamPrivate) SetEventID(val NilInt32) {
 	s.EventID = val
 }
 
-// SetProjectID sets the value of ProjectID.
-func (s *Team) SetProjectID(val int32) {
-	s.ProjectID = val
-}
-
 // SetOwnerID sets the value of OwnerID.
-func (s *Team) SetOwnerID(val OptInt32) {
+func (s *TeamPrivate) SetOwnerID(val NilInt32) {
 	s.OwnerID = val
 }
 
+// SetProjectID sets the value of ProjectID.
+func (s *TeamPrivate) SetProjectID(val NilInt32) {
+	s.ProjectID = val
+}
+
 // SetContactLink sets the value of ContactLink.
-func (s *Team) SetContactLink(val OptString) {
+func (s *TeamPrivate) SetContactLink(val string) {
 	s.ContactLink = val
 }
 
 // SetInviteCode sets the value of InviteCode.
-func (s *Team) SetInviteCode(val OptString) {
+func (s *TeamPrivate) SetInviteCode(val OptString) {
 	s.InviteCode = val
 }
 
-func (*Team) readTeamRes()   {}
-func (*Team) updateTeamRes() {}
+func (*TeamPrivate) createEventTeamRes() {}
+func (*TeamPrivate) createUserTeamRes()  {}
+func (*TeamPrivate) updateEventTeamRes() {}
+func (*TeamPrivate) updateUserTeamRes()  {}
 
-type TeamContactLink url.URL
+// Merged schema.
+// Ref: #/components/schemas/TeamPrivateWithPersons
+type TeamPrivateWithPersons struct {
+	// ID команды.
+	ID int32 `json:"id"`
+	// Дата создания.
+	CreatedAt time.Time `json:"created_at"`
+	// Дата обновления.
+	UpdatedAt time.Time `json:"updated_at"`
+	// Название команды.
+	Title string `json:"title"`
+	// Описание команды.
+	Description string `json:"description"`
+	// Команда участвует в автораспределении.
+	AssignmentParticipation bool `json:"assignment_participation"`
+	// Команда создана автораспределением.
+	CreatedByAssignment bool `json:"created_by_assignment"`
+	// ID мероприятия команды.
+	EventID NilInt32 `json:"event_id"`
+	// TalentID капитана команды.
+	OwnerID NilInt32 `json:"owner_id"`
+	// ID проекта команды.
+	ProjectID NilInt32 `json:"project_id"`
+	// Контактная ссылка команды.
+	ContactLink string `json:"contact_link"`
+	// Код для вступления в команду.
+	InviteCode OptString            `json:"invite_code"`
+	Persons    []TeamPersonWithUser `json:"persons"`
+}
+
+// GetID returns the value of ID.
+func (s *TeamPrivateWithPersons) GetID() int32 {
+	return s.ID
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *TeamPrivateWithPersons) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *TeamPrivateWithPersons) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// GetTitle returns the value of Title.
+func (s *TeamPrivateWithPersons) GetTitle() string {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *TeamPrivateWithPersons) GetDescription() string {
+	return s.Description
+}
+
+// GetAssignmentParticipation returns the value of AssignmentParticipation.
+func (s *TeamPrivateWithPersons) GetAssignmentParticipation() bool {
+	return s.AssignmentParticipation
+}
+
+// GetCreatedByAssignment returns the value of CreatedByAssignment.
+func (s *TeamPrivateWithPersons) GetCreatedByAssignment() bool {
+	return s.CreatedByAssignment
+}
+
+// GetEventID returns the value of EventID.
+func (s *TeamPrivateWithPersons) GetEventID() NilInt32 {
+	return s.EventID
+}
+
+// GetOwnerID returns the value of OwnerID.
+func (s *TeamPrivateWithPersons) GetOwnerID() NilInt32 {
+	return s.OwnerID
+}
+
+// GetProjectID returns the value of ProjectID.
+func (s *TeamPrivateWithPersons) GetProjectID() NilInt32 {
+	return s.ProjectID
+}
+
+// GetContactLink returns the value of ContactLink.
+func (s *TeamPrivateWithPersons) GetContactLink() string {
+	return s.ContactLink
+}
+
+// GetInviteCode returns the value of InviteCode.
+func (s *TeamPrivateWithPersons) GetInviteCode() OptString {
+	return s.InviteCode
+}
+
+// GetPersons returns the value of Persons.
+func (s *TeamPrivateWithPersons) GetPersons() []TeamPersonWithUser {
+	return s.Persons
+}
+
+// SetID sets the value of ID.
+func (s *TeamPrivateWithPersons) SetID(val int32) {
+	s.ID = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *TeamPrivateWithPersons) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *TeamPrivateWithPersons) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetTitle sets the value of Title.
+func (s *TeamPrivateWithPersons) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *TeamPrivateWithPersons) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetAssignmentParticipation sets the value of AssignmentParticipation.
+func (s *TeamPrivateWithPersons) SetAssignmentParticipation(val bool) {
+	s.AssignmentParticipation = val
+}
+
+// SetCreatedByAssignment sets the value of CreatedByAssignment.
+func (s *TeamPrivateWithPersons) SetCreatedByAssignment(val bool) {
+	s.CreatedByAssignment = val
+}
+
+// SetEventID sets the value of EventID.
+func (s *TeamPrivateWithPersons) SetEventID(val NilInt32) {
+	s.EventID = val
+}
+
+// SetOwnerID sets the value of OwnerID.
+func (s *TeamPrivateWithPersons) SetOwnerID(val NilInt32) {
+	s.OwnerID = val
+}
+
+// SetProjectID sets the value of ProjectID.
+func (s *TeamPrivateWithPersons) SetProjectID(val NilInt32) {
+	s.ProjectID = val
+}
+
+// SetContactLink sets the value of ContactLink.
+func (s *TeamPrivateWithPersons) SetContactLink(val string) {
+	s.ContactLink = val
+}
+
+// SetInviteCode sets the value of InviteCode.
+func (s *TeamPrivateWithPersons) SetInviteCode(val OptString) {
+	s.InviteCode = val
+}
+
+// SetPersons sets the value of Persons.
+func (s *TeamPrivateWithPersons) SetPersons(val []TeamPersonWithUser) {
+	s.Persons = val
+}
+
+// Ref: #/components/schemas/TeamPublic
+type TeamPublic struct {
+	// ID команды.
+	ID int32 `json:"id"`
+	// Дата создания.
+	CreatedAt time.Time `json:"created_at"`
+	// Дата обновления.
+	UpdatedAt time.Time `json:"updated_at"`
+	// Название команды.
+	Title string `json:"title"`
+	// Описание команды.
+	Description string `json:"description"`
+	// Команда участвует в автораспределении.
+	AssignmentParticipation bool `json:"assignment_participation"`
+	// Команда создана автораспределением.
+	CreatedByAssignment bool `json:"created_by_assignment"`
+	// ID мероприятия команды.
+	EventID NilInt32 `json:"event_id"`
+	// TalentID капитана команды.
+	OwnerID NilInt32 `json:"owner_id"`
+	// ID проекта команды.
+	ProjectID NilInt32 `json:"project_id"`
+}
+
+// GetID returns the value of ID.
+func (s *TeamPublic) GetID() int32 {
+	return s.ID
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *TeamPublic) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *TeamPublic) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// GetTitle returns the value of Title.
+func (s *TeamPublic) GetTitle() string {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *TeamPublic) GetDescription() string {
+	return s.Description
+}
+
+// GetAssignmentParticipation returns the value of AssignmentParticipation.
+func (s *TeamPublic) GetAssignmentParticipation() bool {
+	return s.AssignmentParticipation
+}
+
+// GetCreatedByAssignment returns the value of CreatedByAssignment.
+func (s *TeamPublic) GetCreatedByAssignment() bool {
+	return s.CreatedByAssignment
+}
+
+// GetEventID returns the value of EventID.
+func (s *TeamPublic) GetEventID() NilInt32 {
+	return s.EventID
+}
+
+// GetOwnerID returns the value of OwnerID.
+func (s *TeamPublic) GetOwnerID() NilInt32 {
+	return s.OwnerID
+}
+
+// GetProjectID returns the value of ProjectID.
+func (s *TeamPublic) GetProjectID() NilInt32 {
+	return s.ProjectID
+}
+
+// SetID sets the value of ID.
+func (s *TeamPublic) SetID(val int32) {
+	s.ID = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *TeamPublic) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *TeamPublic) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetTitle sets the value of Title.
+func (s *TeamPublic) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *TeamPublic) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetAssignmentParticipation sets the value of AssignmentParticipation.
+func (s *TeamPublic) SetAssignmentParticipation(val bool) {
+	s.AssignmentParticipation = val
+}
+
+// SetCreatedByAssignment sets the value of CreatedByAssignment.
+func (s *TeamPublic) SetCreatedByAssignment(val bool) {
+	s.CreatedByAssignment = val
+}
+
+// SetEventID sets the value of EventID.
+func (s *TeamPublic) SetEventID(val NilInt32) {
+	s.EventID = val
+}
+
+// SetOwnerID sets the value of OwnerID.
+func (s *TeamPublic) SetOwnerID(val NilInt32) {
+	s.OwnerID = val
+}
+
+// SetProjectID sets the value of ProjectID.
+func (s *TeamPublic) SetProjectID(val NilInt32) {
+	s.ProjectID = val
+}
+
+// Merged schema.
+// Ref: #/components/schemas/TeamPublicWithPersons
+type TeamPublicWithPersons struct {
+	// ID команды.
+	ID int32 `json:"id"`
+	// Дата создания.
+	CreatedAt time.Time `json:"created_at"`
+	// Дата обновления.
+	UpdatedAt time.Time `json:"updated_at"`
+	// Название команды.
+	Title string `json:"title"`
+	// Описание команды.
+	Description string `json:"description"`
+	// Команда участвует в автораспределении.
+	AssignmentParticipation bool `json:"assignment_participation"`
+	// Команда создана автораспределением.
+	CreatedByAssignment bool `json:"created_by_assignment"`
+	// ID мероприятия команды.
+	EventID NilInt32 `json:"event_id"`
+	// TalentID капитана команды.
+	OwnerID NilInt32 `json:"owner_id"`
+	// ID проекта команды.
+	ProjectID NilInt32             `json:"project_id"`
+	Persons   []TeamPersonWithUser `json:"persons"`
+}
+
+// GetID returns the value of ID.
+func (s *TeamPublicWithPersons) GetID() int32 {
+	return s.ID
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *TeamPublicWithPersons) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *TeamPublicWithPersons) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// GetTitle returns the value of Title.
+func (s *TeamPublicWithPersons) GetTitle() string {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *TeamPublicWithPersons) GetDescription() string {
+	return s.Description
+}
+
+// GetAssignmentParticipation returns the value of AssignmentParticipation.
+func (s *TeamPublicWithPersons) GetAssignmentParticipation() bool {
+	return s.AssignmentParticipation
+}
+
+// GetCreatedByAssignment returns the value of CreatedByAssignment.
+func (s *TeamPublicWithPersons) GetCreatedByAssignment() bool {
+	return s.CreatedByAssignment
+}
+
+// GetEventID returns the value of EventID.
+func (s *TeamPublicWithPersons) GetEventID() NilInt32 {
+	return s.EventID
+}
+
+// GetOwnerID returns the value of OwnerID.
+func (s *TeamPublicWithPersons) GetOwnerID() NilInt32 {
+	return s.OwnerID
+}
+
+// GetProjectID returns the value of ProjectID.
+func (s *TeamPublicWithPersons) GetProjectID() NilInt32 {
+	return s.ProjectID
+}
+
+// GetPersons returns the value of Persons.
+func (s *TeamPublicWithPersons) GetPersons() []TeamPersonWithUser {
+	return s.Persons
+}
+
+// SetID sets the value of ID.
+func (s *TeamPublicWithPersons) SetID(val int32) {
+	s.ID = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *TeamPublicWithPersons) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *TeamPublicWithPersons) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetTitle sets the value of Title.
+func (s *TeamPublicWithPersons) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *TeamPublicWithPersons) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetAssignmentParticipation sets the value of AssignmentParticipation.
+func (s *TeamPublicWithPersons) SetAssignmentParticipation(val bool) {
+	s.AssignmentParticipation = val
+}
+
+// SetCreatedByAssignment sets the value of CreatedByAssignment.
+func (s *TeamPublicWithPersons) SetCreatedByAssignment(val bool) {
+	s.CreatedByAssignment = val
+}
+
+// SetEventID sets the value of EventID.
+func (s *TeamPublicWithPersons) SetEventID(val NilInt32) {
+	s.EventID = val
+}
+
+// SetOwnerID sets the value of OwnerID.
+func (s *TeamPublicWithPersons) SetOwnerID(val NilInt32) {
+	s.OwnerID = val
+}
+
+// SetProjectID sets the value of ProjectID.
+func (s *TeamPublicWithPersons) SetProjectID(val NilInt32) {
+	s.ProjectID = val
+}
+
+// SetPersons sets the value of Persons.
+func (s *TeamPublicWithPersons) SetPersons(val []TeamPersonWithUser) {
+	s.Persons = val
+}
 
 type UUIDs []uuid.UUID
 
@@ -9932,11 +10513,6 @@ func (*UnproccessableEntity) archiveEventRequestsFilesRes() {}
 func (*UnproccessableEntity) createFileMetaRes()            {}
 func (*UnproccessableEntity) listEventsRes()                {}
 func (*UnproccessableEntity) listOrganizationsRes()         {}
-
-// UpdateAuthenticatedUserOK is response for UpdateAuthenticatedUser operation.
-type UpdateAuthenticatedUserOK struct{}
-
-func (*UpdateAuthenticatedUserOK) updateAuthenticatedUserRes() {}
 
 type UpdateEventDeferredNotificationReq struct {
 	BeforeStart OptEventDeferredNotificationBeforeStart `json:"before_start"`
@@ -10023,227 +10599,447 @@ func (s *UpdateEventDiplomaSettingsReq) SetDiplomaIssueMode(val OptDiplomaIssueM
 	s.DiplomaIssueMode = val
 }
 
-type UpdateEventLimitReq struct {
-	AutoApprove      OptEventLimitAutoApprove         `json:"auto_approve"`
-	CollectSnils     OptEventLimitCollectSNILS        `json:"collect_snils"`
-	CollectPhones    OptEventLimitCollectPhones       `json:"collect_phones"`
-	ParticipantLimit OptNilEventLimitParticipantLimit `json:"participant_limit"`
-	DateEndRequest   OptNilEventLimitDateEndRequest   `json:"date_end_request"`
-	DateEndUpdate    OptNilEventLimitDateEndUpdate    `json:"date_end_update"`
-	UserAgeStart     OptNilEventLimitUserAgeStart     `json:"user_age_start"`
-	UserAgeEnd       OptNilEventLimitUserAgeEnd       `json:"user_age_end"`
-	RequiresProject  OptEventLimitRequiresProject     `json:"requires_project"`
-	RequiresStepik   OptEventLimitRequiresStepik      `json:"requires_stepik"`
-	RequiresGithub   OptEventLimitRequiresGitHub      `json:"requires_github"`
-	RequiresYandex   OptEventLimitRequiresYandex      `json:"requires_yandex"`
-	RequiresKaggle   OptEventLimitRequiresKaggle      `json:"requires_kaggle"`
-	RequiresLeader   OptEventLimitRequiresLeader      `json:"requires_leader"`
-	RequiresVk       OptEventLimitRequiresVK          `json:"requires_vk"`
-	RequiresTelegram OptEventLimitRequiresTelegram    `json:"requires_telegram"`
-	Countries        EventLimitCountries              `json:"countries"`
-	Regions          EventLimitRegions                `json:"regions"`
-	Cities           EventLimitCities                 `json:"cities"`
-	Description      OptEventLimitDescription         `json:"description"`
+// Merged schema.
+type UpdateEventReq struct {
+	// ID мета-мероприятия.
+	MetaEventID OptNilInt32 `json:"meta_event_id"`
+	// Мероприятие находится в статусе черновика. На такое
+	// мероприятие нельзя зарегистрироваться.
+	Draft OptBool `json:"draft"`
+	// Статус публичности мероприятия.
+	Public OptBool `json:"public"`
+	// Исключение мероприятия из календаря.
+	Hidden OptBool `json:"hidden"`
+	// Название мероприятия.
+	Title OptString `json:"title"`
+	// Дата начала мероприятия.
+	Start OptNilDateTime `json:"start"`
+	// Дата окончания мероприятия.
+	End    OptNilDateTime `json:"end"`
+	Format OptEventFormat `json:"format"`
+	// ID [площадки] на которой проводится мероприятие.
+	//
+	// [площадки]: /venue-api/docs/
+	VenueID OptNilInt32 `json:"venue_id"`
+	// Доступность упрощенной регистрации на мероприятие.
+	SimplifiedRegistration OptBool `json:"simplified_registration"`
+	// Автоматическое добавление в участники организации
+	// пользователя с подтвержденной заявки.
+	AutocreateMember OptBool `json:"autocreate_member"`
+	// Допуск на создания достижений на мероприятие.
+	AchievementsAllowed OptBool `json:"achievements_allowed"`
+	// Допуск на создания заявок на мероприятие.
+	RequestsAllowed OptBool `json:"requests_allowed"`
+	// Доступность чекина.
+	SelfCheckIn         OptBool               `json:"self_check_in"`
+	TeamsInvolved       OptEventTeamsInvolved `json:"teams_involved"`
+	OwnerCanModerate    OptBool               `json:"owner_can_moderate"`
+	UserInMultipleTeams OptBool               `json:"user_in_multiple_teams"`
+	MentorsAllowed      OptBool               `json:"mentors_allowed"`
+	SupportI18n         OptBool               `json:"support_i18n"`
+	GirCollection       OptBool               `json:"gir_collection"`
+	Promoted            OptBool               `json:"promoted"`
+	// Учитывается ли время или только даты в полях `start` и `end`.
+	TimeMatters            OptBool                      `json:"time_matters"`
+	MaxUsers               OptNilInt32                  `json:"max_users"`
+	TeamCreateNotification OptBool                      `json:"team_create_notification"`
+	TeamAssignmentMethod   OptEventTeamAssignmentMethod `json:"team_assignment_method"`
+	ExpectedStart          OptNilDateTime               `json:"expected_start"`
+	// Альтернативное название мероприятия.
+	AltTitle OptString `json:"alt_title"`
+	// Адрес online мероприятия.
+	URL OptURI `json:"url"`
+	// Идентификатор типа мероприятия.
+	TypeID OptNilInt32 `json:"type_id"`
+	// Описание мероприятия.
+	Description OptString `json:"description"`
+	// Сообщение о заполненной анкете.
+	QuestionnaireCompletedMessage OptString `json:"questionnaire_completed_message"`
+	// Дополнительный текст для Email уведомления о
+	// регистрации на мероприятие.
+	//
+	// 	Текст интерпретируется в соответствии с форматом
+	// 	markdown.
+	NotificationEmailMessage OptString `json:"notification_email_message"`
+	// Ссылка на обложку мероприятия.
+	CoverURL OptURI    `json:"cover_url"`
+	Keywords OptString `json:"keywords"`
+	// ID организации мероприятия.
+	OrganizationID OptNilInt32 `json:"organization_id"`
+	// Статус отмены мероприятия.
+	Canceled OptBool `json:"canceled"`
+	// Причина отмены мероприятия.
+	CancellationReason OptString `json:"cancellation_reason"`
 }
 
-// GetAutoApprove returns the value of AutoApprove.
-func (s *UpdateEventLimitReq) GetAutoApprove() OptEventLimitAutoApprove {
-	return s.AutoApprove
+// GetMetaEventID returns the value of MetaEventID.
+func (s *UpdateEventReq) GetMetaEventID() OptNilInt32 {
+	return s.MetaEventID
 }
 
-// GetCollectSnils returns the value of CollectSnils.
-func (s *UpdateEventLimitReq) GetCollectSnils() OptEventLimitCollectSNILS {
-	return s.CollectSnils
+// GetDraft returns the value of Draft.
+func (s *UpdateEventReq) GetDraft() OptBool {
+	return s.Draft
 }
 
-// GetCollectPhones returns the value of CollectPhones.
-func (s *UpdateEventLimitReq) GetCollectPhones() OptEventLimitCollectPhones {
-	return s.CollectPhones
+// GetPublic returns the value of Public.
+func (s *UpdateEventReq) GetPublic() OptBool {
+	return s.Public
 }
 
-// GetParticipantLimit returns the value of ParticipantLimit.
-func (s *UpdateEventLimitReq) GetParticipantLimit() OptNilEventLimitParticipantLimit {
-	return s.ParticipantLimit
+// GetHidden returns the value of Hidden.
+func (s *UpdateEventReq) GetHidden() OptBool {
+	return s.Hidden
 }
 
-// GetDateEndRequest returns the value of DateEndRequest.
-func (s *UpdateEventLimitReq) GetDateEndRequest() OptNilEventLimitDateEndRequest {
-	return s.DateEndRequest
+// GetTitle returns the value of Title.
+func (s *UpdateEventReq) GetTitle() OptString {
+	return s.Title
 }
 
-// GetDateEndUpdate returns the value of DateEndUpdate.
-func (s *UpdateEventLimitReq) GetDateEndUpdate() OptNilEventLimitDateEndUpdate {
-	return s.DateEndUpdate
+// GetStart returns the value of Start.
+func (s *UpdateEventReq) GetStart() OptNilDateTime {
+	return s.Start
 }
 
-// GetUserAgeStart returns the value of UserAgeStart.
-func (s *UpdateEventLimitReq) GetUserAgeStart() OptNilEventLimitUserAgeStart {
-	return s.UserAgeStart
+// GetEnd returns the value of End.
+func (s *UpdateEventReq) GetEnd() OptNilDateTime {
+	return s.End
 }
 
-// GetUserAgeEnd returns the value of UserAgeEnd.
-func (s *UpdateEventLimitReq) GetUserAgeEnd() OptNilEventLimitUserAgeEnd {
-	return s.UserAgeEnd
+// GetFormat returns the value of Format.
+func (s *UpdateEventReq) GetFormat() OptEventFormat {
+	return s.Format
 }
 
-// GetRequiresProject returns the value of RequiresProject.
-func (s *UpdateEventLimitReq) GetRequiresProject() OptEventLimitRequiresProject {
-	return s.RequiresProject
+// GetVenueID returns the value of VenueID.
+func (s *UpdateEventReq) GetVenueID() OptNilInt32 {
+	return s.VenueID
 }
 
-// GetRequiresStepik returns the value of RequiresStepik.
-func (s *UpdateEventLimitReq) GetRequiresStepik() OptEventLimitRequiresStepik {
-	return s.RequiresStepik
+// GetSimplifiedRegistration returns the value of SimplifiedRegistration.
+func (s *UpdateEventReq) GetSimplifiedRegistration() OptBool {
+	return s.SimplifiedRegistration
 }
 
-// GetRequiresGithub returns the value of RequiresGithub.
-func (s *UpdateEventLimitReq) GetRequiresGithub() OptEventLimitRequiresGitHub {
-	return s.RequiresGithub
+// GetAutocreateMember returns the value of AutocreateMember.
+func (s *UpdateEventReq) GetAutocreateMember() OptBool {
+	return s.AutocreateMember
 }
 
-// GetRequiresYandex returns the value of RequiresYandex.
-func (s *UpdateEventLimitReq) GetRequiresYandex() OptEventLimitRequiresYandex {
-	return s.RequiresYandex
+// GetAchievementsAllowed returns the value of AchievementsAllowed.
+func (s *UpdateEventReq) GetAchievementsAllowed() OptBool {
+	return s.AchievementsAllowed
 }
 
-// GetRequiresKaggle returns the value of RequiresKaggle.
-func (s *UpdateEventLimitReq) GetRequiresKaggle() OptEventLimitRequiresKaggle {
-	return s.RequiresKaggle
+// GetRequestsAllowed returns the value of RequestsAllowed.
+func (s *UpdateEventReq) GetRequestsAllowed() OptBool {
+	return s.RequestsAllowed
 }
 
-// GetRequiresLeader returns the value of RequiresLeader.
-func (s *UpdateEventLimitReq) GetRequiresLeader() OptEventLimitRequiresLeader {
-	return s.RequiresLeader
+// GetSelfCheckIn returns the value of SelfCheckIn.
+func (s *UpdateEventReq) GetSelfCheckIn() OptBool {
+	return s.SelfCheckIn
 }
 
-// GetRequiresVk returns the value of RequiresVk.
-func (s *UpdateEventLimitReq) GetRequiresVk() OptEventLimitRequiresVK {
-	return s.RequiresVk
+// GetTeamsInvolved returns the value of TeamsInvolved.
+func (s *UpdateEventReq) GetTeamsInvolved() OptEventTeamsInvolved {
+	return s.TeamsInvolved
 }
 
-// GetRequiresTelegram returns the value of RequiresTelegram.
-func (s *UpdateEventLimitReq) GetRequiresTelegram() OptEventLimitRequiresTelegram {
-	return s.RequiresTelegram
+// GetOwnerCanModerate returns the value of OwnerCanModerate.
+func (s *UpdateEventReq) GetOwnerCanModerate() OptBool {
+	return s.OwnerCanModerate
 }
 
-// GetCountries returns the value of Countries.
-func (s *UpdateEventLimitReq) GetCountries() EventLimitCountries {
-	return s.Countries
+// GetUserInMultipleTeams returns the value of UserInMultipleTeams.
+func (s *UpdateEventReq) GetUserInMultipleTeams() OptBool {
+	return s.UserInMultipleTeams
 }
 
-// GetRegions returns the value of Regions.
-func (s *UpdateEventLimitReq) GetRegions() EventLimitRegions {
-	return s.Regions
+// GetMentorsAllowed returns the value of MentorsAllowed.
+func (s *UpdateEventReq) GetMentorsAllowed() OptBool {
+	return s.MentorsAllowed
 }
 
-// GetCities returns the value of Cities.
-func (s *UpdateEventLimitReq) GetCities() EventLimitCities {
-	return s.Cities
+// GetSupportI18n returns the value of SupportI18n.
+func (s *UpdateEventReq) GetSupportI18n() OptBool {
+	return s.SupportI18n
+}
+
+// GetGirCollection returns the value of GirCollection.
+func (s *UpdateEventReq) GetGirCollection() OptBool {
+	return s.GirCollection
+}
+
+// GetPromoted returns the value of Promoted.
+func (s *UpdateEventReq) GetPromoted() OptBool {
+	return s.Promoted
+}
+
+// GetTimeMatters returns the value of TimeMatters.
+func (s *UpdateEventReq) GetTimeMatters() OptBool {
+	return s.TimeMatters
+}
+
+// GetMaxUsers returns the value of MaxUsers.
+func (s *UpdateEventReq) GetMaxUsers() OptNilInt32 {
+	return s.MaxUsers
+}
+
+// GetTeamCreateNotification returns the value of TeamCreateNotification.
+func (s *UpdateEventReq) GetTeamCreateNotification() OptBool {
+	return s.TeamCreateNotification
+}
+
+// GetTeamAssignmentMethod returns the value of TeamAssignmentMethod.
+func (s *UpdateEventReq) GetTeamAssignmentMethod() OptEventTeamAssignmentMethod {
+	return s.TeamAssignmentMethod
+}
+
+// GetExpectedStart returns the value of ExpectedStart.
+func (s *UpdateEventReq) GetExpectedStart() OptNilDateTime {
+	return s.ExpectedStart
+}
+
+// GetAltTitle returns the value of AltTitle.
+func (s *UpdateEventReq) GetAltTitle() OptString {
+	return s.AltTitle
+}
+
+// GetURL returns the value of URL.
+func (s *UpdateEventReq) GetURL() OptURI {
+	return s.URL
+}
+
+// GetTypeID returns the value of TypeID.
+func (s *UpdateEventReq) GetTypeID() OptNilInt32 {
+	return s.TypeID
 }
 
 // GetDescription returns the value of Description.
-func (s *UpdateEventLimitReq) GetDescription() OptEventLimitDescription {
+func (s *UpdateEventReq) GetDescription() OptString {
 	return s.Description
 }
 
-// SetAutoApprove sets the value of AutoApprove.
-func (s *UpdateEventLimitReq) SetAutoApprove(val OptEventLimitAutoApprove) {
-	s.AutoApprove = val
+// GetQuestionnaireCompletedMessage returns the value of QuestionnaireCompletedMessage.
+func (s *UpdateEventReq) GetQuestionnaireCompletedMessage() OptString {
+	return s.QuestionnaireCompletedMessage
 }
 
-// SetCollectSnils sets the value of CollectSnils.
-func (s *UpdateEventLimitReq) SetCollectSnils(val OptEventLimitCollectSNILS) {
-	s.CollectSnils = val
+// GetNotificationEmailMessage returns the value of NotificationEmailMessage.
+func (s *UpdateEventReq) GetNotificationEmailMessage() OptString {
+	return s.NotificationEmailMessage
 }
 
-// SetCollectPhones sets the value of CollectPhones.
-func (s *UpdateEventLimitReq) SetCollectPhones(val OptEventLimitCollectPhones) {
-	s.CollectPhones = val
+// GetCoverURL returns the value of CoverURL.
+func (s *UpdateEventReq) GetCoverURL() OptURI {
+	return s.CoverURL
 }
 
-// SetParticipantLimit sets the value of ParticipantLimit.
-func (s *UpdateEventLimitReq) SetParticipantLimit(val OptNilEventLimitParticipantLimit) {
-	s.ParticipantLimit = val
+// GetKeywords returns the value of Keywords.
+func (s *UpdateEventReq) GetKeywords() OptString {
+	return s.Keywords
 }
 
-// SetDateEndRequest sets the value of DateEndRequest.
-func (s *UpdateEventLimitReq) SetDateEndRequest(val OptNilEventLimitDateEndRequest) {
-	s.DateEndRequest = val
+// GetOrganizationID returns the value of OrganizationID.
+func (s *UpdateEventReq) GetOrganizationID() OptNilInt32 {
+	return s.OrganizationID
 }
 
-// SetDateEndUpdate sets the value of DateEndUpdate.
-func (s *UpdateEventLimitReq) SetDateEndUpdate(val OptNilEventLimitDateEndUpdate) {
-	s.DateEndUpdate = val
+// GetCanceled returns the value of Canceled.
+func (s *UpdateEventReq) GetCanceled() OptBool {
+	return s.Canceled
 }
 
-// SetUserAgeStart sets the value of UserAgeStart.
-func (s *UpdateEventLimitReq) SetUserAgeStart(val OptNilEventLimitUserAgeStart) {
-	s.UserAgeStart = val
+// GetCancellationReason returns the value of CancellationReason.
+func (s *UpdateEventReq) GetCancellationReason() OptString {
+	return s.CancellationReason
 }
 
-// SetUserAgeEnd sets the value of UserAgeEnd.
-func (s *UpdateEventLimitReq) SetUserAgeEnd(val OptNilEventLimitUserAgeEnd) {
-	s.UserAgeEnd = val
+// SetMetaEventID sets the value of MetaEventID.
+func (s *UpdateEventReq) SetMetaEventID(val OptNilInt32) {
+	s.MetaEventID = val
 }
 
-// SetRequiresProject sets the value of RequiresProject.
-func (s *UpdateEventLimitReq) SetRequiresProject(val OptEventLimitRequiresProject) {
-	s.RequiresProject = val
+// SetDraft sets the value of Draft.
+func (s *UpdateEventReq) SetDraft(val OptBool) {
+	s.Draft = val
 }
 
-// SetRequiresStepik sets the value of RequiresStepik.
-func (s *UpdateEventLimitReq) SetRequiresStepik(val OptEventLimitRequiresStepik) {
-	s.RequiresStepik = val
+// SetPublic sets the value of Public.
+func (s *UpdateEventReq) SetPublic(val OptBool) {
+	s.Public = val
 }
 
-// SetRequiresGithub sets the value of RequiresGithub.
-func (s *UpdateEventLimitReq) SetRequiresGithub(val OptEventLimitRequiresGitHub) {
-	s.RequiresGithub = val
+// SetHidden sets the value of Hidden.
+func (s *UpdateEventReq) SetHidden(val OptBool) {
+	s.Hidden = val
 }
 
-// SetRequiresYandex sets the value of RequiresYandex.
-func (s *UpdateEventLimitReq) SetRequiresYandex(val OptEventLimitRequiresYandex) {
-	s.RequiresYandex = val
+// SetTitle sets the value of Title.
+func (s *UpdateEventReq) SetTitle(val OptString) {
+	s.Title = val
 }
 
-// SetRequiresKaggle sets the value of RequiresKaggle.
-func (s *UpdateEventLimitReq) SetRequiresKaggle(val OptEventLimitRequiresKaggle) {
-	s.RequiresKaggle = val
+// SetStart sets the value of Start.
+func (s *UpdateEventReq) SetStart(val OptNilDateTime) {
+	s.Start = val
 }
 
-// SetRequiresLeader sets the value of RequiresLeader.
-func (s *UpdateEventLimitReq) SetRequiresLeader(val OptEventLimitRequiresLeader) {
-	s.RequiresLeader = val
+// SetEnd sets the value of End.
+func (s *UpdateEventReq) SetEnd(val OptNilDateTime) {
+	s.End = val
 }
 
-// SetRequiresVk sets the value of RequiresVk.
-func (s *UpdateEventLimitReq) SetRequiresVk(val OptEventLimitRequiresVK) {
-	s.RequiresVk = val
+// SetFormat sets the value of Format.
+func (s *UpdateEventReq) SetFormat(val OptEventFormat) {
+	s.Format = val
 }
 
-// SetRequiresTelegram sets the value of RequiresTelegram.
-func (s *UpdateEventLimitReq) SetRequiresTelegram(val OptEventLimitRequiresTelegram) {
-	s.RequiresTelegram = val
+// SetVenueID sets the value of VenueID.
+func (s *UpdateEventReq) SetVenueID(val OptNilInt32) {
+	s.VenueID = val
 }
 
-// SetCountries sets the value of Countries.
-func (s *UpdateEventLimitReq) SetCountries(val EventLimitCountries) {
-	s.Countries = val
+// SetSimplifiedRegistration sets the value of SimplifiedRegistration.
+func (s *UpdateEventReq) SetSimplifiedRegistration(val OptBool) {
+	s.SimplifiedRegistration = val
 }
 
-// SetRegions sets the value of Regions.
-func (s *UpdateEventLimitReq) SetRegions(val EventLimitRegions) {
-	s.Regions = val
+// SetAutocreateMember sets the value of AutocreateMember.
+func (s *UpdateEventReq) SetAutocreateMember(val OptBool) {
+	s.AutocreateMember = val
 }
 
-// SetCities sets the value of Cities.
-func (s *UpdateEventLimitReq) SetCities(val EventLimitCities) {
-	s.Cities = val
+// SetAchievementsAllowed sets the value of AchievementsAllowed.
+func (s *UpdateEventReq) SetAchievementsAllowed(val OptBool) {
+	s.AchievementsAllowed = val
+}
+
+// SetRequestsAllowed sets the value of RequestsAllowed.
+func (s *UpdateEventReq) SetRequestsAllowed(val OptBool) {
+	s.RequestsAllowed = val
+}
+
+// SetSelfCheckIn sets the value of SelfCheckIn.
+func (s *UpdateEventReq) SetSelfCheckIn(val OptBool) {
+	s.SelfCheckIn = val
+}
+
+// SetTeamsInvolved sets the value of TeamsInvolved.
+func (s *UpdateEventReq) SetTeamsInvolved(val OptEventTeamsInvolved) {
+	s.TeamsInvolved = val
+}
+
+// SetOwnerCanModerate sets the value of OwnerCanModerate.
+func (s *UpdateEventReq) SetOwnerCanModerate(val OptBool) {
+	s.OwnerCanModerate = val
+}
+
+// SetUserInMultipleTeams sets the value of UserInMultipleTeams.
+func (s *UpdateEventReq) SetUserInMultipleTeams(val OptBool) {
+	s.UserInMultipleTeams = val
+}
+
+// SetMentorsAllowed sets the value of MentorsAllowed.
+func (s *UpdateEventReq) SetMentorsAllowed(val OptBool) {
+	s.MentorsAllowed = val
+}
+
+// SetSupportI18n sets the value of SupportI18n.
+func (s *UpdateEventReq) SetSupportI18n(val OptBool) {
+	s.SupportI18n = val
+}
+
+// SetGirCollection sets the value of GirCollection.
+func (s *UpdateEventReq) SetGirCollection(val OptBool) {
+	s.GirCollection = val
+}
+
+// SetPromoted sets the value of Promoted.
+func (s *UpdateEventReq) SetPromoted(val OptBool) {
+	s.Promoted = val
+}
+
+// SetTimeMatters sets the value of TimeMatters.
+func (s *UpdateEventReq) SetTimeMatters(val OptBool) {
+	s.TimeMatters = val
+}
+
+// SetMaxUsers sets the value of MaxUsers.
+func (s *UpdateEventReq) SetMaxUsers(val OptNilInt32) {
+	s.MaxUsers = val
+}
+
+// SetTeamCreateNotification sets the value of TeamCreateNotification.
+func (s *UpdateEventReq) SetTeamCreateNotification(val OptBool) {
+	s.TeamCreateNotification = val
+}
+
+// SetTeamAssignmentMethod sets the value of TeamAssignmentMethod.
+func (s *UpdateEventReq) SetTeamAssignmentMethod(val OptEventTeamAssignmentMethod) {
+	s.TeamAssignmentMethod = val
+}
+
+// SetExpectedStart sets the value of ExpectedStart.
+func (s *UpdateEventReq) SetExpectedStart(val OptNilDateTime) {
+	s.ExpectedStart = val
+}
+
+// SetAltTitle sets the value of AltTitle.
+func (s *UpdateEventReq) SetAltTitle(val OptString) {
+	s.AltTitle = val
+}
+
+// SetURL sets the value of URL.
+func (s *UpdateEventReq) SetURL(val OptURI) {
+	s.URL = val
+}
+
+// SetTypeID sets the value of TypeID.
+func (s *UpdateEventReq) SetTypeID(val OptNilInt32) {
+	s.TypeID = val
 }
 
 // SetDescription sets the value of Description.
-func (s *UpdateEventLimitReq) SetDescription(val OptEventLimitDescription) {
+func (s *UpdateEventReq) SetDescription(val OptString) {
 	s.Description = val
+}
+
+// SetQuestionnaireCompletedMessage sets the value of QuestionnaireCompletedMessage.
+func (s *UpdateEventReq) SetQuestionnaireCompletedMessage(val OptString) {
+	s.QuestionnaireCompletedMessage = val
+}
+
+// SetNotificationEmailMessage sets the value of NotificationEmailMessage.
+func (s *UpdateEventReq) SetNotificationEmailMessage(val OptString) {
+	s.NotificationEmailMessage = val
+}
+
+// SetCoverURL sets the value of CoverURL.
+func (s *UpdateEventReq) SetCoverURL(val OptURI) {
+	s.CoverURL = val
+}
+
+// SetKeywords sets the value of Keywords.
+func (s *UpdateEventReq) SetKeywords(val OptString) {
+	s.Keywords = val
+}
+
+// SetOrganizationID sets the value of OrganizationID.
+func (s *UpdateEventReq) SetOrganizationID(val OptNilInt32) {
+	s.OrganizationID = val
+}
+
+// SetCanceled sets the value of Canceled.
+func (s *UpdateEventReq) SetCanceled(val OptBool) {
+	s.Canceled = val
+}
+
+// SetCancellationReason sets the value of CancellationReason.
+func (s *UpdateEventReq) SetCancellationReason(val OptString) {
+	s.CancellationReason = val
 }
 
 type UpdateFileMetaReq struct {
@@ -10258,67 +11054,6 @@ func (s *UpdateFileMetaReq) GetName() OptFileMetaName {
 // SetName sets the value of Name.
 func (s *UpdateFileMetaReq) SetName(val OptFileMetaName) {
 	s.Name = val
-}
-
-type UpdateTeamReq struct {
-	Title       OptString `json:"title"`
-	Description OptString `json:"description"`
-	// Команда участвует в автораспределении.
-	AssignmentParticipation OptBool `json:"assignment_participation"`
-	// ID проекта команды.
-	// > Доступно для обновления только капитану команды.
-	ProjectID   OptInt32           `json:"project_id"`
-	ContactLink OptTeamContactLink `json:"contact_link"`
-}
-
-// GetTitle returns the value of Title.
-func (s *UpdateTeamReq) GetTitle() OptString {
-	return s.Title
-}
-
-// GetDescription returns the value of Description.
-func (s *UpdateTeamReq) GetDescription() OptString {
-	return s.Description
-}
-
-// GetAssignmentParticipation returns the value of AssignmentParticipation.
-func (s *UpdateTeamReq) GetAssignmentParticipation() OptBool {
-	return s.AssignmentParticipation
-}
-
-// GetProjectID returns the value of ProjectID.
-func (s *UpdateTeamReq) GetProjectID() OptInt32 {
-	return s.ProjectID
-}
-
-// GetContactLink returns the value of ContactLink.
-func (s *UpdateTeamReq) GetContactLink() OptTeamContactLink {
-	return s.ContactLink
-}
-
-// SetTitle sets the value of Title.
-func (s *UpdateTeamReq) SetTitle(val OptString) {
-	s.Title = val
-}
-
-// SetDescription sets the value of Description.
-func (s *UpdateTeamReq) SetDescription(val OptString) {
-	s.Description = val
-}
-
-// SetAssignmentParticipation sets the value of AssignmentParticipation.
-func (s *UpdateTeamReq) SetAssignmentParticipation(val OptBool) {
-	s.AssignmentParticipation = val
-}
-
-// SetProjectID sets the value of ProjectID.
-func (s *UpdateTeamReq) SetProjectID(val OptInt32) {
-	s.ProjectID = val
-}
-
-// SetContactLink sets the value of ContactLink.
-func (s *UpdateTeamReq) SetContactLink(val OptTeamContactLink) {
-	s.ContactLink = val
 }
 
 type UploadFileReq struct {
@@ -10424,184 +11159,34 @@ func (s *UserSex) UnmarshalText(data []byte) error {
 	}
 }
 
-// Ref: #/components/schemas/UserUpdate
-type UserUpdate struct {
-	LastName          OptString  `json:"last_name"`
-	FirstName         OptString  `json:"first_name"`
-	MiddleName        OptString  `json:"middle_name"`
-	NoMiddleName      OptBool    `json:"no_middle_name"`
-	Birthday          OptDate    `json:"birthday"`
-	Address           OptString  `json:"address"`
-	Sex               OptUserSex `json:"sex"`
-	Grade             OptInt8    `json:"grade"`
-	Snils             OptString  `json:"snils"`
-	Phone             OptString  `json:"phone"`
-	SessionToken      OptString  `json:"session_token"`
-	About             OptString  `json:"about"`
-	StatusText        OptString  `json:"status_text"`
-	PublicPageEnabled OptBool    `json:"public_page_enabled"`
-	FirstGradeYear    OptInt16   `json:"first_grade_year"`
-	CurrentEducation  OptInt32   `json:"current_education"`
+// Ref: #/components/schemas/UserTeamPersonCreate
+type UserTeamPersonCreate struct {
+	InviteCode OptString `json:"invite_code"`
 }
 
-// GetLastName returns the value of LastName.
-func (s *UserUpdate) GetLastName() OptString {
-	return s.LastName
+// GetInviteCode returns the value of InviteCode.
+func (s *UserTeamPersonCreate) GetInviteCode() OptString {
+	return s.InviteCode
 }
 
-// GetFirstName returns the value of FirstName.
-func (s *UserUpdate) GetFirstName() OptString {
-	return s.FirstName
+// SetInviteCode sets the value of InviteCode.
+func (s *UserTeamPersonCreate) SetInviteCode(val OptString) {
+	s.InviteCode = val
 }
 
-// GetMiddleName returns the value of MiddleName.
-func (s *UserUpdate) GetMiddleName() OptString {
-	return s.MiddleName
+// Ref: #/components/schemas/UserTeamPersonUpdate
+type UserTeamPersonUpdate struct {
+	UserAccepted TeamPersonAcceptValue `json:"user_accepted"`
 }
 
-// GetNoMiddleName returns the value of NoMiddleName.
-func (s *UserUpdate) GetNoMiddleName() OptBool {
-	return s.NoMiddleName
+// GetUserAccepted returns the value of UserAccepted.
+func (s *UserTeamPersonUpdate) GetUserAccepted() TeamPersonAcceptValue {
+	return s.UserAccepted
 }
 
-// GetBirthday returns the value of Birthday.
-func (s *UserUpdate) GetBirthday() OptDate {
-	return s.Birthday
-}
-
-// GetAddress returns the value of Address.
-func (s *UserUpdate) GetAddress() OptString {
-	return s.Address
-}
-
-// GetSex returns the value of Sex.
-func (s *UserUpdate) GetSex() OptUserSex {
-	return s.Sex
-}
-
-// GetGrade returns the value of Grade.
-func (s *UserUpdate) GetGrade() OptInt8 {
-	return s.Grade
-}
-
-// GetSnils returns the value of Snils.
-func (s *UserUpdate) GetSnils() OptString {
-	return s.Snils
-}
-
-// GetPhone returns the value of Phone.
-func (s *UserUpdate) GetPhone() OptString {
-	return s.Phone
-}
-
-// GetSessionToken returns the value of SessionToken.
-func (s *UserUpdate) GetSessionToken() OptString {
-	return s.SessionToken
-}
-
-// GetAbout returns the value of About.
-func (s *UserUpdate) GetAbout() OptString {
-	return s.About
-}
-
-// GetStatusText returns the value of StatusText.
-func (s *UserUpdate) GetStatusText() OptString {
-	return s.StatusText
-}
-
-// GetPublicPageEnabled returns the value of PublicPageEnabled.
-func (s *UserUpdate) GetPublicPageEnabled() OptBool {
-	return s.PublicPageEnabled
-}
-
-// GetFirstGradeYear returns the value of FirstGradeYear.
-func (s *UserUpdate) GetFirstGradeYear() OptInt16 {
-	return s.FirstGradeYear
-}
-
-// GetCurrentEducation returns the value of CurrentEducation.
-func (s *UserUpdate) GetCurrentEducation() OptInt32 {
-	return s.CurrentEducation
-}
-
-// SetLastName sets the value of LastName.
-func (s *UserUpdate) SetLastName(val OptString) {
-	s.LastName = val
-}
-
-// SetFirstName sets the value of FirstName.
-func (s *UserUpdate) SetFirstName(val OptString) {
-	s.FirstName = val
-}
-
-// SetMiddleName sets the value of MiddleName.
-func (s *UserUpdate) SetMiddleName(val OptString) {
-	s.MiddleName = val
-}
-
-// SetNoMiddleName sets the value of NoMiddleName.
-func (s *UserUpdate) SetNoMiddleName(val OptBool) {
-	s.NoMiddleName = val
-}
-
-// SetBirthday sets the value of Birthday.
-func (s *UserUpdate) SetBirthday(val OptDate) {
-	s.Birthday = val
-}
-
-// SetAddress sets the value of Address.
-func (s *UserUpdate) SetAddress(val OptString) {
-	s.Address = val
-}
-
-// SetSex sets the value of Sex.
-func (s *UserUpdate) SetSex(val OptUserSex) {
-	s.Sex = val
-}
-
-// SetGrade sets the value of Grade.
-func (s *UserUpdate) SetGrade(val OptInt8) {
-	s.Grade = val
-}
-
-// SetSnils sets the value of Snils.
-func (s *UserUpdate) SetSnils(val OptString) {
-	s.Snils = val
-}
-
-// SetPhone sets the value of Phone.
-func (s *UserUpdate) SetPhone(val OptString) {
-	s.Phone = val
-}
-
-// SetSessionToken sets the value of SessionToken.
-func (s *UserUpdate) SetSessionToken(val OptString) {
-	s.SessionToken = val
-}
-
-// SetAbout sets the value of About.
-func (s *UserUpdate) SetAbout(val OptString) {
-	s.About = val
-}
-
-// SetStatusText sets the value of StatusText.
-func (s *UserUpdate) SetStatusText(val OptString) {
-	s.StatusText = val
-}
-
-// SetPublicPageEnabled sets the value of PublicPageEnabled.
-func (s *UserUpdate) SetPublicPageEnabled(val OptBool) {
-	s.PublicPageEnabled = val
-}
-
-// SetFirstGradeYear sets the value of FirstGradeYear.
-func (s *UserUpdate) SetFirstGradeYear(val OptInt16) {
-	s.FirstGradeYear = val
-}
-
-// SetCurrentEducation sets the value of CurrentEducation.
-func (s *UserUpdate) SetCurrentEducation(val OptInt32) {
-	s.CurrentEducation = val
+// SetUserAccepted sets the value of UserAccepted.
+func (s *UserTeamPersonUpdate) SetUserAccepted(val TeamPersonAcceptValue) {
+	s.UserAccepted = val
 }
 
 // ValidateAuthorizationOK is response for ValidateAuthorization operation.
@@ -10628,10 +11213,20 @@ func (s *ValidationErrors) init() ValidationErrors {
 	return m
 }
 
-func (*ValidationErrors) confirmSignupEmailRes()      {}
-func (*ValidationErrors) createEventLimitRes()        {}
-func (*ValidationErrors) createEventRes()             {}
-func (*ValidationErrors) eventSignupRes()             {}
-func (*ValidationErrors) signupRes()                  {}
-func (*ValidationErrors) updateAuthenticatedUserRes() {}
-func (*ValidationErrors) updateEventLimitRes()        {}
+func (*ValidationErrors) confirmEventSignupRes()    {}
+func (*ValidationErrors) confirmSignupEmailRes()    {}
+func (*ValidationErrors) createEventLimitRes()      {}
+func (*ValidationErrors) createEventRes()           {}
+func (*ValidationErrors) createEventTeamPersonRes() {}
+func (*ValidationErrors) createEventTeamRes()       {}
+func (*ValidationErrors) createUserTeamPersonRes()  {}
+func (*ValidationErrors) createUserTeamRes()        {}
+func (*ValidationErrors) eventSignupRes()           {}
+func (*ValidationErrors) signupRes()                {}
+func (*ValidationErrors) updateEventLimitRes()      {}
+func (*ValidationErrors) updateEventRequestRes()    {}
+func (*ValidationErrors) updateEventRes()           {}
+func (*ValidationErrors) updateEventTeamRes()       {}
+func (*ValidationErrors) updateOwnerTeamPersonRes() {}
+func (*ValidationErrors) updateUserTeamPersonRes()  {}
+func (*ValidationErrors) updateUserTeamRes()        {}

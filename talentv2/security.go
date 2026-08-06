@@ -17,6 +17,11 @@ type TalentTokenSource interface {
 	Token(context.Context) (string, error)
 }
 
+// StaticCredentialsSource implements [ClientCredentialsSource].
+func StaticCredentialsSource(id, secret string) ClientCredentialsSource {
+	return &clientCredentials{id: id, secret: secret}
+}
+
 type clientCredentials struct {
 	id     string
 	secret string

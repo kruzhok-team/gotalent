@@ -62,7 +62,7 @@ func decodeAddEventDiplomaRoleResponse(resp *http.Response) (res AddEventDiploma
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -75,7 +75,7 @@ func decodeAddEventDiplomaRoleResponse(resp *http.Response) (res AddEventDiploma
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -92,48 +92,10 @@ func decodeAddEventDiplomaRoleResponse(resp *http.Response) (res AddEventDiploma
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -307,7 +269,7 @@ func decodeArchiveEventRequestsFilesResponse(resp *http.Response) (res ArchiveEv
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -320,7 +282,7 @@ func decodeArchiveEventRequestsFilesResponse(resp *http.Response) (res ArchiveEv
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -337,48 +299,10 @@ func decodeArchiveEventRequestsFilesResponse(resp *http.Response) (res ArchiveEv
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -430,7 +354,7 @@ func decodeAuthorizeClientResponse(resp *http.Response) (res *AuthorizeClientFou
 		return &wrapper, nil
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -443,7 +367,7 @@ func decodeAuthorizeClientResponse(resp *http.Response) (res *AuthorizeClientFou
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -460,48 +384,10 @@ func decodeAuthorizeClientResponse(resp *http.Response) (res *AuthorizeClientFou
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -665,7 +551,7 @@ func decodeCancelEventDeferredNotificationResponse(resp *http.Response) (res Can
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -678,7 +564,7 @@ func decodeCancelEventDeferredNotificationResponse(resp *http.Response) (res Can
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -695,48 +581,10 @@ func decodeCancelEventDeferredNotificationResponse(resp *http.Response) (res Can
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -792,7 +640,7 @@ func decodeCheckUserConsentResponse(resp *http.Response) (res CheckUserConsentRe
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -805,7 +653,7 @@ func decodeCheckUserConsentResponse(resp *http.Response) (res CheckUserConsentRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -822,48 +670,128 @@ func decodeCheckUserConsentResponse(resp *http.Response) (res CheckUserConsentRe
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
 
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
+func decodeCityNameResponse(resp *http.Response) (res CityNameRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
 			}
-			return &wrapper, nil
+			d := jx.DecodeBytes(buf)
+
+			var response CityNameOK
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response NotFound
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -983,7 +911,7 @@ func decodeCompleteSocialAuthResponse(resp *http.Response) (res CompleteSocialAu
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -996,7 +924,7 @@ func decodeCompleteSocialAuthResponse(resp *http.Response) (res CompleteSocialAu
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1013,48 +941,216 @@ func decodeCompleteSocialAuthResponse(resp *http.Response) (res CompleteSocialAu
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
 
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
+func decodeConfirmEventSignupResponse(resp *http.Response) (res ConfirmEventSignupRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
 			}
-			return &wrapper, nil
+			d := jx.DecodeBytes(buf)
+
+			var response ConfirmEventSignupOK
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 201:
+		// Code 201.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ConfirmEventSignupCreated
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 202:
+		// Code 202.
+		return &ConfirmEventSignupAccepted{}, nil
+	case 204:
+		// Code 204.
+		return &ConfirmEventSignupNoContent{}, nil
+	case 208:
+		// Code 208.
+		return &ConfirmEventSignupAlreadyReported{}, nil
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response NotFound
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 422:
+		// Code 422.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ValidationErrors
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -1183,7 +1279,7 @@ func decodeConfirmFileUploadResponse(resp *http.Response) (res ConfirmFileUpload
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -1196,7 +1292,7 @@ func decodeConfirmFileUploadResponse(resp *http.Response) (res ConfirmFileUpload
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1213,48 +1309,10 @@ func decodeConfirmFileUploadResponse(resp *http.Response) (res ConfirmFileUpload
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -1437,7 +1495,7 @@ func decodeConfirmSignupEmailResponse(resp *http.Response) (res ConfirmSignupEma
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -1450,7 +1508,7 @@ func decodeConfirmSignupEmailResponse(resp *http.Response) (res ConfirmSignupEma
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1467,48 +1525,10 @@ func decodeConfirmSignupEmailResponse(resp *http.Response) (res ConfirmSignupEma
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -1560,7 +1580,7 @@ func decodeCountEventsResponse(resp *http.Response) (res *CountEventsOK, _ error
 		return &wrapper, nil
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -1573,7 +1593,7 @@ func decodeCountEventsResponse(resp *http.Response) (res *CountEventsOK, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1590,48 +1610,10 @@ func decodeCountEventsResponse(resp *http.Response) (res *CountEventsOK, _ error
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -1769,7 +1751,7 @@ func decodeCreateEventResponse(resp *http.Response) (res CreateEventRes, _ error
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -1782,7 +1764,7 @@ func decodeCreateEventResponse(resp *http.Response) (res CreateEventRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1799,48 +1781,10 @@ func decodeCreateEventResponse(resp *http.Response) (res CreateEventRes, _ error
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -2004,7 +1948,7 @@ func decodeCreateEventDeferredNotificationResponse(resp *http.Response) (res Cre
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -2017,7 +1961,7 @@ func decodeCreateEventDeferredNotificationResponse(resp *http.Response) (res Cre
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -2034,48 +1978,10 @@ func decodeCreateEventDeferredNotificationResponse(resp *http.Response) (res Cre
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -2204,7 +2110,7 @@ func decodeCreateEventDiplomaSettingsResponse(resp *http.Response) (res CreateEv
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -2217,7 +2123,7 @@ func decodeCreateEventDiplomaSettingsResponse(resp *http.Response) (res CreateEv
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -2234,48 +2140,10 @@ func decodeCreateEventDiplomaSettingsResponse(resp *http.Response) (res CreateEv
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -2483,7 +2351,7 @@ func decodeCreateEventLimitResponse(resp *http.Response) (res CreateEventLimitRe
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -2496,7 +2364,7 @@ func decodeCreateEventLimitResponse(resp *http.Response) (res CreateEventLimitRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -2513,48 +2381,282 @@ func decodeCreateEventLimitResponse(resp *http.Response) (res CreateEventLimitRe
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
 
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
+func decodeCreateEventTeamResponse(resp *http.Response) (res CreateEventTeamRes, _ error) {
+	switch resp.StatusCode {
+	case 201:
+		// Code 201.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
 			}
-			return &wrapper, nil
+			d := jx.DecodeBytes(buf)
+
+			var response TeamPrivate
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 422:
+		// Code 422.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ValidationErrors
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeCreateEventTeamPersonResponse(resp *http.Response) (res CreateEventTeamPersonRes, _ error) {
+	switch resp.StatusCode {
+	case 201:
+		// Code 201.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response TeamPerson
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 422:
+		// Code 422.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ValidationErrors
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -2683,7 +2785,7 @@ func decodeCreateFileMetaResponse(resp *http.Response) (res CreateFileMetaRes, _
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -2696,7 +2798,7 @@ func decodeCreateFileMetaResponse(resp *http.Response) (res CreateFileMetaRes, _
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -2713,48 +2815,10 @@ func decodeCreateFileMetaResponse(resp *http.Response) (res CreateFileMetaRes, _
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -2918,7 +2982,7 @@ func decodeCreateFileReferenceResponse(resp *http.Response) (res CreateFileRefer
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -2931,7 +2995,7 @@ func decodeCreateFileReferenceResponse(resp *http.Response) (res CreateFileRefer
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -2948,48 +3012,10 @@ func decodeCreateFileReferenceResponse(resp *http.Response) (res CreateFileRefer
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -3057,7 +3083,7 @@ func decodeCreateMutationLockResponse(resp *http.Response) (res CreateMutationLo
 		return &CreateMutationLockUnprocessableEntity{}, nil
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -3070,7 +3096,7 @@ func decodeCreateMutationLockResponse(resp *http.Response) (res CreateMutationLo
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -3087,48 +3113,10 @@ func decodeCreateMutationLockResponse(resp *http.Response) (res CreateMutationLo
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -3184,7 +3172,7 @@ func decodeCreateOrganizationSubjectResponse(resp *http.Response) (res CreateOrg
 		return &CreateOrganizationSubjectConflict{}, nil
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -3197,7 +3185,7 @@ func decodeCreateOrganizationSubjectResponse(resp *http.Response) (res CreateOrg
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -3214,48 +3202,326 @@ func decodeCreateOrganizationSubjectResponse(resp *http.Response) (res CreateOrg
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
 
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
+func decodeCreateUserTeamResponse(resp *http.Response) (res CreateUserTeamRes, _ error) {
+	switch resp.StatusCode {
+	case 201:
+		// Code 201.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
 			}
-			return &wrapper, nil
+			d := jx.DecodeBytes(buf)
+
+			var response TeamPrivate
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 422:
+		// Code 422.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ValidationErrors
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeCreateUserTeamPersonResponse(resp *http.Response) (res CreateUserTeamPersonRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response CreateUserTeamPersonOK
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 201:
+		// Code 201.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response CreateUserTeamPersonCreated
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 422:
+		// Code 422.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ValidationErrors
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -3273,7 +3539,7 @@ func decodeDeleteEventDiplomaRoleResponse(resp *http.Response) (res *DeleteEvent
 		return &DeleteEventDiplomaRoleNoContent{}, nil
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -3286,7 +3552,7 @@ func decodeDeleteEventDiplomaRoleResponse(resp *http.Response) (res *DeleteEvent
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -3303,48 +3569,10 @@ func decodeDeleteEventDiplomaRoleResponse(resp *http.Response) (res *DeleteEvent
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -3432,7 +3660,7 @@ func decodeDeleteEventLimitResponse(resp *http.Response) (res DeleteEventLimitRe
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -3445,7 +3673,7 @@ func decodeDeleteEventLimitResponse(resp *http.Response) (res DeleteEventLimitRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -3462,48 +3690,10 @@ func decodeDeleteEventLimitResponse(resp *http.Response) (res DeleteEventLimitRe
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -3591,7 +3781,7 @@ func decodeDeleteFileReferenceResponse(resp *http.Response) (res DeleteFileRefer
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -3604,7 +3794,7 @@ func decodeDeleteFileReferenceResponse(resp *http.Response) (res DeleteFileRefer
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -3621,48 +3811,10 @@ func decodeDeleteFileReferenceResponse(resp *http.Response) (res DeleteFileRefer
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -3750,7 +3902,7 @@ func decodeDeleteMutationLockResponse(resp *http.Response) (res DeleteMutationLo
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -3763,7 +3915,7 @@ func decodeDeleteMutationLockResponse(resp *http.Response) (res DeleteMutationLo
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -3780,48 +3932,10 @@ func decodeDeleteMutationLockResponse(resp *http.Response) (res DeleteMutationLo
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -3909,7 +4023,7 @@ func decodeDisconnectSocialAuthResponse(resp *http.Response) (res DisconnectSoci
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -3922,7 +4036,7 @@ func decodeDisconnectSocialAuthResponse(resp *http.Response) (res DisconnectSoci
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -3939,48 +4053,10 @@ func decodeDisconnectSocialAuthResponse(resp *http.Response) (res DisconnectSoci
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -4065,7 +4141,7 @@ func decodeEventDeferredNotificationTemplateIDResponse(resp *http.Response) (res
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -4078,7 +4154,7 @@ func decodeEventDeferredNotificationTemplateIDResponse(resp *http.Response) (res
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -4095,48 +4171,10 @@ func decodeEventDeferredNotificationTemplateIDResponse(resp *http.Response) (res
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -4151,7 +4189,42 @@ func decodeEventSignupResponse(resp *http.Response) (res EventSignupRes, _ error
 	switch resp.StatusCode {
 	case 201:
 		// Code 201.
-		return &EventSignupCreated{}, nil
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response EventSignupCreatedApplicationJSON
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 204:
+		// Code 204.
+		return &EventSignupNoContent{}, nil
 	case 400:
 		// Code 400.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
@@ -4303,7 +4376,7 @@ func decodeEventSignupResponse(resp *http.Response) (res EventSignupRes, _ error
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -4316,7 +4389,7 @@ func decodeEventSignupResponse(resp *http.Response) (res EventSignupRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -4333,48 +4406,10 @@ func decodeEventSignupResponse(resp *http.Response) (res EventSignupRes, _ error
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -4395,7 +4430,7 @@ func decodeExistsEventDeferredNotificationResponse(resp *http.Response) (res Exi
 		return &ExistsEventDeferredNotificationNoContent{}, nil
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -4408,7 +4443,7 @@ func decodeExistsEventDeferredNotificationResponse(resp *http.Response) (res Exi
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -4425,48 +4460,10 @@ func decodeExistsEventDeferredNotificationResponse(resp *http.Response) (res Exi
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -4490,7 +4487,7 @@ func decodeIsOrganizationAdminResponse(resp *http.Response) (res IsOrganizationA
 		return &IsOrganizationAdminNotFound{}, nil
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -4503,7 +4500,7 @@ func decodeIsOrganizationAdminResponse(resp *http.Response) (res IsOrganizationA
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -4520,48 +4517,61 @@ func decodeIsOrganizationAdminResponse(resp *http.Response) (res IsOrganizationA
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
 
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
+func decodeIsTeamOwnerResponse(resp *http.Response) (res *IsTeamOwnerOK, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		return &IsTeamOwnerOK{}, nil
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
 			}
-			return &wrapper, nil
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -4698,7 +4708,7 @@ func decodeIssueAccessTokenResponse(resp *http.Response) (res IssueAccessTokenRe
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -4711,7 +4721,7 @@ func decodeIssueAccessTokenResponse(resp *http.Response) (res IssueAccessTokenRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -4728,48 +4738,10 @@ func decodeIssueAccessTokenResponse(resp *http.Response) (res IssueAccessTokenRe
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -4888,7 +4860,7 @@ func decodeListAddAchievementEventsResponse(resp *http.Response) (res *ListAddAc
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -4901,7 +4873,7 @@ func decodeListAddAchievementEventsResponse(resp *http.Response) (res *ListAddAc
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -4918,48 +4890,10 @@ func decodeListAddAchievementEventsResponse(resp *http.Response) (res *ListAddAc
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -5078,7 +5012,7 @@ func decodeListCalendarEventsResponse(resp *http.Response) (res *ListCalendarEve
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -5091,7 +5025,7 @@ func decodeListCalendarEventsResponse(resp *http.Response) (res *ListCalendarEve
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -5108,48 +5042,10 @@ func decodeListCalendarEventsResponse(resp *http.Response) (res *ListCalendarEve
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -5251,7 +5147,7 @@ func decodeListEventBrandsResponse(resp *http.Response) (res *ListEventBrandsHea
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -5264,7 +5160,7 @@ func decodeListEventBrandsResponse(resp *http.Response) (res *ListEventBrandsHea
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -5281,48 +5177,10 @@ func decodeListEventBrandsResponse(resp *http.Response) (res *ListEventBrandsHea
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -5441,7 +5299,7 @@ func decodeListEventDiplomaSettingsResponse(resp *http.Response) (res *ListEvent
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -5454,7 +5312,7 @@ func decodeListEventDiplomaSettingsResponse(resp *http.Response) (res *ListEvent
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -5471,48 +5329,10 @@ func decodeListEventDiplomaSettingsResponse(resp *http.Response) (res *ListEvent
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -5579,7 +5399,7 @@ func decodeListEventFieldsResponse(resp *http.Response) (res []EventFieldListed,
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -5592,7 +5412,7 @@ func decodeListEventFieldsResponse(resp *http.Response) (res []EventFieldListed,
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -5609,48 +5429,10 @@ func decodeListEventFieldsResponse(resp *http.Response) (res []EventFieldListed,
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -5661,7 +5443,7 @@ func decodeListEventFieldsResponse(resp *http.Response) (res []EventFieldListed,
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodeListEventRoutesResponse(resp *http.Response) (res *ListEventRoutesHeaders, _ error) {
+func decodeListEventRoutesResponse(resp *http.Response) (res *ListEventRoutesOKHeaders, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -5711,7 +5493,7 @@ func decodeListEventRoutesResponse(resp *http.Response) (res *ListEventRoutesHea
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
 			}
-			var wrapper ListEventRoutesHeaders
+			var wrapper ListEventRoutesOKHeaders
 			wrapper.Response = response
 			h := uri.NewHeaderDecoder(resp.Header)
 			// Parse "X-Count" header.
@@ -5752,7 +5534,7 @@ func decodeListEventRoutesResponse(resp *http.Response) (res *ListEventRoutesHea
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -5765,7 +5547,7 @@ func decodeListEventRoutesResponse(resp *http.Response) (res *ListEventRoutesHea
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -5782,48 +5564,10 @@ func decodeListEventRoutesResponse(resp *http.Response) (res *ListEventRoutesHea
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -5977,7 +5721,7 @@ func decodeListEventsResponse(resp *http.Response) (res ListEventsRes, _ error) 
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -5990,7 +5734,7 @@ func decodeListEventsResponse(resp *http.Response) (res ListEventsRes, _ error) 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -6007,48 +5751,10 @@ func decodeListEventsResponse(resp *http.Response) (res ListEventsRes, _ error) 
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -6202,7 +5908,7 @@ func decodeListFileMetaResponse(resp *http.Response) (res ListFileMetaRes, _ err
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -6215,7 +5921,7 @@ func decodeListFileMetaResponse(resp *http.Response) (res ListFileMetaRes, _ err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -6232,48 +5938,10 @@ func decodeListFileMetaResponse(resp *http.Response) (res ListFileMetaRes, _ err
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -6392,7 +6060,7 @@ func decodeListOrganizationEventsResponse(resp *http.Response) (res *ListOrganiz
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -6405,7 +6073,7 @@ func decodeListOrganizationEventsResponse(resp *http.Response) (res *ListOrganiz
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -6422,48 +6090,10 @@ func decodeListOrganizationEventsResponse(resp *http.Response) (res *ListOrganiz
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -6565,7 +6195,7 @@ func decodeListOrganizationSubjectsResponse(resp *http.Response) (res *ListOrgan
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -6578,7 +6208,7 @@ func decodeListOrganizationSubjectsResponse(resp *http.Response) (res *ListOrgan
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -6595,48 +6225,10 @@ func decodeListOrganizationSubjectsResponse(resp *http.Response) (res *ListOrgan
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -6790,7 +6382,7 @@ func decodeListOrganizationsResponse(resp *http.Response) (res ListOrganizations
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -6803,7 +6395,7 @@ func decodeListOrganizationsResponse(resp *http.Response) (res ListOrganizations
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -6820,48 +6412,10 @@ func decodeListOrganizationsResponse(resp *http.Response) (res ListOrganizations
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -7015,7 +6569,7 @@ func decodeListSocialAuthsResponse(resp *http.Response) (res ListSocialAuthsRes,
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -7028,7 +6582,7 @@ func decodeListSocialAuthsResponse(resp *http.Response) (res ListSocialAuthsRes,
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -7045,48 +6599,10 @@ func decodeListSocialAuthsResponse(resp *http.Response) (res ListSocialAuthsRes,
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -7188,7 +6704,7 @@ func decodeListSubjectsResponse(resp *http.Response) (res *ListSubjectsHeaders, 
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -7201,7 +6717,7 @@ func decodeListSubjectsResponse(resp *http.Response) (res *ListSubjectsHeaders, 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -7218,48 +6734,127 @@ func decodeListSubjectsResponse(resp *http.Response) (res *ListSubjectsHeaders, 
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeListTeamsResponse(resp *http.Response) (res []TeamPublic, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response []TeamPublic
+			if err := func() error {
+				response = make([]TeamPublic, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem TeamPublic
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					response = append(response, elem)
+					return nil
+				}); err != nil {
+					return err
 				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if response == nil {
+					return errors.New("nil is invalid value")
+				}
+				var failures []validate.FieldError
+				for i, elem := range response {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
 							return err
 						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
 					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
 				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
-			return &wrapper, nil
+			return response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -7353,7 +6948,7 @@ func decodeListUserConsentsResponse(resp *http.Response) (res ListUserConsentsRe
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -7366,7 +6961,7 @@ func decodeListUserConsentsResponse(resp *http.Response) (res ListUserConsentsRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -7383,48 +6978,10 @@ func decodeListUserConsentsResponse(resp *http.Response) (res ListUserConsentsRe
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -7615,7 +7172,7 @@ func decodeLoginSocialAuthResponse(resp *http.Response) (res LoginSocialAuthRes,
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -7628,7 +7185,7 @@ func decodeLoginSocialAuthResponse(resp *http.Response) (res LoginSocialAuthRes,
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -7645,48 +7202,10 @@ func decodeLoginSocialAuthResponse(resp *http.Response) (res LoginSocialAuthRes,
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -7806,7 +7325,7 @@ func decodePatchMutationLockResponse(resp *http.Response) (res PatchMutationLock
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -7819,7 +7338,7 @@ func decodePatchMutationLockResponse(resp *http.Response) (res PatchMutationLock
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -7836,48 +7355,10 @@ func decodePatchMutationLockResponse(resp *http.Response) (res PatchMutationLock
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -7888,7 +7369,7 @@ func decodePatchMutationLockResponse(resp *http.Response) (res PatchMutationLock
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodeReadEventResponse(resp *http.Response) (res ReadEventRes, _ error) {
+func decodeReadEventResponse(resp *http.Response) (res ReadEventOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -7930,48 +7411,13 @@ func decodeReadEventResponse(resp *http.Response) (res ReadEventRes, _ error) {
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
 			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 404:
-		// Code 404.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response NotFound
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
+			return response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -7984,7 +7430,7 @@ func decodeReadEventResponse(resp *http.Response) (res ReadEventRes, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -8001,48 +7447,10 @@ func decodeReadEventResponse(resp *http.Response) (res ReadEventRes, _ error) {
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -8171,7 +7579,7 @@ func decodeReadEventDeferredNotificationResponse(resp *http.Response) (res ReadE
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -8184,7 +7592,7 @@ func decodeReadEventDeferredNotificationResponse(resp *http.Response) (res ReadE
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -8201,48 +7609,10 @@ func decodeReadEventDeferredNotificationResponse(resp *http.Response) (res ReadE
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -8339,7 +7709,7 @@ func decodeReadEventDiplomaSettingsResponse(resp *http.Response) (res ReadEventD
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -8352,7 +7722,7 @@ func decodeReadEventDiplomaSettingsResponse(resp *http.Response) (res ReadEventD
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -8369,48 +7739,10 @@ func decodeReadEventDiplomaSettingsResponse(resp *http.Response) (res ReadEventD
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -8504,7 +7836,7 @@ func decodeReadEventLimitResponse(resp *http.Response) (res ReadEventLimitRes, _
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -8517,7 +7849,7 @@ func decodeReadEventLimitResponse(resp *http.Response) (res ReadEventLimitRes, _
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -8534,48 +7866,255 @@ func decodeReadEventLimitResponse(resp *http.Response) (res ReadEventLimitRes, _
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
 
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
+func decodeReadEventRequestResponse(resp *http.Response) (res ReadEventRequestRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
 			}
-			return &wrapper, nil
+			d := jx.DecodeBytes(buf)
+
+			var response EventRequest
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 403:
+		// Code 403.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response PermissionDenied
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response NotFound
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeReadEventTeamResponse(resp *http.Response) (res *TeamPrivateWithPersons, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response TeamPrivateWithPersons
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -8767,7 +8306,7 @@ func decodeReadFileResponse(resp *http.Response) (res ReadFileRes, _ error) {
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -8780,7 +8319,7 @@ func decodeReadFileResponse(resp *http.Response) (res ReadFileRes, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -8797,48 +8336,10 @@ func decodeReadFileResponse(resp *http.Response) (res ReadFileRes, _ error) {
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -9002,7 +8503,7 @@ func decodeReadFileMetaResponse(resp *http.Response) (res ReadFileMetaRes, _ err
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -9015,7 +8516,7 @@ func decodeReadFileMetaResponse(resp *http.Response) (res ReadFileMetaRes, _ err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -9032,48 +8533,10 @@ func decodeReadFileMetaResponse(resp *http.Response) (res ReadFileMetaRes, _ err
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -9084,7 +8547,125 @@ func decodeReadFileMetaResponse(resp *http.Response) (res ReadFileMetaRes, _ err
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodeReadPersonResponse(resp *http.Response) (res ReadPersonRes, _ error) {
+func decodeReadGeoDataResponse(resp *http.Response) (res ReadGeoDataRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response GeoData
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response NotFound
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeReadPersonResponse(resp *http.Response) (res *ReadPersonOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -9121,44 +8702,9 @@ func decodeReadPersonResponse(resp *http.Response) (res ReadPersonRes, _ error) 
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	case 404:
-		// Code 404.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response NotFound
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -9171,7 +8717,7 @@ func decodeReadPersonResponse(resp *http.Response) (res ReadPersonRes, _ error) 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -9188,48 +8734,10 @@ func decodeReadPersonResponse(resp *http.Response) (res ReadPersonRes, _ error) 
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -9240,7 +8748,7 @@ func decodeReadPersonResponse(resp *http.Response) (res ReadPersonRes, _ error) 
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodeReadTeamResponse(resp *http.Response) (res ReadTeamRes, _ error) {
+func decodeReadTeamResponse(resp *http.Response) (res *TeamPublicWithPersons, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -9256,7 +8764,191 @@ func decodeReadTeamResponse(resp *http.Response) (res ReadTeamRes, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Team
+			var response TeamPublicWithPersons
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeReadUserTeamResponse(resp *http.Response) (res *TeamPrivateWithPersons, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response TeamPrivateWithPersons
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeRegionNameResponse(resp *http.Response) (res RegionNameRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response RegionNameOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -9314,7 +9006,7 @@ func decodeReadTeamResponse(resp *http.Response) (res ReadTeamRes, _ error) {
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -9327,7 +9019,7 @@ func decodeReadTeamResponse(resp *http.Response) (res ReadTeamRes, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -9344,48 +9036,10 @@ func decodeReadTeamResponse(resp *http.Response) (res ReadTeamRes, _ error) {
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -9636,7 +9290,7 @@ func decodeSignupResponse(resp *http.Response) (res SignupRes, _ error) {
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -9649,7 +9303,7 @@ func decodeSignupResponse(resp *http.Response) (res SignupRes, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -9666,48 +9320,10 @@ func decodeSignupResponse(resp *http.Response) (res SignupRes, _ error) {
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -9760,7 +9376,7 @@ func decodeSignupInitialDataResponse(resp *http.Response) (res SignupInitialData
 		return &SignupInitialDataNoContent{}, nil
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -9773,7 +9389,7 @@ func decodeSignupInitialDataResponse(resp *http.Response) (res SignupInitialData
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -9790,48 +9406,10 @@ func decodeSignupInitialDataResponse(resp *http.Response) (res SignupInitialData
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -9887,7 +9465,7 @@ func decodeSubmitUserConsentResponse(resp *http.Response) (res SubmitUserConsent
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -9900,7 +9478,7 @@ func decodeSubmitUserConsentResponse(resp *http.Response) (res SubmitUserConsent
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -9917,48 +9495,10 @@ func decodeSubmitUserConsentResponse(resp *http.Response) (res SubmitUserConsent
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -9969,11 +9509,152 @@ func decodeSubmitUserConsentResponse(resp *http.Response) (res SubmitUserConsent
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodeUpdateAuthenticatedUserResponse(resp *http.Response) (res UpdateAuthenticatedUserRes, _ error) {
+func decodeSuggestGeoFieldResponse(resp *http.Response) (res []SuggestGeoFieldOKItem, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
-		return &UpdateAuthenticatedUserOK{}, nil
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response []SuggestGeoFieldOKItem
+			if err := func() error {
+				response = make([]SuggestGeoFieldOKItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem SuggestGeoFieldOKItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					response = append(response, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if response == nil {
+					return errors.New("nil is invalid value")
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeUpdateEventResponse(resp *http.Response) (res UpdateEventRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Event
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	case 403:
 		// Code 403.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
@@ -9989,6 +9670,41 @@ func decodeUpdateAuthenticatedUserResponse(resp *http.Response) (res UpdateAuthe
 			d := jx.DecodeBytes(buf)
 
 			var response PermissionDenied
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response NotFound
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -10055,7 +9771,7 @@ func decodeUpdateAuthenticatedUserResponse(resp *http.Response) (res UpdateAuthe
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -10068,7 +9784,7 @@ func decodeUpdateAuthenticatedUserResponse(resp *http.Response) (res UpdateAuthe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -10085,48 +9801,10 @@ func decodeUpdateAuthenticatedUserResponse(resp *http.Response) (res UpdateAuthe
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -10290,7 +9968,7 @@ func decodeUpdateEventDeferredNotificationResponse(resp *http.Response) (res Upd
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -10303,7 +9981,7 @@ func decodeUpdateEventDeferredNotificationResponse(resp *http.Response) (res Upd
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -10320,48 +9998,10 @@ func decodeUpdateEventDeferredNotificationResponse(resp *http.Response) (res Upd
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -10455,7 +10095,7 @@ func decodeUpdateEventDiplomaSettingsResponse(resp *http.Response) (res UpdateEv
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -10468,7 +10108,7 @@ func decodeUpdateEventDiplomaSettingsResponse(resp *http.Response) (res UpdateEv
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -10485,48 +10125,10 @@ func decodeUpdateEventDiplomaSettingsResponse(resp *http.Response) (res UpdateEv
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -10699,7 +10301,7 @@ func decodeUpdateEventLimitResponse(resp *http.Response) (res UpdateEventLimitRe
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -10712,7 +10314,7 @@ func decodeUpdateEventLimitResponse(resp *http.Response) (res UpdateEventLimitRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -10729,48 +10331,435 @@ func decodeUpdateEventLimitResponse(resp *http.Response) (res UpdateEventLimitRe
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
 
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
+func decodeUpdateEventRequestResponse(resp *http.Response) (res UpdateEventRequestRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
 			}
-			return &wrapper, nil
+			d := jx.DecodeBytes(buf)
+
+			var response EventRequest
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 403:
+		// Code 403.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response PermissionDenied
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response NotFound
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 422:
+		// Code 422.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ValidationErrors
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeUpdateEventTeamResponse(resp *http.Response) (res UpdateEventTeamRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response TeamPrivate
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 422:
+		// Code 422.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ValidationErrors
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeUpdateEventTeamPersonResponse(resp *http.Response) (res *TeamPerson, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response TeamPerson
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -10899,197 +10888,7 @@ func decodeUpdateFileMetaResponse(resp *http.Response) (res UpdateFileMetaRes, _
 		}
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response Default
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	}()
-	if err != nil {
-		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
-	}
-	return res, errors.Wrap(defRes, "error")
-}
-
-func decodeUpdateTeamResponse(resp *http.Response) (res UpdateTeamRes, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response Team
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 403:
-		// Code 403.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response PermissionDenied
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 404:
-		// Code 404.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response NotFound
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 422:
-		// Code 422.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -11119,13 +10918,24 @@ func decodeUpdateTeamResponse(resp *http.Response) (res UpdateTeamRes, _ error) 
 				}
 				return res, err
 			}
-			return &response, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
 	}
-	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeUpdateOwnerTeamPersonResponse(resp *http.Response) (res UpdateOwnerTeamPersonRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -11138,7 +10948,7 @@ func decodeUpdateTeamResponse(resp *http.Response) (res UpdateTeamRes, _ error) 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response TeamPerson
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -11155,48 +10965,371 @@ func decodeUpdateTeamResponse(resp *http.Response) (res UpdateTeamRes, _ error) 
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
 				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
-			return &wrapper, nil
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 422:
+		// Code 422.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ValidationErrors
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeUpdateUserTeamResponse(resp *http.Response) (res UpdateUserTeamRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response TeamPrivate
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 422:
+		// Code 422.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ValidationErrors
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodeUpdateUserTeamPersonResponse(resp *http.Response) (res UpdateUserTeamPersonRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response TeamPerson
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 422:
+		// Code 422.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ValidationErrors
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *ErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response Error
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -11354,7 +11487,7 @@ func decodeUploadFileResponse(resp *http.Response) (res UploadFileRes, _ error) 
 		return &UploadFileUnprocessableEntity{}, nil
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -11367,7 +11500,7 @@ func decodeUploadFileResponse(resp *http.Response) (res UploadFileRes, _ error) 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -11384,48 +11517,10 @@ func decodeUploadFileResponse(resp *http.Response) (res UploadFileRes, _ error) 
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -11443,7 +11538,7 @@ func decodeValidateAuthorizationResponse(resp *http.Response) (res *ValidateAuth
 		return &ValidateAuthorizationOK{}, nil
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -11456,7 +11551,7 @@ func decodeValidateAuthorizationResponse(resp *http.Response) (res *ValidateAuth
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -11473,48 +11568,10 @@ func decodeValidateAuthorizationResponse(resp *http.Response) (res *ValidateAuth
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -11535,7 +11592,7 @@ func decodeValidateTeamContactResponse(resp *http.Response) (res ValidateTeamCon
 		return &ValidateTeamContactUnprocessableEntity{}, nil
 	}
 	// Convenient error response.
-	defRes, err := func() (res *DefaultStatusCodeWithHeaders, err error) {
+	defRes, err := func() (res *ErrorStatusCode, err error) {
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -11548,7 +11605,7 @@ func decodeValidateTeamContactResponse(resp *http.Response) (res ValidateTeamCon
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response Default
+			var response Error
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -11565,48 +11622,10 @@ func decodeValidateTeamContactResponse(resp *http.Response) (res ValidateTeamCon
 				}
 				return res, err
 			}
-			var wrapper DefaultStatusCodeWithHeaders
-			wrapper.Response = response
-			wrapper.StatusCode = resp.StatusCode
-			h := uri.NewHeaderDecoder(resp.Header)
-			// Parse "Www-Authenticate" header.
-			{
-				cfg := uri.HeaderParameterDecodingConfig{
-					Name:    "Www-Authenticate",
-					Explode: false,
-				}
-				if err := func() error {
-					if err := h.HasParam(cfg); err == nil {
-						if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
-							var wrapperDotWwwAuthenticateVal string
-							if err := func() error {
-								val, err := d.DecodeValue()
-								if err != nil {
-									return err
-								}
-
-								c, err := conv.ToString(val)
-								if err != nil {
-									return err
-								}
-
-								wrapperDotWwwAuthenticateVal = c
-								return nil
-							}(); err != nil {
-								return err
-							}
-							wrapper.WwwAuthenticate.SetTo(wrapperDotWwwAuthenticateVal)
-							return nil
-						}); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return res, errors.Wrap(err, "parse Www-Authenticate header")
-				}
-			}
-			return &wrapper, nil
+			return &ErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}

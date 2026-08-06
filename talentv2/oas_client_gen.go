@@ -4,6 +4,7 @@ package talentv2
 
 import (
 	"context"
+	"io"
 	"net/url"
 	"strings"
 	"time"
@@ -52,6 +53,7 @@ type Invoker interface {
 	// CancelEventDeferredNotification invokes CancelEventDeferredNotification operation.
 	//
 	// Перевод уведомления из статуса `pending` в статус `canceled`.
+	//
 	// Если уведомление в статусе `pending` не найдено, будет
 	// возвращен `404` ответ.
 	//
@@ -61,14 +63,32 @@ type Invoker interface {
 	//
 	// Проверка наличия согласия пользователя.
 	//
-	// HEAD /users/{user_id}/consents/{kind}
+	// HEAD /users/{talent_id}/consents/{kind}
 	CheckUserConsent(ctx context.Context, params CheckUserConsentParams) (CheckUserConsentRes, error)
+	// CityName invokes CityName operation.
+	//
+	// Название города по ФИАС ID.
+	//
+	// GET /geo/fias/city/{fias}
+	CityName(ctx context.Context, params CityNameParams) (CityNameRes, error)
 	// CompleteSocialAuth invokes CompleteSocialAuth operation.
 	//
 	// Завершение авторизации.
 	//
 	// GET /auth/complete/{provider}
 	CompleteSocialAuth(ctx context.Context, params CompleteSocialAuthParams) (CompleteSocialAuthRes, error)
+	// ConfirmEventSignup invokes ConfirmEventSignup operation.
+	//
+	// Для предварительной валидации запроса, без
+	// подтверждения заявки, нужно указать параметр `dry_run=true`.
+	//
+	// `4xx` ответы:
+	//
+	//  - `404` - если не найдена подтверждаемая заявка;
+	//  - `422` - если токен не валиден.
+	//
+	// POST /events/confirm-signup/{event_request_id}/{token}
+	ConfirmEventSignup(ctx context.Context, request OptConfirmEventSignupReq, params ConfirmEventSignupParams) (ConfirmEventSignupRes, error)
 	// ConfirmFileUpload invokes ConfirmFileUpload operation.
 	//
 	// Подтверждение загрузки файла.
@@ -91,8 +111,7 @@ type Invoker interface {
 	// CreateEvent invokes CreateEvent operation.
 	//
 	// При полном отсутствии в запросе массива `achievement_roles`,
-	// мероприятию назначаются роли достижений
-	// по-умолчанию.
+	// мероприятию назначаются роли достижений по-умолчанию.
 	// Пустой же массив приведет к созданию мероприятия без
 	// ролей.
 	//
@@ -112,12 +131,38 @@ type Invoker interface {
 	CreateEventDiplomaSettings(ctx context.Context, request *CreateEventDiplomaSettingsReq, params CreateEventDiplomaSettingsParams) (CreateEventDiplomaSettingsRes, error)
 	// CreateEventLimit invokes CreateEventLimit operation.
 	//
-	// Лимиты могут существовать только в единичном кол-ве
-	// на мероприятие.
-	// Попытка создать больше будет возвращать `409` ответ.
+	// Лимиты могут существовать только в единичном кол-ве на
+	// мероприятие. Попытка создать больше будет возвращать
+	// `409` ответ.
 	//
 	// POST /events/{event_id}/limit
-	CreateEventLimit(ctx context.Context, request *CreateEventLimitReq, params CreateEventLimitParams) (CreateEventLimitRes, error)
+	CreateEventLimit(ctx context.Context, request *EventLimitWrite, params CreateEventLimitParams) (CreateEventLimitRes, error)
+	// CreateEventTeam invokes CreateEventTeam operation.
+	//
+	// Администратор организации создает команду на
+	// мероприятие. В качестве капитана команды и участников
+	// указываются пользователи, имеющие заявку на это
+	// мероприятие.
+	//
+	// POST /events/{event_id}/teams
+	CreateEventTeam(ctx context.Context, request *OrganizationTeamCreate, params CreateEventTeamParams) (CreateEventTeamRes, error)
+	// CreateEventTeamPerson invokes CreateEventTeamPerson operation.
+	//
+	// Добавление в команду участника мероприятия
+	// администратором организации.
+	//
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+----------------------------------------------------------------------------------------------------------------------
+	// 	`403`  | Пользователь не является администратором организации
+	// 	`404`  | Мероприятие не найдено
+	// 	`404`  | Команда не найдена
+	// 	`409`  | У добавляемого пользователя уже имеется команда на мероприятии
+	// 	`422`  | Невалидный идентификатор пользователя
+	//
+	// POST /events/{event_id}/teams/{team_id}/persons
+	CreateEventTeamPerson(ctx context.Context, request *CreateEventTeamPersonReq, params CreateEventTeamPersonParams) (CreateEventTeamPersonRes, error)
 	// CreateFileMeta invokes CreateFileMeta operation.
 	//
 	// Создание файла.
@@ -132,22 +177,79 @@ type Invoker interface {
 	CreateFileReference(ctx context.Context, params CreateFileReferenceParams) (CreateFileReferenceRes, error)
 	// CreateMutationLock invokes CreateMutationLock operation.
 	//
-	// Блокировки создаются только для файлов,
-	// принадлежащих пользователю.
-	// Чужие файлы, несуществующие файлы, а так же файлы,
-	// для которых блокировки уже имеются,
-	// будут пропущены и не возвращены в теле `201` ответа.
+	// Блокировки создаются только для файлов, принадлежащих
+	// пользователю. Чужие файлы, несуществующие файлы, а так
+	// же файлы, для которых блокировки уже имеются, будут
+	// пропущены и не возвращены в теле `201` ответа.
 	//
 	// POST /mutation-locks/{object_namespace}/{object_key}
 	CreateMutationLock(ctx context.Context, request []uuid.UUID, params CreateMutationLockParams) (CreateMutationLockRes, error)
 	// CreateOrganizationSubject invokes CreateOrganizationSubject operation.
 	//
-	// > Запрос необходимо выполнять от ментора или
-	// владельца организации,
-	// > указываемой в свойстве `organization_id` тела запроса.
+	// 	Запрос необходимо выполнять от ментора или владельца
+	// 	организации, указываемой в свойстве `organization_id` тела
+	// 	запроса.
 	//
 	// POST /organization-subjects
 	CreateOrganizationSubject(ctx context.Context, request *OrganizationSubjectBody) (CreateOrganizationSubjectRes, error)
+	// CreateUserTeam invokes CreateUserTeam operation.
+	//
+	// Создание команды от аутентифицированного
+	// пользователя. Пользователь становится и ее капитаном
+	// и ее первым участником.
+	//
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+--------------------------------------------------------------------------------------------------------------------
+	// 	`403`  | Мероприятие завершено
+	// 	`404`  | Команда не найдена
+	// 	`409`  | У пользователя уже имеется команда на мероприятии
+	// 	`409`  | Команда с таким названием уже имеется на мероприятии
+	// 	`422`  | Невалидный идентификатор мероприятия
+	// 	`422`  | Невалидная контактная ссылка
+	// 	`422`  | Невалидное название команды
+	// 	`422`  | Мероприятие не допускает командного участия
+	// 	`422`  | Мероприятие не допускает управления параметром `assignment_participation`
+	// 	`422`  | Название команды уже занято на мероприятии
+	//
+	// POST /users/me/teams
+	CreateUserTeam(ctx context.Context, request *OwnerTeamCreate) (CreateUserTeamRes, error)
+	// CreateUserTeamPerson invokes CreateUserTeamPerson operation.
+	//
+	// Добавление в команду нового участника ее капитаном
+	// или запрос на добавление от участника.
+	//
+	// Запрос от участника, при наличии в нем (корректного)
+	// `invite_code`, не требует подтверждения со стороны капитана
+	// команды.
+	//
+	// Если участник уже добавлен в команду, возвращется `200`
+	// ответ. В том числе и когда он находится в частично
+	// отклоненном состоянии:
+	//
+	//  - на запрос от капитана, может вернуться участник,
+	//    отклонивший свое участие
+	//  - на запрос от самого участника, может вернуться уже
+	//    имеющаяся заявка на участие, отклоненная капитаном.
+	//
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+------------------------------------------------------------------------------------------------------------------------------------
+	// 	`403`  | Пользователь не является капитаном команды
+	// 	`403`  | Мероприятие команды завершено
+	// 	`404`  | Команда не найдена
+	// 	`409`  | У добавляемого пользователя уже имеется команда на мероприятии
+	// 	`422`  | Указан невалидный ID пользователя
+	// 	`422`  | Указан неправильный инвайт-код
+	// 	`422`  | У добавляемого пользователя отсутствует заявка на мероприятие команды
+	// 	`422`  | Достижение допустимого количества участников команды
+	// 	`422`  | Достижение допустимого количества приглашений в команду
+	// 	`422`  | Достижение допустимого количества запросов в команды для пользователя
+	//
+	// POST /users/me/teams/{team_id}/persons
+	CreateUserTeamPerson(ctx context.Context, request CreateUserTeamPersonReq, params CreateUserTeamPersonParams) (CreateUserTeamPersonRes, error)
 	// DeleteEventDiplomaRole invokes DeleteEventDiplomaRole operation.
 	//
 	// Удаление роли для диплома мероприятия.
@@ -177,6 +279,7 @@ type Invoker interface {
 	// Удаление авторизации возможно только если это не
 	// единственный оставшийся у пользователя способ
 	// аутентификации под своей учетной записью.
+	//
 	// Не допускается параллельная обработка запросов на
 	// удаление, в случае появления такой гонки, будет
 	// возвращен 409 ответ.
@@ -191,13 +294,15 @@ type Invoker interface {
 	EventDeferredNotificationTemplateID(ctx context.Context, params EventDeferredNotificationTemplateIDParams) (EventDeferredNotificationTemplateIDRes, error)
 	// EventSignup invokes EventSignup operation.
 	//
-	// #### Аутентификация
-	// При выполнении запроса с аутентификацией,
-	// заявка создается для пользователя, с которым связан
-	// токен.
-	// Параметры, используемые для создания пользователя,
-	// в аутентифицированном запросе будут использованы
-	// для его обновления.
+	// # Аутентификация
+	//
+	// При выполнении запроса с аутентификацией, заявка
+	// создается для пользователя, с которым связан токен.
+	//
+	// Параметры, используемые для создания пользователя, в
+	// аутентифицированном запросе будут использованы для
+	// его обновления.
+	//
 	// Параметр `email` недопускается в аутентифицированных
 	// запросах.
 	//
@@ -215,6 +320,19 @@ type Invoker interface {
 	//
 	// POST /organizations/{organization_id}/is-admin
 	IsOrganizationAdmin(ctx context.Context, params IsOrganizationAdminParams) (IsOrganizationAdminRes, error)
+	// IsTeamOwner invokes IsTeamOwner operation.
+	//
+	// Является ли пользователь капитаном указанной команды.
+	//
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+---------------------------------------------------------------------------------
+	// 	`403`  | Пользователь не является капитаном команды
+	// 	`404`  | Команда не найдена
+	//
+	// POST /users/me/teams/{team_id}/is-owner
+	IsTeamOwner(ctx context.Context, params IsTeamOwnerParams) error
 	// IssueAccessToken invokes IssueAccessToken operation.
 	//
 	// Выдача токена доступа.
@@ -257,35 +375,40 @@ type Invoker interface {
 	// Список направлений мероприятий.
 	//
 	// GET /event-routes
-	ListEventRoutes(ctx context.Context, params ListEventRoutesParams) (*ListEventRoutesHeaders, error)
+	ListEventRoutes(ctx context.Context, params ListEventRoutesParams) (*ListEventRoutesOKHeaders, error)
 	// ListEvents invokes ListEvents operation.
 	//
 	// Если не указан критерий сортировки результатов `order_by`,
 	// то он определяется в зависимости от указания других
 	// параметров.
+	//
 	// По-умолчанию результаты сортируются по
-	// идентификаторам в порядке возрастания (`id_asc`).
-	// Но если указан поисковый запрос и не используется
-	// параметр `id_offset`,
-	// то результаты сортируются по релевантности к
+	// идентификаторам в порядке возрастания (`id_asc`). Но если
+	// указан поисковый запрос и не используется параметр
+	// `id_offset`, то результаты сортируются по релевантности к
 	// поисковому запросу (`relevant`).
+	//
 	// При явном указании `order_by`, его значение должно
 	// соответствовать требованиям:
-	// - с параметром `id_offset` допускается только `order_by=id_asc`
-	// - вариант `order_by=relevant` доступен только при указании
-	// параметра `search`.
+	//
+	//  - с параметром `id_offset` допускается только `order_by=id_asc`
+	//  - вариант `order_by=relevant` доступен только при указании
+	//    параметра `search`.
 	//
 	// GET /events
 	ListEvents(ctx context.Context, params ListEventsParams) (ListEventsRes, error)
 	// ListFileMeta invokes ListFileMeta operation.
 	//
-	// #### Неаутентифицированный запрос публичных файлов
-	// Допускается запрос без аутентификации при
-	// соблюдении условий:
-	// - присутствуют значения параметра `file_id`
-	// - параметр `is_public` отсутствует либо содержит `true`
-	// При несоблюдении какого-либо из условий,
-	// возвращается `401` ответ.
+	// # Неаутентифицированный запрос публичных файлов
+	//
+	// Допускается запрос без аутентификации при соблюдении
+	// условий:
+	//
+	//  - присутствуют значения параметра `file_id`
+	//  - параметр `is_public` отсутствует либо содержит `true`
+	//
+	// При несоблюдении какого-либо из условий, возвращается
+	// `401` ответ.
 	//
 	// GET /files
 	ListFileMeta(ctx context.Context, params ListFileMetaParams) (ListFileMetaRes, error)
@@ -311,7 +434,7 @@ type Invoker interface {
 	//
 	// Список авторизаций пользователя в соц. сетях.
 	//
-	// GET /social-auths/{user_id}
+	// GET /social-auths/{talent_id}
 	ListSocialAuths(ctx context.Context, params ListSocialAuthsParams) (ListSocialAuthsRes, error)
 	// ListSubjects invokes ListSubjects operation.
 	//
@@ -319,11 +442,17 @@ type Invoker interface {
 	//
 	// GET /subjects
 	ListSubjects(ctx context.Context, params ListSubjectsParams) (*ListSubjectsHeaders, error)
+	// ListTeams invokes ListTeams operation.
+	//
+	// Все команды пользователей.
+	//
+	// GET /teams
+	ListTeams(ctx context.Context, params ListTeamsParams) ([]TeamPublic, error)
 	// ListUserConsents invokes ListUserConsents operation.
 	//
 	// Список согласий пользователя.
 	//
-	// GET /users/{user_id}/consents
+	// GET /users/{talent_id}/consents
 	ListUserConsents(ctx context.Context, params ListUserConsentsParams) (ListUserConsentsRes, error)
 	// LoginSocialAuth invokes LoginSocialAuth operation.
 	//
@@ -333,22 +462,28 @@ type Invoker interface {
 	LoginSocialAuth(ctx context.Context, params LoginSocialAuthParams) (LoginSocialAuthRes, error)
 	// PatchMutationLock invokes PatchMutationLock operation.
 	//
-	// Изначально блокировка создается в состоянии
-	// активной.
+	// Изначально блокировка создается в состоянии активной.
 	// После создания, состояние можно декактивировать и
 	// активировать обратно.
-	// > Неактивная блокировка равнозначна ее отсутствию.
+	//
+	// 	Неактивная блокировка равнозначна ее отсутствию.
 	//
 	// PATCH /mutation-locks/{object_namespace}/{object_key}
 	PatchMutationLock(ctx context.Context, request *PatchMutationLockReq, params PatchMutationLockParams) (PatchMutationLockRes, error)
 	// ReadEvent invokes ReadEvent operation.
 	//
-	// По умолчанию возвращаются только метаданные.
-	// Для получения полного набора свойств используйте
+	// По умолчанию возвращаются только метаданные. Для
+	// получения полного набора свойств используйте
 	// параметр `extend`.
 	//
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+-------------------------------------------
+	// 	`404`  | Мероприятие не найдено
+	//
 	// GET /events/{event_id}
-	ReadEvent(ctx context.Context, params ReadEventParams) (ReadEventRes, error)
+	ReadEvent(ctx context.Context, params ReadEventParams) (ReadEventOK, error)
 	// ReadEventDeferredNotification invokes ReadEventDeferredNotification operation.
 	//
 	// Чтение отложенного уведомления.
@@ -367,40 +502,102 @@ type Invoker interface {
 	//
 	// GET /events/{event_id}/limit
 	ReadEventLimit(ctx context.Context, params ReadEventLimitParams) (ReadEventLimitRes, error)
+	// ReadEventRequest invokes ReadEventRequest operation.
+	//
+	// Ответ дополняется значениями заполненных в заявке
+	// полей при указании параметра `fields=true`.
+	//
+	// GET /events/requests/{event_request_id}
+	ReadEventRequest(ctx context.Context, params ReadEventRequestParams) (ReadEventRequestRes, error)
+	// ReadEventTeam invokes ReadEventTeam operation.
+	//
+	// Команда на мероприятие для администратора его
+	// организации. Включает проверку наличия актуального
+	// соглашения с организацией.
+	//
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+-----------------------------------------------------------------------------------------------------
+	// 	`403`  | Пользователь не является администратором организации
+	// 	`404`  | Мероприятие не найдено
+	// 	`404`  | Команда не найдена
+	//
+	// GET /events/{event_id}/teams/{team_id}
+	ReadEventTeam(ctx context.Context, params ReadEventTeamParams) (*TeamPrivateWithPersons, error)
 	// ReadFile invokes ReadFile operation.
 	//
-	// По-умолчанию возвращается в форме `307` ответа.
-	// С параметром `noredir=true` возвращается `200`.
-	// Чтение приватного файла требует прохождение
-	// авторизации.
-	// Аутентифицированный пользователь должен быть
-	// владельцем файла.
+	// По-умолчанию возвращается в форме `307` ответа. С
+	// параметром `noredir=true` возвращается `200`.
+	//
+	// Чтение приватного файла требует прохождения
+	// авторизации. Аутентифицированный пользователь должен
+	// быть владельцем файла. Токен должен иметь скоуп
+	// `files:read`.
 	//
 	// GET /files/{file_id}
 	ReadFile(ctx context.Context, params ReadFileParams) (ReadFileRes, error)
 	// ReadFileMeta invokes ReadFileMeta operation.
 	//
-	// Чтение приватного файла требует прохождение
-	// авторизации.
-	// Аутентифицированный пользователь должен быть
-	// владельцем файла.
+	// Чтение приватного файла требует прохождения
+	// авторизации. Аутентифицированный пользователь должен
+	// быть владельцем файла. Токен должен иметь скоуп
+	// `files:read`.
 	//
 	// GET /files/{file_id}/meta
 	ReadFileMeta(ctx context.Context, params ReadFileMetaParams) (ReadFileMetaRes, error)
+	// ReadGeoData invokes ReadGeoData operation.
+	//
+	// Все свойства, кроме отмеченных как `nullable`, могут
+	// содержать пустые строки в значениях.
+	//
+	// GET /geo/{geodata_id}
+	ReadGeoData(ctx context.Context, params ReadGeoDataParams) (ReadGeoDataRes, error)
 	// ReadPerson invokes ReadPerson operation.
 	//
-	// Чтение персоны пользователя.
+	// Чтение персоны, опционально ассоциированной с
+	// пользователем.
+	//
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+-----------------------------------
+	// 	`404`  | Персона не найдена
 	//
 	// GET /persons/{person_id}
-	ReadPerson(ctx context.Context, params ReadPersonParams) (ReadPersonRes, error)
+	ReadPerson(ctx context.Context, params ReadPersonParams) (*ReadPersonOK, error)
 	// ReadTeam invokes ReadTeam operation.
 	//
-	// Часть данных возвращается только при наличии
-	// аутентификации и определенных прав у пользователя,
-	// от лица которого выполняется запрос.
+	// Свойства команды, опционально содержащие список ее
+	// участников.
+	//
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+-----------------------------------
+	// 	`404`  | Команда не найдена
 	//
 	// GET /teams/{team_id}
-	ReadTeam(ctx context.Context, params ReadTeamParams) (ReadTeamRes, error)
+	ReadTeam(ctx context.Context, params ReadTeamParams) (*TeamPublicWithPersons, error)
+	// ReadUserTeam invokes ReadUserTeam operation.
+	//
+	// Чтение команды ее участником или капитаном.
+	//
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+-----------------------------------------------------------------------------------------------------------------
+	// 	`403`  | Пользователь не является ни участником, ни капитаном команды
+	// 	`404`  | Команда не найдена
+	//
+	// GET /users/me/teams/{team_id}
+	ReadUserTeam(ctx context.Context, params ReadUserTeamParams) (*TeamPrivateWithPersons, error)
+	// RegionName invokes RegionName operation.
+	//
+	// Название региона по ФИАС ID.
+	//
+	// GET /geo/fias/region/{fias}
+	RegionName(ctx context.Context, params RegionNameParams) (RegionNameRes, error)
 	// Signup invokes Signup operation.
 	//
 	// Регистрация пользователя.
@@ -417,19 +614,24 @@ type Invoker interface {
 	//
 	// Фиксация согласия пользователя.
 	//
-	// POST /users/{user_id}/consents/{kind}
+	// POST /users/{talent_id}/consents/{kind}
 	SubmitUserConsent(ctx context.Context, params SubmitUserConsentParams) (SubmitUserConsentRes, error)
-	// UpdateAuthenticatedUser invokes UpdateAuthenticatedUser operation.
+	// SuggestGeoField invokes SuggestGeoField operation.
 	//
-	// > Операция еще не доступна.
+	// Подсказки по геоданным.
 	//
-	// PATCH /users/me
-	UpdateAuthenticatedUser(ctx context.Context, request *UserUpdate) (UpdateAuthenticatedUserRes, error)
+	// GET /geo/suggest/{field}
+	SuggestGeoField(ctx context.Context, params SuggestGeoFieldParams) ([]SuggestGeoFieldOKItem, error)
+	// UpdateEvent invokes UpdateEvent operation.
+	//
+	// Обновление свойств мероприятия.
+	//
+	// PATCH /events/{event_id}
+	UpdateEvent(ctx context.Context, request *UpdateEventReq, params UpdateEventParams) (UpdateEventRes, error)
 	// UpdateEventDeferredNotification invokes UpdateEventDeferredNotification operation.
 	//
 	// Если уведомление уже существует и оно находится в
-	// статусе `canceled`,
-	// оно будет переведено в статус `pending`.
+	// статусе `canceled`, оно будет переведено в статус `pending`.
 	//
 	// PATCH /events/{event_id}/deferred-notification
 	UpdateEventDeferredNotification(ctx context.Context, request *UpdateEventDeferredNotificationReq, params UpdateEventDeferredNotificationParams) (UpdateEventDeferredNotificationRes, error)
@@ -444,26 +646,115 @@ type Invoker interface {
 	// Обновление лимитов мероприятия.
 	//
 	// PATCH /events/{event_id}/limit
-	UpdateEventLimit(ctx context.Context, request *UpdateEventLimitReq, params UpdateEventLimitParams) (UpdateEventLimitRes, error)
+	UpdateEventLimit(ctx context.Context, request *EventLimitWrite, params UpdateEventLimitParams) (UpdateEventLimitRes, error)
+	// UpdateEventRequest invokes UpdateEventRequest operation.
+	//
+	// Ответ дополняется значениями заполненных в заявке
+	// полей при указании параметра `fields=true`.
+	//
+	// PATCH /events/requests/{event_request_id}
+	UpdateEventRequest(ctx context.Context, request *EventSignupUpdate, params UpdateEventRequestParams) (UpdateEventRequestRes, error)
+	// UpdateEventTeam invokes UpdateEventTeam operation.
+	//
+	// Обновление свойств команды администратором
+	// организатора мероприятия.
+	//
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+-----------------------------------------------------------------------------------------------------------------------------------------
+	// 	`403`  | Пользователь не является администратором организации
+	// 	`404`  | Мероприятие не найдено
+	// 	`404`  | Команда не найдена
+	// 	`409`  | У назначаемого капитаном пользователя уже имеется команда на мероприятии
+	// 	`409`  | Команда с таким названием уже имеется на мероприятии
+	//
+	// PATCH /events/{event_id}/teams/{team_id}
+	UpdateEventTeam(ctx context.Context, request *OrganizationTeamUpdate, params UpdateEventTeamParams) (UpdateEventTeamRes, error)
+	// UpdateEventTeamPerson invokes UpdateEventTeamPerson operation.
+	//
+	// Изменение статуса участника команды администратором
+	// организации мероприятия.
+	//
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+----------------------------------------------------------------------------------------------------------------------------
+	// 	`403`  | Пользователь не является администратором организации
+	// 	`404`  | Мероприятие не найдено
+	// 	`404`  | Команда не найдена
+	// 	`404`  | Участник команды не найден
+	// 	`409`  | У подтверждаемого пользователя уже имеется команда на мероприятии
+	//
+	// PATCH /events/{event_id}/teams/{team_id}/persons/{team_person_id}
+	UpdateEventTeamPerson(ctx context.Context, request *OrganizationTeamPersonUpdate, params UpdateEventTeamPersonParams) (*TeamPerson, error)
 	// UpdateFileMeta invokes UpdateFileMeta operation.
 	//
 	// Обновление информации о файле.
 	//
 	// PATCH /files/{file_id}/meta
 	UpdateFileMeta(ctx context.Context, request *UpdateFileMetaReq, params UpdateFileMetaParams) (UpdateFileMetaRes, error)
-	// UpdateTeam invokes UpdateTeam operation.
+	// UpdateOwnerTeamPerson invokes UpdateOwnerTeamPerson operation.
 	//
-	// Доступно только для капитана команды и организатора
-	// мероприятия.
+	// Изменение статуса участника команды ее капитаном.
 	//
-	// PATCH /teams/{team_id}
-	UpdateTeam(ctx context.Context, request *UpdateTeamReq, params UpdateTeamParams) (UpdateTeamRes, error)
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+-----------------------------------------------------------------------------------------------------------
+	// 	`403`  | Пользователь не является капитаном команды
+	// 	`403`  | Мероприятие команды завершено
+	// 	`404`  | Команда не найдена
+	// 	`404`  | Не найден участник команды
+	// 	`409`  | У пользователя уже имеется команда на мероприятии
+	// 	`422`  | У пользователя отсутствует заявка на мероприятие команды
+	// 	`422`  | Достижение допустимого количества участников команды
+	// 	`422`  | Достижение допустимого количества приглашений в команду
+	//
+	// PATCH /users/me/teams/{team_id}/persons/{team_person_id}
+	UpdateOwnerTeamPerson(ctx context.Context, request *OwnerTeamPersonUpdate, params UpdateOwnerTeamPersonParams) (UpdateOwnerTeamPersonRes, error)
+	// UpdateUserTeam invokes UpdateUserTeam operation.
+	//
+	// Обновление свойств команды ее капитаном.
+	//
+	// # Причины 4xx ошибок
+	//
+	// Таблица не включает в себя ошибки валидации
+	// возвращаемые с 422 статусом.
+	//
+	// 	Код | Описание
+	// 	-------+--------------------------------------------------------------------------------------------------
+	// 	`403`  | Пользователь не является капитаном команды
+	// 	`403`  | Мероприятие завершено
+	// 	`404`  | Команда не найдена
+	// 	`409`  | У пользователя уже имеется команда на мероприятии
+	// 	`409`  | Команда с таким названием уже имеется на мероприятии
+	//
+	// PATCH /users/me/teams/{team_id}
+	UpdateUserTeam(ctx context.Context, request *OwnerTeamUpdate, params UpdateUserTeamParams) (UpdateUserTeamRes, error)
+	// UpdateUserTeamPerson invokes UpdateUserTeamPerson operation.
+	//
+	// Изменение статуса участия в команде от ее участника.
+	//
+	// # Причины 4xx ошибок
+	//
+	// 	Код | Описание
+	// 	-------+------------------------------------------------------------------------------------------------------------------------------------
+	// 	`403`  | Мероприятие команды завершено
+	// 	`404`  | Команда не найдена
+	// 	`404`  | Пользователь не является участником команды
+	// 	`409`  | У пользователя уже имеется команда на мероприятии
+	// 	`422`  | У пользователя отсутствует заявка на мероприятие команды
+	// 	`422`  | Достижение допустимого количества участников команды
+	// 	`422`  | Достижение допустимого количества запросов в команды для пользователя
+	//
+	// PATCH /users/me/teams/{team_id}/persons/me
+	UpdateUserTeamPerson(ctx context.Context, request *UserTeamPersonUpdate, params UpdateUserTeamPersonParams) (UpdateUserTeamPersonRes, error)
 	// UploadFile invokes UploadFile operation.
 	//
 	// Позволяет повторно получить ссылку на загрузку того
-	// же файла или сформировать
-	// ссылку для загрузки новой версии файла (того же типа,
-	// но другого размера).
+	// же файла или сформировать ссылку для загрузки новой
+	// версии файла (того же типа, но другого размера).
 	//
 	// PUT /files/{file_id}
 	UploadFile(ctx context.Context, request *UploadFileReq, params UploadFileParams) (UploadFileRes, error)
@@ -655,7 +946,13 @@ func (c *Client) sendAddEventDiplomaRole(ctx context.Context, params AddEventDip
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeAddEventDiplomaRoleResponse(resp)
@@ -820,7 +1117,13 @@ func (c *Client) sendArchiveEventRequestsFiles(ctx context.Context, params Archi
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeArchiveEventRequestsFilesResponse(resp)
@@ -928,7 +1231,13 @@ func (c *Client) sendAuthorizeClient(ctx context.Context) (res *AuthorizeClientF
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeAuthorizeClientResponse(resp)
@@ -942,6 +1251,7 @@ func (c *Client) sendAuthorizeClient(ctx context.Context) (res *AuthorizeClientF
 // CancelEventDeferredNotification invokes CancelEventDeferredNotification operation.
 //
 // Перевод уведомления из статуса `pending` в статус `canceled`.
+//
 // Если уведомление в статусе `pending` не найдено, будет
 // возвращен `404` ответ.
 //
@@ -1056,7 +1366,13 @@ func (c *Client) sendCancelEventDeferredNotification(ctx context.Context, params
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeCancelEventDeferredNotificationResponse(resp)
@@ -1071,7 +1387,7 @@ func (c *Client) sendCancelEventDeferredNotification(ctx context.Context, params
 //
 // Проверка наличия согласия пользователя.
 //
-// HEAD /users/{user_id}/consents/{kind}
+// HEAD /users/{talent_id}/consents/{kind}
 func (c *Client) CheckUserConsent(ctx context.Context, params CheckUserConsentParams) (CheckUserConsentRes, error) {
 	res, err := c.sendCheckUserConsent(ctx, params)
 	return res, err
@@ -1081,7 +1397,7 @@ func (c *Client) sendCheckUserConsent(ctx context.Context, params CheckUserConse
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CheckUserConsent"),
 		semconv.HTTPRequestMethodKey.String("HEAD"),
-		semconv.URLTemplateKey.String("/users/{user_id}/consents/{kind}"),
+		semconv.URLTemplateKey.String("/users/{talent_id}/consents/{kind}"),
 	}
 	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
@@ -1117,14 +1433,14 @@ func (c *Client) sendCheckUserConsent(ctx context.Context, params CheckUserConse
 	var pathParts [4]string
 	pathParts[0] = "/users/"
 	{
-		// Encode "user_id" parameter.
+		// Encode "talent_id" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "user_id",
+			Param:   "talent_id",
 			Style:   uri.PathStyleSimple,
 			Explode: false,
 		})
 		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.UserID))
+			return e.EncodeValue(conv.Int32ToString(params.TalentID))
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
@@ -1200,10 +1516,114 @@ func (c *Client) sendCheckUserConsent(ctx context.Context, params CheckUserConse
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeCheckUserConsentResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CityName invokes CityName operation.
+//
+// Название города по ФИАС ID.
+//
+// GET /geo/fias/city/{fias}
+func (c *Client) CityName(ctx context.Context, params CityNameParams) (CityNameRes, error) {
+	res, err := c.sendCityName(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendCityName(ctx context.Context, params CityNameParams) (res CityNameRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CityName"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/geo/fias/city/{fias}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CityNameOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/geo/fias/city/"
+	{
+		// Encode "fias" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "fias",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.Fias))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeCityNameResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1329,10 +1749,163 @@ func (c *Client) sendCompleteSocialAuth(ctx context.Context, params CompleteSoci
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeCompleteSocialAuthResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ConfirmEventSignup invokes ConfirmEventSignup operation.
+//
+// Для предварительной валидации запроса, без
+// подтверждения заявки, нужно указать параметр `dry_run=true`.
+//
+// `4xx` ответы:
+//
+//   - `404` - если не найдена подтверждаемая заявка;
+//   - `422` - если токен не валиден.
+//
+// POST /events/confirm-signup/{event_request_id}/{token}
+func (c *Client) ConfirmEventSignup(ctx context.Context, request OptConfirmEventSignupReq, params ConfirmEventSignupParams) (ConfirmEventSignupRes, error) {
+	res, err := c.sendConfirmEventSignup(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendConfirmEventSignup(ctx context.Context, request OptConfirmEventSignupReq, params ConfirmEventSignupParams) (res ConfirmEventSignupRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ConfirmEventSignup"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.URLTemplateKey.String("/events/confirm-signup/{event_request_id}/{token}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ConfirmEventSignupOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/events/confirm-signup/"
+	{
+		// Encode "event_request_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_request_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.EventRequestID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/"
+	{
+		// Encode "token" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "token",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.Token))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "dry_run" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "dry_run",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.DryRun.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeConfirmEventSignupRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeConfirmEventSignupResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1455,7 +2028,13 @@ func (c *Client) sendConfirmFileUpload(ctx context.Context, params ConfirmFileUp
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeConfirmFileUploadResponse(resp)
@@ -1567,7 +2146,13 @@ func (c *Client) sendConfirmSignupEmail(ctx context.Context, params ConfirmSignu
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeConfirmSignupEmailResponse(resp)
@@ -1817,7 +2402,13 @@ func (c *Client) sendCountEvents(ctx context.Context, params CountEventsParams) 
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeCountEventsResponse(resp)
@@ -1831,8 +2422,7 @@ func (c *Client) sendCountEvents(ctx context.Context, params CountEventsParams) 
 // CreateEvent invokes CreateEvent operation.
 //
 // При полном отсутствии в запросе массива `achievement_roles`,
-// мероприятию назначаются роли достижений
-// по-умолчанию.
+// мероприятию назначаются роли достижений по-умолчанию.
 // Пустой же массив приведет к созданию мероприятия без
 // ролей.
 //
@@ -1931,7 +2521,13 @@ func (c *Client) sendCreateEvent(ctx context.Context, request *CreateEventReq) (
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateEventResponse(resp)
@@ -2060,7 +2656,13 @@ func (c *Client) sendCreateEventDeferredNotification(ctx context.Context, reques
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateEventDeferredNotificationResponse(resp)
@@ -2189,7 +2791,13 @@ func (c *Client) sendCreateEventDiplomaSettings(ctx context.Context, request *Cr
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateEventDiplomaSettingsResponse(resp)
@@ -2202,17 +2810,17 @@ func (c *Client) sendCreateEventDiplomaSettings(ctx context.Context, request *Cr
 
 // CreateEventLimit invokes CreateEventLimit operation.
 //
-// Лимиты могут существовать только в единичном кол-ве
-// на мероприятие.
-// Попытка создать больше будет возвращать `409` ответ.
+// Лимиты могут существовать только в единичном кол-ве на
+// мероприятие. Попытка создать больше будет возвращать
+// `409` ответ.
 //
 // POST /events/{event_id}/limit
-func (c *Client) CreateEventLimit(ctx context.Context, request *CreateEventLimitReq, params CreateEventLimitParams) (CreateEventLimitRes, error) {
+func (c *Client) CreateEventLimit(ctx context.Context, request *EventLimitWrite, params CreateEventLimitParams) (CreateEventLimitRes, error) {
 	res, err := c.sendCreateEventLimit(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendCreateEventLimit(ctx context.Context, request *CreateEventLimitReq, params CreateEventLimitParams) (res CreateEventLimitRes, err error) {
+func (c *Client) sendCreateEventLimit(ctx context.Context, request *EventLimitWrite, params CreateEventLimitParams) (res CreateEventLimitRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateEventLimit"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -2320,10 +2928,319 @@ func (c *Client) sendCreateEventLimit(ctx context.Context, request *CreateEventL
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateEventLimitResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateEventTeam invokes CreateEventTeam operation.
+//
+// Администратор организации создает команду на
+// мероприятие. В качестве капитана команды и участников
+// указываются пользователи, имеющие заявку на это
+// мероприятие.
+//
+// POST /events/{event_id}/teams
+func (c *Client) CreateEventTeam(ctx context.Context, request *OrganizationTeamCreate, params CreateEventTeamParams) (CreateEventTeamRes, error) {
+	res, err := c.sendCreateEventTeam(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendCreateEventTeam(ctx context.Context, request *OrganizationTeamCreate, params CreateEventTeamParams) (res CreateEventTeamRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CreateEventTeam"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.URLTemplateKey.String("/events/{event_id}/teams"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateEventTeamOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/teams"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateEventTeamRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CreateEventTeamOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateEventTeamResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateEventTeamPerson invokes CreateEventTeamPerson operation.
+//
+// Добавление в команду участника мероприятия
+// администратором организации.
+//
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+----------------------------------------------------------------------------------------------------------------------
+//	`403`  | Пользователь не является администратором организации
+//	`404`  | Мероприятие не найдено
+//	`404`  | Команда не найдена
+//	`409`  | У добавляемого пользователя уже имеется команда на мероприятии
+//	`422`  | Невалидный идентификатор пользователя
+//
+// POST /events/{event_id}/teams/{team_id}/persons
+func (c *Client) CreateEventTeamPerson(ctx context.Context, request *CreateEventTeamPersonReq, params CreateEventTeamPersonParams) (CreateEventTeamPersonRes, error) {
+	res, err := c.sendCreateEventTeamPerson(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendCreateEventTeamPerson(ctx context.Context, request *CreateEventTeamPersonReq, params CreateEventTeamPersonParams) (res CreateEventTeamPersonRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CreateEventTeamPerson"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.URLTemplateKey.String("/events/{event_id}/teams/{team_id}/persons"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateEventTeamPersonOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [5]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/teams/"
+	{
+		// Encode "team_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	pathParts[4] = "/persons"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateEventTeamPersonRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CreateEventTeamPersonOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateEventTeamPersonResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -2430,7 +3347,13 @@ func (c *Client) sendCreateFileMeta(ctx context.Context, request *CreateFileMeta
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateFileMetaResponse(resp)
@@ -2574,7 +3497,13 @@ func (c *Client) sendCreateFileReference(ctx context.Context, params CreateFileR
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateFileReferenceResponse(resp)
@@ -2587,11 +3516,10 @@ func (c *Client) sendCreateFileReference(ctx context.Context, params CreateFileR
 
 // CreateMutationLock invokes CreateMutationLock operation.
 //
-// Блокировки создаются только для файлов,
-// принадлежащих пользователю.
-// Чужие файлы, несуществующие файлы, а так же файлы,
-// для которых блокировки уже имеются,
-// будут пропущены и не возвращены в теле `201` ответа.
+// Блокировки создаются только для файлов, принадлежащих
+// пользователю. Чужие файлы, несуществующие файлы, а так
+// же файлы, для которых блокировки уже имеются, будут
+// пропущены и не возвращены в теле `201` ответа.
 //
 // POST /mutation-locks/{object_namespace}/{object_key}
 func (c *Client) CreateMutationLock(ctx context.Context, request []uuid.UUID, params CreateMutationLockParams) (CreateMutationLockRes, error) {
@@ -2725,7 +3653,13 @@ func (c *Client) sendCreateMutationLock(ctx context.Context, request []uuid.UUID
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateMutationLockResponse(resp)
@@ -2738,9 +3672,9 @@ func (c *Client) sendCreateMutationLock(ctx context.Context, request []uuid.UUID
 
 // CreateOrganizationSubject invokes CreateOrganizationSubject operation.
 //
-// > Запрос необходимо выполнять от ментора или
-// владельца организации,
-// > указываемой в свойстве `organization_id` тела запроса.
+//	Запрос необходимо выполнять от ментора или владельца
+//	организации, указываемой в свойстве `organization_id` тела
+//	запроса.
 //
 // POST /organization-subjects
 func (c *Client) CreateOrganizationSubject(ctx context.Context, request *OrganizationSubjectBody) (CreateOrganizationSubjectRes, error) {
@@ -2837,10 +3771,313 @@ func (c *Client) sendCreateOrganizationSubject(ctx context.Context, request *Org
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateOrganizationSubjectResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateUserTeam invokes CreateUserTeam operation.
+//
+// Создание команды от аутентифицированного
+// пользователя. Пользователь становится и ее капитаном
+// и ее первым участником.
+//
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+--------------------------------------------------------------------------------------------------------------------
+//	`403`  | Мероприятие завершено
+//	`404`  | Команда не найдена
+//	`409`  | У пользователя уже имеется команда на мероприятии
+//	`409`  | Команда с таким названием уже имеется на мероприятии
+//	`422`  | Невалидный идентификатор мероприятия
+//	`422`  | Невалидная контактная ссылка
+//	`422`  | Невалидное название команды
+//	`422`  | Мероприятие не допускает командного участия
+//	`422`  | Мероприятие не допускает управления параметром `assignment_participation`
+//	`422`  | Название команды уже занято на мероприятии
+//
+// POST /users/me/teams
+func (c *Client) CreateUserTeam(ctx context.Context, request *OwnerTeamCreate) (CreateUserTeamRes, error) {
+	res, err := c.sendCreateUserTeam(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendCreateUserTeam(ctx context.Context, request *OwnerTeamCreate) (res CreateUserTeamRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CreateUserTeam"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.URLTemplateKey.String("/users/me/teams"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateUserTeamOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/users/me/teams"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateUserTeamRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CreateUserTeamOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateUserTeamResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateUserTeamPerson invokes CreateUserTeamPerson operation.
+//
+// Добавление в команду нового участника ее капитаном
+// или запрос на добавление от участника.
+//
+// Запрос от участника, при наличии в нем (корректного)
+// `invite_code`, не требует подтверждения со стороны капитана
+// команды.
+//
+// Если участник уже добавлен в команду, возвращется `200`
+// ответ. В том числе и когда он находится в частично
+// отклоненном состоянии:
+//
+//   - на запрос от капитана, может вернуться участник,
+//     отклонивший свое участие
+//   - на запрос от самого участника, может вернуться уже
+//     имеющаяся заявка на участие, отклоненная капитаном.
+//
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+------------------------------------------------------------------------------------------------------------------------------------
+//	`403`  | Пользователь не является капитаном команды
+//	`403`  | Мероприятие команды завершено
+//	`404`  | Команда не найдена
+//	`409`  | У добавляемого пользователя уже имеется команда на мероприятии
+//	`422`  | Указан невалидный ID пользователя
+//	`422`  | Указан неправильный инвайт-код
+//	`422`  | У добавляемого пользователя отсутствует заявка на мероприятие команды
+//	`422`  | Достижение допустимого количества участников команды
+//	`422`  | Достижение допустимого количества приглашений в команду
+//	`422`  | Достижение допустимого количества запросов в команды для пользователя
+//
+// POST /users/me/teams/{team_id}/persons
+func (c *Client) CreateUserTeamPerson(ctx context.Context, request CreateUserTeamPersonReq, params CreateUserTeamPersonParams) (CreateUserTeamPersonRes, error) {
+	res, err := c.sendCreateUserTeamPerson(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendCreateUserTeamPerson(ctx context.Context, request CreateUserTeamPersonReq, params CreateUserTeamPersonParams) (res CreateUserTeamPersonRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CreateUserTeamPerson"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.URLTemplateKey.String("/users/me/teams/{team_id}/persons"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateUserTeamPersonOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/users/me/teams/"
+	{
+		// Encode "team_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/persons"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateUserTeamPersonRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, CreateUserTeamPersonOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateUserTeamPersonResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -2981,7 +4218,13 @@ func (c *Client) sendDeleteEventDiplomaRole(ctx context.Context, params DeleteEv
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeDeleteEventDiplomaRoleResponse(resp)
@@ -3107,7 +4350,13 @@ func (c *Client) sendDeleteEventLimit(ctx context.Context, params DeleteEventLim
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeDeleteEventLimitResponse(resp)
@@ -3251,7 +4500,13 @@ func (c *Client) sendDeleteFileReference(ctx context.Context, params DeleteFileR
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeDeleteFileReferenceResponse(resp)
@@ -3395,7 +4650,13 @@ func (c *Client) sendDeleteMutationLock(ctx context.Context, params DeleteMutati
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeDeleteMutationLockResponse(resp)
@@ -3411,6 +4672,7 @@ func (c *Client) sendDeleteMutationLock(ctx context.Context, params DeleteMutati
 // Удаление авторизации возможно только если это не
 // единственный оставшийся у пользователя способ
 // аутентификации под своей учетной записью.
+//
 // Не допускается параллельная обработка запросов на
 // удаление, в случае появления такой гонки, будет
 // возвращен 409 ответ.
@@ -3544,7 +4806,13 @@ func (c *Client) sendDisconnectSocialAuth(ctx context.Context, params Disconnect
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeDisconnectSocialAuthResponse(resp)
@@ -3636,7 +4904,13 @@ func (c *Client) sendEventDeferredNotificationTemplateID(ctx context.Context, pa
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeEventDeferredNotificationTemplateIDResponse(resp)
@@ -3649,13 +4923,15 @@ func (c *Client) sendEventDeferredNotificationTemplateID(ctx context.Context, pa
 
 // EventSignup invokes EventSignup operation.
 //
-// #### Аутентификация
-// При выполнении запроса с аутентификацией,
-// заявка создается для пользователя, с которым связан
-// токен.
-// Параметры, используемые для создания пользователя,
-// в аутентифицированном запросе будут использованы
-// для его обновления.
+// # Аутентификация
+//
+// При выполнении запроса с аутентификацией, заявка
+// создается для пользователя, с которым связан токен.
+//
+// Параметры, используемые для создания пользователя, в
+// аутентифицированном запросе будут использованы для
+// его обновления.
+//
 // Параметр `email` недопускается в аутентифицированных
 // запросах.
 //
@@ -3848,7 +5124,13 @@ func (c *Client) sendEventSignup(ctx context.Context, request *EventSignup, para
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeEventSignupResponse(resp)
@@ -3941,7 +5223,13 @@ func (c *Client) sendExistsEventDeferredNotification(ctx context.Context, params
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeExistsEventDeferredNotificationResponse(resp)
@@ -4088,10 +5376,155 @@ func (c *Client) sendIsOrganizationAdmin(ctx context.Context, params IsOrganizat
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeIsOrganizationAdminResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// IsTeamOwner invokes IsTeamOwner operation.
+//
+// Является ли пользователь капитаном указанной команды.
+//
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+---------------------------------------------------------------------------------
+//	`403`  | Пользователь не является капитаном команды
+//	`404`  | Команда не найдена
+//
+// POST /users/me/teams/{team_id}/is-owner
+func (c *Client) IsTeamOwner(ctx context.Context, params IsTeamOwnerParams) error {
+	_, err := c.sendIsTeamOwner(ctx, params)
+	return err
+}
+
+func (c *Client) sendIsTeamOwner(ctx context.Context, params IsTeamOwnerParams) (res *IsTeamOwnerOK, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("IsTeamOwner"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.URLTemplateKey.String("/users/me/teams/{team_id}/is-owner"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, IsTeamOwnerOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/users/me/teams/"
+	{
+		// Encode "team_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/is-owner"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, IsTeamOwnerOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeIsTeamOwnerResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -4162,7 +5595,13 @@ func (c *Client) sendIssueAccessToken(ctx context.Context) (res IssueAccessToken
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeIssueAccessTokenResponse(resp)
@@ -4438,7 +5877,13 @@ func (c *Client) sendListAddAchievementEvents(ctx context.Context, params ListAd
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListAddAchievementEventsResponse(resp)
@@ -4567,7 +6012,13 @@ func (c *Client) sendListCalendarEvents(ctx context.Context, params ListCalendar
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListCalendarEventsResponse(resp)
@@ -4748,7 +6199,13 @@ func (c *Client) sendListEventBrands(ctx context.Context, params ListEventBrands
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListEventBrandsResponse(resp)
@@ -4936,7 +6393,13 @@ func (c *Client) sendListEventDiplomaSettings(ctx context.Context, params ListEv
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListEventDiplomaSettingsResponse(resp)
@@ -5029,7 +6492,13 @@ func (c *Client) sendListEventFields(ctx context.Context, params ListEventFields
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListEventFieldsResponse(resp)
@@ -5045,12 +6514,12 @@ func (c *Client) sendListEventFields(ctx context.Context, params ListEventFields
 // Список направлений мероприятий.
 //
 // GET /event-routes
-func (c *Client) ListEventRoutes(ctx context.Context, params ListEventRoutesParams) (*ListEventRoutesHeaders, error) {
+func (c *Client) ListEventRoutes(ctx context.Context, params ListEventRoutesParams) (*ListEventRoutesOKHeaders, error) {
 	res, err := c.sendListEventRoutes(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendListEventRoutes(ctx context.Context, params ListEventRoutesParams) (res *ListEventRoutesHeaders, err error) {
+func (c *Client) sendListEventRoutes(ctx context.Context, params ListEventRoutesParams) (res *ListEventRoutesOKHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListEventRoutes"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -5210,7 +6679,13 @@ func (c *Client) sendListEventRoutes(ctx context.Context, params ListEventRoutes
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListEventRoutesResponse(resp)
@@ -5226,17 +6701,19 @@ func (c *Client) sendListEventRoutes(ctx context.Context, params ListEventRoutes
 // Если не указан критерий сортировки результатов `order_by`,
 // то он определяется в зависимости от указания других
 // параметров.
+//
 // По-умолчанию результаты сортируются по
-// идентификаторам в порядке возрастания (`id_asc`).
-// Но если указан поисковый запрос и не используется
-// параметр `id_offset`,
-// то результаты сортируются по релевантности к
+// идентификаторам в порядке возрастания (`id_asc`). Но если
+// указан поисковый запрос и не используется параметр
+// `id_offset`, то результаты сортируются по релевантности к
 // поисковому запросу (`relevant`).
+//
 // При явном указании `order_by`, его значение должно
 // соответствовать требованиям:
-// - с параметром `id_offset` допускается только `order_by=id_asc`
-// - вариант `order_by=relevant` доступен только при указании
-// параметра `search`.
+//
+//   - с параметром `id_offset` допускается только `order_by=id_asc`
+//   - вариант `order_by=relevant` доступен только при указании
+//     параметра `search`.
 //
 // GET /events
 func (c *Client) ListEvents(ctx context.Context, params ListEventsParams) (ListEventsRes, error) {
@@ -5541,7 +7018,13 @@ func (c *Client) sendListEvents(ctx context.Context, params ListEventsParams) (r
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListEventsResponse(resp)
@@ -5554,13 +7037,16 @@ func (c *Client) sendListEvents(ctx context.Context, params ListEventsParams) (r
 
 // ListFileMeta invokes ListFileMeta operation.
 //
-// #### Неаутентифицированный запрос публичных файлов
-// Допускается запрос без аутентификации при
-// соблюдении условий:
-// - присутствуют значения параметра `file_id`
-// - параметр `is_public` отсутствует либо содержит `true`
-// При несоблюдении какого-либо из условий,
-// возвращается `401` ответ.
+// # Неаутентифицированный запрос публичных файлов
+//
+// Допускается запрос без аутентификации при соблюдении
+// условий:
+//
+//   - присутствуют значения параметра `file_id`
+//   - параметр `is_public` отсутствует либо содержит `true`
+//
+// При несоблюдении какого-либо из условий, возвращается
+// `401` ответ.
 //
 // GET /files
 func (c *Client) ListFileMeta(ctx context.Context, params ListFileMetaParams) (ListFileMetaRes, error) {
@@ -5821,7 +7307,13 @@ func (c *Client) sendListFileMeta(ctx context.Context, params ListFileMetaParams
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListFileMetaResponse(resp)
@@ -6079,7 +7571,13 @@ func (c *Client) sendListOrganizationEvents(ctx context.Context, params ListOrga
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListOrganizationEventsResponse(resp)
@@ -6260,7 +7758,13 @@ func (c *Client) sendListOrganizationSubjects(ctx context.Context, params ListOr
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListOrganizationSubjectsResponse(resp)
@@ -6449,7 +7953,13 @@ func (c *Client) sendListOrganizations(ctx context.Context, params ListOrganizat
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListOrganizationsResponse(resp)
@@ -6464,7 +7974,7 @@ func (c *Client) sendListOrganizations(ctx context.Context, params ListOrganizat
 //
 // Список авторизаций пользователя в соц. сетях.
 //
-// GET /social-auths/{user_id}
+// GET /social-auths/{talent_id}
 func (c *Client) ListSocialAuths(ctx context.Context, params ListSocialAuthsParams) (ListSocialAuthsRes, error) {
 	res, err := c.sendListSocialAuths(ctx, params)
 	return res, err
@@ -6474,7 +7984,7 @@ func (c *Client) sendListSocialAuths(ctx context.Context, params ListSocialAuths
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListSocialAuths"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.URLTemplateKey.String("/social-auths/{user_id}"),
+		semconv.URLTemplateKey.String("/social-auths/{talent_id}"),
 	}
 	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
@@ -6510,14 +8020,14 @@ func (c *Client) sendListSocialAuths(ctx context.Context, params ListSocialAuths
 	var pathParts [2]string
 	pathParts[0] = "/social-auths/"
 	{
-		// Encode "user_id" parameter.
+		// Encode "talent_id" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "user_id",
+			Param:   "talent_id",
 			Style:   uri.PathStyleSimple,
 			Explode: false,
 		})
 		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.UserID))
+			return e.EncodeValue(conv.Int32ToString(params.TalentID))
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
@@ -6658,7 +8168,13 @@ func (c *Client) sendListSocialAuths(ctx context.Context, params ListSocialAuths
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListSocialAuthsResponse(resp)
@@ -6787,10 +8303,210 @@ func (c *Client) sendListSubjects(ctx context.Context, params ListSubjectsParams
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListSubjectsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ListTeams invokes ListTeams operation.
+//
+// Все команды пользователей.
+//
+// GET /teams
+func (c *Client) ListTeams(ctx context.Context, params ListTeamsParams) ([]TeamPublic, error) {
+	res, err := c.sendListTeams(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendListTeams(ctx context.Context, params ListTeamsParams) (res []TeamPublic, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ListTeams"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/teams"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ListTeamsOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/teams"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "id_offset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "id_offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IDOffset.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "limit" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Limit.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "id",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.ID != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.ID {
+						if err := func() error {
+							return e.EncodeValue(conv.Int32ToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "order_by" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "order_by",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.OrderBy.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ListTeamsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeListTeamsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -6802,7 +8518,7 @@ func (c *Client) sendListSubjects(ctx context.Context, params ListSubjectsParams
 //
 // Список согласий пользователя.
 //
-// GET /users/{user_id}/consents
+// GET /users/{talent_id}/consents
 func (c *Client) ListUserConsents(ctx context.Context, params ListUserConsentsParams) (ListUserConsentsRes, error) {
 	res, err := c.sendListUserConsents(ctx, params)
 	return res, err
@@ -6812,7 +8528,7 @@ func (c *Client) sendListUserConsents(ctx context.Context, params ListUserConsen
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListUserConsents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.URLTemplateKey.String("/users/{user_id}/consents"),
+		semconv.URLTemplateKey.String("/users/{talent_id}/consents"),
 	}
 	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
@@ -6848,14 +8564,14 @@ func (c *Client) sendListUserConsents(ctx context.Context, params ListUserConsen
 	var pathParts [3]string
 	pathParts[0] = "/users/"
 	{
-		// Encode "user_id" parameter.
+		// Encode "talent_id" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "user_id",
+			Param:   "talent_id",
 			Style:   uri.PathStyleSimple,
 			Explode: false,
 		})
 		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.UserID))
+			return e.EncodeValue(conv.Int32ToString(params.TalentID))
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
@@ -6913,7 +8629,13 @@ func (c *Client) sendListUserConsents(ctx context.Context, params ListUserConsen
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeListUserConsentsResponse(resp)
@@ -7060,7 +8782,13 @@ func (c *Client) sendLoginSocialAuth(ctx context.Context, params LoginSocialAuth
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeLoginSocialAuthResponse(resp)
@@ -7073,11 +8801,11 @@ func (c *Client) sendLoginSocialAuth(ctx context.Context, params LoginSocialAuth
 
 // PatchMutationLock invokes PatchMutationLock operation.
 //
-// Изначально блокировка создается в состоянии
-// активной.
+// Изначально блокировка создается в состоянии активной.
 // После создания, состояние можно декактивировать и
 // активировать обратно.
-// > Неактивная блокировка равнозначна ее отсутствию.
+//
+//	Неактивная блокировка равнозначна ее отсутствию.
 //
 // PATCH /mutation-locks/{object_namespace}/{object_key}
 func (c *Client) PatchMutationLock(ctx context.Context, request *PatchMutationLockReq, params PatchMutationLockParams) (PatchMutationLockRes, error) {
@@ -7211,7 +8939,13 @@ func (c *Client) sendPatchMutationLock(ctx context.Context, request *PatchMutati
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodePatchMutationLockResponse(resp)
@@ -7224,17 +8958,23 @@ func (c *Client) sendPatchMutationLock(ctx context.Context, request *PatchMutati
 
 // ReadEvent invokes ReadEvent operation.
 //
-// По умолчанию возвращаются только метаданные.
-// Для получения полного набора свойств используйте
+// По умолчанию возвращаются только метаданные. Для
+// получения полного набора свойств используйте
 // параметр `extend`.
 //
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+-------------------------------------------
+//	`404`  | Мероприятие не найдено
+//
 // GET /events/{event_id}
-func (c *Client) ReadEvent(ctx context.Context, params ReadEventParams) (ReadEventRes, error) {
+func (c *Client) ReadEvent(ctx context.Context, params ReadEventParams) (ReadEventOK, error) {
 	res, err := c.sendReadEvent(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendReadEvent(ctx context.Context, params ReadEventParams) (res ReadEventRes, err error) {
+func (c *Client) sendReadEvent(ctx context.Context, params ReadEventParams) (res ReadEventOK, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadEvent"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -7326,7 +9066,13 @@ func (c *Client) sendReadEvent(ctx context.Context, params ReadEventParams) (res
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadEventResponse(resp)
@@ -7452,7 +9198,13 @@ func (c *Client) sendReadEventDeferredNotification(ctx context.Context, params R
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadEventDeferredNotificationResponse(resp)
@@ -7578,7 +9330,13 @@ func (c *Client) sendReadEventDiplomaSettings(ctx context.Context, params ReadEv
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadEventDiplomaSettingsResponse(resp)
@@ -7671,7 +9429,13 @@ func (c *Client) sendReadEventLimit(ctx context.Context, params ReadEventLimitPa
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadEventLimitResponse(resp)
@@ -7682,14 +9446,328 @@ func (c *Client) sendReadEventLimit(ctx context.Context, params ReadEventLimitPa
 	return result, nil
 }
 
+// ReadEventRequest invokes ReadEventRequest operation.
+//
+// Ответ дополняется значениями заполненных в заявке
+// полей при указании параметра `fields=true`.
+//
+// GET /events/requests/{event_request_id}
+func (c *Client) ReadEventRequest(ctx context.Context, params ReadEventRequestParams) (ReadEventRequestRes, error) {
+	res, err := c.sendReadEventRequest(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendReadEventRequest(ctx context.Context, params ReadEventRequestParams) (res ReadEventRequestRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ReadEventRequest"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/events/requests/{event_request_id}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ReadEventRequestOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/events/requests/"
+	{
+		// Encode "event_request_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_request_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventRequestID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "fields" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "fields",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Fields.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ReadEventRequestOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeReadEventRequestResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ReadEventTeam invokes ReadEventTeam operation.
+//
+// Команда на мероприятие для администратора его
+// организации. Включает проверку наличия актуального
+// соглашения с организацией.
+//
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+-----------------------------------------------------------------------------------------------------
+//	`403`  | Пользователь не является администратором организации
+//	`404`  | Мероприятие не найдено
+//	`404`  | Команда не найдена
+//
+// GET /events/{event_id}/teams/{team_id}
+func (c *Client) ReadEventTeam(ctx context.Context, params ReadEventTeamParams) (*TeamPrivateWithPersons, error) {
+	res, err := c.sendReadEventTeam(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendReadEventTeam(ctx context.Context, params ReadEventTeamParams) (res *TeamPrivateWithPersons, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ReadEventTeam"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/events/{event_id}/teams/{team_id}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ReadEventTeamOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/teams/"
+	{
+		// Encode "team_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ReadEventTeamOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeReadEventTeamResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // ReadFile invokes ReadFile operation.
 //
-// По-умолчанию возвращается в форме `307` ответа.
-// С параметром `noredir=true` возвращается `200`.
-// Чтение приватного файла требует прохождение
-// авторизации.
-// Аутентифицированный пользователь должен быть
-// владельцем файла.
+// По-умолчанию возвращается в форме `307` ответа. С
+// параметром `noredir=true` возвращается `200`.
+//
+// Чтение приватного файла требует прохождения
+// авторизации. Аутентифицированный пользователь должен
+// быть владельцем файла. Токен должен иметь скоуп
+// `files:read`.
 //
 // GET /files/{file_id}
 func (c *Client) ReadFile(ctx context.Context, params ReadFileParams) (ReadFileRes, error) {
@@ -7823,7 +9901,13 @@ func (c *Client) sendReadFile(ctx context.Context, params ReadFileParams) (res R
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadFileResponse(resp)
@@ -7836,10 +9920,10 @@ func (c *Client) sendReadFile(ctx context.Context, params ReadFileParams) (res R
 
 // ReadFileMeta invokes ReadFileMeta operation.
 //
-// Чтение приватного файла требует прохождение
-// авторизации.
-// Аутентифицированный пользователь должен быть
-// владельцем файла.
+// Чтение приватного файла требует прохождения
+// авторизации. Аутентифицированный пользователь должен
+// быть владельцем файла. Токен должен иметь скоуп
+// `files:read`.
 //
 // GET /files/{file_id}/meta
 func (c *Client) ReadFileMeta(ctx context.Context, params ReadFileMetaParams) (ReadFileMetaRes, error) {
@@ -7953,7 +10037,13 @@ func (c *Client) sendReadFileMeta(ctx context.Context, params ReadFileMetaParams
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadFileMetaResponse(resp)
@@ -7964,17 +10054,123 @@ func (c *Client) sendReadFileMeta(ctx context.Context, params ReadFileMetaParams
 	return result, nil
 }
 
+// ReadGeoData invokes ReadGeoData operation.
+//
+// Все свойства, кроме отмеченных как `nullable`, могут
+// содержать пустые строки в значениях.
+//
+// GET /geo/{geodata_id}
+func (c *Client) ReadGeoData(ctx context.Context, params ReadGeoDataParams) (ReadGeoDataRes, error) {
+	res, err := c.sendReadGeoData(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendReadGeoData(ctx context.Context, params ReadGeoDataParams) (res ReadGeoDataRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ReadGeoData"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/geo/{geodata_id}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ReadGeoDataOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/geo/"
+	{
+		// Encode "geodata_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "geodata_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.GeodataID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeReadGeoDataResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // ReadPerson invokes ReadPerson operation.
 //
-// Чтение персоны пользователя.
+// Чтение персоны, опционально ассоциированной с
+// пользователем.
+//
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+-----------------------------------
+//	`404`  | Персона не найдена
 //
 // GET /persons/{person_id}
-func (c *Client) ReadPerson(ctx context.Context, params ReadPersonParams) (ReadPersonRes, error) {
+func (c *Client) ReadPerson(ctx context.Context, params ReadPersonParams) (*ReadPersonOK, error) {
 	res, err := c.sendReadPerson(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendReadPerson(ctx context.Context, params ReadPersonParams) (res ReadPersonRes, err error) {
+func (c *Client) sendReadPerson(ctx context.Context, params ReadPersonParams) (res *ReadPersonOK, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadPerson"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -8045,7 +10241,13 @@ func (c *Client) sendReadPerson(ctx context.Context, params ReadPersonParams) (r
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadPersonResponse(resp)
@@ -8058,17 +10260,22 @@ func (c *Client) sendReadPerson(ctx context.Context, params ReadPersonParams) (r
 
 // ReadTeam invokes ReadTeam operation.
 //
-// Часть данных возвращается только при наличии
-// аутентификации и определенных прав у пользователя,
-// от лица которого выполняется запрос.
+// Свойства команды, опционально содержащие список ее
+// участников.
+//
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+-----------------------------------
+//	`404`  | Команда не найдена
 //
 // GET /teams/{team_id}
-func (c *Client) ReadTeam(ctx context.Context, params ReadTeamParams) (ReadTeamRes, error) {
+func (c *Client) ReadTeam(ctx context.Context, params ReadTeamParams) (*TeamPublicWithPersons, error) {
 	res, err := c.sendReadTeam(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendReadTeam(ctx context.Context, params ReadTeamParams) (res ReadTeamRes, err error) {
+func (c *Client) sendReadTeam(ctx context.Context, params ReadTeamParams) (res *TeamPublicWithPersons, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadTeam"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -8127,6 +10334,27 @@ func (c *Client) sendReadTeam(ctx context.Context, params ReadTeamParams) (res R
 	}
 	uri.AddPathParts(u, pathParts[:]...)
 
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "persons" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "persons",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Persons.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
@@ -8173,10 +10401,252 @@ func (c *Client) sendReadTeam(ctx context.Context, params ReadTeamParams) (res R
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeReadTeamResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ReadUserTeam invokes ReadUserTeam operation.
+//
+// Чтение команды ее участником или капитаном.
+//
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+-----------------------------------------------------------------------------------------------------------------
+//	`403`  | Пользователь не является ни участником, ни капитаном команды
+//	`404`  | Команда не найдена
+//
+// GET /users/me/teams/{team_id}
+func (c *Client) ReadUserTeam(ctx context.Context, params ReadUserTeamParams) (*TeamPrivateWithPersons, error) {
+	res, err := c.sendReadUserTeam(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendReadUserTeam(ctx context.Context, params ReadUserTeamParams) (res *TeamPrivateWithPersons, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ReadUserTeam"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/users/me/teams/{team_id}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ReadUserTeamOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/users/me/teams/"
+	{
+		// Encode "team_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ReadUserTeamOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeReadUserTeamResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// RegionName invokes RegionName operation.
+//
+// Название региона по ФИАС ID.
+//
+// GET /geo/fias/region/{fias}
+func (c *Client) RegionName(ctx context.Context, params RegionNameParams) (RegionNameRes, error) {
+	res, err := c.sendRegionName(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendRegionName(ctx context.Context, params RegionNameParams) (res RegionNameRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("RegionName"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/geo/fias/region/{fias}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, RegionNameOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/geo/fias/region/"
+	{
+		// Encode "fias" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "fias",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.Fias))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeRegionNameResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -8290,7 +10760,13 @@ func (c *Client) sendSignup(ctx context.Context, request *Signup, params SignupP
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeSignupResponse(resp)
@@ -8382,7 +10858,13 @@ func (c *Client) sendSignupInitialData(ctx context.Context, params SignupInitial
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeSignupInitialDataResponse(resp)
@@ -8397,7 +10879,7 @@ func (c *Client) sendSignupInitialData(ctx context.Context, params SignupInitial
 //
 // Фиксация согласия пользователя.
 //
-// POST /users/{user_id}/consents/{kind}
+// POST /users/{talent_id}/consents/{kind}
 func (c *Client) SubmitUserConsent(ctx context.Context, params SubmitUserConsentParams) (SubmitUserConsentRes, error) {
 	res, err := c.sendSubmitUserConsent(ctx, params)
 	return res, err
@@ -8407,7 +10889,7 @@ func (c *Client) sendSubmitUserConsent(ctx context.Context, params SubmitUserCon
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("SubmitUserConsent"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.URLTemplateKey.String("/users/{user_id}/consents/{kind}"),
+		semconv.URLTemplateKey.String("/users/{talent_id}/consents/{kind}"),
 	}
 	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
@@ -8443,14 +10925,14 @@ func (c *Client) sendSubmitUserConsent(ctx context.Context, params SubmitUserCon
 	var pathParts [4]string
 	pathParts[0] = "/users/"
 	{
-		// Encode "user_id" parameter.
+		// Encode "talent_id" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "user_id",
+			Param:   "talent_id",
 			Style:   uri.PathStyleSimple,
 			Explode: false,
 		})
 		if err := func() error {
-			return e.EncodeValue(conv.Int32ToString(params.UserID))
+			return e.EncodeValue(conv.Int32ToString(params.TalentID))
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
@@ -8526,7 +11008,13 @@ func (c *Client) sendSubmitUserConsent(ctx context.Context, params SubmitUserCon
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeSubmitUserConsentResponse(resp)
@@ -8537,21 +11025,21 @@ func (c *Client) sendSubmitUserConsent(ctx context.Context, params SubmitUserCon
 	return result, nil
 }
 
-// UpdateAuthenticatedUser invokes UpdateAuthenticatedUser operation.
+// SuggestGeoField invokes SuggestGeoField operation.
 //
-// > Операция еще не доступна.
+// Подсказки по геоданным.
 //
-// PATCH /users/me
-func (c *Client) UpdateAuthenticatedUser(ctx context.Context, request *UserUpdate) (UpdateAuthenticatedUserRes, error) {
-	res, err := c.sendUpdateAuthenticatedUser(ctx, request)
+// GET /geo/suggest/{field}
+func (c *Client) SuggestGeoField(ctx context.Context, params SuggestGeoFieldParams) ([]SuggestGeoFieldOKItem, error) {
+	res, err := c.sendSuggestGeoField(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateAuthenticatedUser(ctx context.Context, request *UserUpdate) (res UpdateAuthenticatedUserRes, err error) {
+func (c *Client) sendSuggestGeoField(ctx context.Context, params SuggestGeoFieldParams) (res []SuggestGeoFieldOKItem, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("UpdateAuthenticatedUser"),
-		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.URLTemplateKey.String("/users/me"),
+		otelogen.OperationID("SuggestGeoField"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/geo/suggest/{field}"),
 	}
 	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
@@ -8567,7 +11055,7 @@ func (c *Client) sendUpdateAuthenticatedUser(ctx context.Context, request *UserU
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, UpdateAuthenticatedUserOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, SuggestGeoFieldOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -8584,17 +11072,50 @@ func (c *Client) sendUpdateAuthenticatedUser(ctx context.Context, request *UserU
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/users/me"
+	var pathParts [2]string
+	pathParts[0] = "/geo/suggest/"
+	{
+		// Encode "field" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "field",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(string(params.Field)))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
 	uri.AddPathParts(u, pathParts[:]...)
 
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "term" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "term",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.Term))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "PATCH", u)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeUpdateAuthenticatedUserRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
 	}
 
 	stage = "SendRequest"
@@ -8603,10 +11124,150 @@ func (c *Client) sendUpdateAuthenticatedUser(ctx context.Context, request *UserU
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
-	result, err := decodeUpdateAuthenticatedUserResponse(resp)
+	result, err := decodeSuggestGeoFieldResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdateEvent invokes UpdateEvent operation.
+//
+// Обновление свойств мероприятия.
+//
+// PATCH /events/{event_id}
+func (c *Client) UpdateEvent(ctx context.Context, request *UpdateEventReq, params UpdateEventParams) (UpdateEventRes, error) {
+	res, err := c.sendUpdateEvent(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUpdateEvent(ctx context.Context, request *UpdateEventReq, params UpdateEventParams) (res UpdateEventRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("UpdateEvent"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.URLTemplateKey.String("/events/{event_id}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateEventOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdateEventRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, UpdateEventOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdateEventResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -8617,8 +11278,7 @@ func (c *Client) sendUpdateAuthenticatedUser(ctx context.Context, request *UserU
 // UpdateEventDeferredNotification invokes UpdateEventDeferredNotification operation.
 //
 // Если уведомление уже существует и оно находится в
-// статусе `canceled`,
-// оно будет переведено в статус `pending`.
+// статусе `canceled`, оно будет переведено в статус `pending`.
 //
 // PATCH /events/{event_id}/deferred-notification
 func (c *Client) UpdateEventDeferredNotification(ctx context.Context, request *UpdateEventDeferredNotificationReq, params UpdateEventDeferredNotificationParams) (UpdateEventDeferredNotificationRes, error) {
@@ -8734,7 +11394,13 @@ func (c *Client) sendUpdateEventDeferredNotification(ctx context.Context, reques
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeUpdateEventDeferredNotificationResponse(resp)
@@ -8863,7 +11529,13 @@ func (c *Client) sendUpdateEventDiplomaSettings(ctx context.Context, request *Up
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeUpdateEventDiplomaSettingsResponse(resp)
@@ -8879,12 +11551,12 @@ func (c *Client) sendUpdateEventDiplomaSettings(ctx context.Context, request *Up
 // Обновление лимитов мероприятия.
 //
 // PATCH /events/{event_id}/limit
-func (c *Client) UpdateEventLimit(ctx context.Context, request *UpdateEventLimitReq, params UpdateEventLimitParams) (UpdateEventLimitRes, error) {
+func (c *Client) UpdateEventLimit(ctx context.Context, request *EventLimitWrite, params UpdateEventLimitParams) (UpdateEventLimitRes, error) {
 	res, err := c.sendUpdateEventLimit(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateEventLimit(ctx context.Context, request *UpdateEventLimitReq, params UpdateEventLimitParams) (res UpdateEventLimitRes, err error) {
+func (c *Client) sendUpdateEventLimit(ctx context.Context, request *EventLimitWrite, params UpdateEventLimitParams) (res UpdateEventLimitRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UpdateEventLimit"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
@@ -8992,10 +11664,519 @@ func (c *Client) sendUpdateEventLimit(ctx context.Context, request *UpdateEventL
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeUpdateEventLimitResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdateEventRequest invokes UpdateEventRequest operation.
+//
+// Ответ дополняется значениями заполненных в заявке
+// полей при указании параметра `fields=true`.
+//
+// PATCH /events/requests/{event_request_id}
+func (c *Client) UpdateEventRequest(ctx context.Context, request *EventSignupUpdate, params UpdateEventRequestParams) (UpdateEventRequestRes, error) {
+	res, err := c.sendUpdateEventRequest(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUpdateEventRequest(ctx context.Context, request *EventSignupUpdate, params UpdateEventRequestParams) (res UpdateEventRequestRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("UpdateEventRequest"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.URLTemplateKey.String("/events/requests/{event_request_id}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateEventRequestOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/events/requests/"
+	{
+		// Encode "event_request_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_request_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventRequestID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "fields" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "fields",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Fields.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdateEventRequestRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, UpdateEventRequestOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdateEventRequestResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdateEventTeam invokes UpdateEventTeam operation.
+//
+// Обновление свойств команды администратором
+// организатора мероприятия.
+//
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+-----------------------------------------------------------------------------------------------------------------------------------------
+//	`403`  | Пользователь не является администратором организации
+//	`404`  | Мероприятие не найдено
+//	`404`  | Команда не найдена
+//	`409`  | У назначаемого капитаном пользователя уже имеется команда на мероприятии
+//	`409`  | Команда с таким названием уже имеется на мероприятии
+//
+// PATCH /events/{event_id}/teams/{team_id}
+func (c *Client) UpdateEventTeam(ctx context.Context, request *OrganizationTeamUpdate, params UpdateEventTeamParams) (UpdateEventTeamRes, error) {
+	res, err := c.sendUpdateEventTeam(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUpdateEventTeam(ctx context.Context, request *OrganizationTeamUpdate, params UpdateEventTeamParams) (res UpdateEventTeamRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("UpdateEventTeam"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.URLTemplateKey.String("/events/{event_id}/teams/{team_id}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateEventTeamOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/teams/"
+	{
+		// Encode "team_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdateEventTeamRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, UpdateEventTeamOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdateEventTeamResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdateEventTeamPerson invokes UpdateEventTeamPerson operation.
+//
+// Изменение статуса участника команды администратором
+// организации мероприятия.
+//
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+----------------------------------------------------------------------------------------------------------------------------
+//	`403`  | Пользователь не является администратором организации
+//	`404`  | Мероприятие не найдено
+//	`404`  | Команда не найдена
+//	`404`  | Участник команды не найден
+//	`409`  | У подтверждаемого пользователя уже имеется команда на мероприятии
+//
+// PATCH /events/{event_id}/teams/{team_id}/persons/{team_person_id}
+func (c *Client) UpdateEventTeamPerson(ctx context.Context, request *OrganizationTeamPersonUpdate, params UpdateEventTeamPersonParams) (*TeamPerson, error) {
+	res, err := c.sendUpdateEventTeamPerson(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUpdateEventTeamPerson(ctx context.Context, request *OrganizationTeamPersonUpdate, params UpdateEventTeamPersonParams) (res *TeamPerson, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("UpdateEventTeamPerson"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.URLTemplateKey.String("/events/{event_id}/teams/{team_id}/persons/{team_person_id}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateEventTeamPersonOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [6]string
+	pathParts[0] = "/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/teams/"
+	{
+		// Encode "team_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	pathParts[4] = "/persons/"
+	{
+		// Encode "team_person_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_person_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamPersonID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[5] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdateEventTeamPersonRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, UpdateEventTeamPersonOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdateEventTeamPersonResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -9121,7 +12302,13 @@ func (c *Client) sendUpdateFileMeta(ctx context.Context, request *UpdateFileMeta
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeUpdateFileMetaResponse(resp)
@@ -9132,22 +12319,34 @@ func (c *Client) sendUpdateFileMeta(ctx context.Context, request *UpdateFileMeta
 	return result, nil
 }
 
-// UpdateTeam invokes UpdateTeam operation.
+// UpdateOwnerTeamPerson invokes UpdateOwnerTeamPerson operation.
 //
-// Доступно только для капитана команды и организатора
-// мероприятия.
+// Изменение статуса участника команды ее капитаном.
 //
-// PATCH /teams/{team_id}
-func (c *Client) UpdateTeam(ctx context.Context, request *UpdateTeamReq, params UpdateTeamParams) (UpdateTeamRes, error) {
-	res, err := c.sendUpdateTeam(ctx, request, params)
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+-----------------------------------------------------------------------------------------------------------
+//	`403`  | Пользователь не является капитаном команды
+//	`403`  | Мероприятие команды завершено
+//	`404`  | Команда не найдена
+//	`404`  | Не найден участник команды
+//	`409`  | У пользователя уже имеется команда на мероприятии
+//	`422`  | У пользователя отсутствует заявка на мероприятие команды
+//	`422`  | Достижение допустимого количества участников команды
+//	`422`  | Достижение допустимого количества приглашений в команду
+//
+// PATCH /users/me/teams/{team_id}/persons/{team_person_id}
+func (c *Client) UpdateOwnerTeamPerson(ctx context.Context, request *OwnerTeamPersonUpdate, params UpdateOwnerTeamPersonParams) (UpdateOwnerTeamPersonRes, error) {
+	res, err := c.sendUpdateOwnerTeamPerson(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateTeam(ctx context.Context, request *UpdateTeamReq, params UpdateTeamParams) (res UpdateTeamRes, err error) {
+func (c *Client) sendUpdateOwnerTeamPerson(ctx context.Context, request *OwnerTeamPersonUpdate, params UpdateOwnerTeamPersonParams) (res UpdateOwnerTeamPersonRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("UpdateTeam"),
+		otelogen.OperationID("UpdateOwnerTeamPerson"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.URLTemplateKey.String("/teams/{team_id}"),
+		semconv.URLTemplateKey.String("/users/me/teams/{team_id}/persons/{team_person_id}"),
 	}
 	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
@@ -9163,7 +12362,7 @@ func (c *Client) sendUpdateTeam(ctx context.Context, request *UpdateTeamReq, par
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, UpdateTeamOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateOwnerTeamPersonOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -9180,8 +12379,8 @@ func (c *Client) sendUpdateTeam(ctx context.Context, request *UpdateTeamReq, par
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [2]string
-	pathParts[0] = "/teams/"
+	var pathParts [4]string
+	pathParts[0] = "/users/me/teams/"
 	{
 		// Encode "team_id" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -9200,6 +12399,25 @@ func (c *Client) sendUpdateTeam(ctx context.Context, request *UpdateTeamReq, par
 		}
 		pathParts[1] = encoded
 	}
+	pathParts[2] = "/persons/"
+	{
+		// Encode "team_person_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_person_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamPersonID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
@@ -9207,7 +12425,7 @@ func (c *Client) sendUpdateTeam(ctx context.Context, request *UpdateTeamReq, par
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeUpdateTeamRequest(request, r); err != nil {
+	if err := encodeUpdateOwnerTeamPersonRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -9216,7 +12434,7 @@ func (c *Client) sendUpdateTeam(ctx context.Context, request *UpdateTeamReq, par
 		var satisfied bitset
 		{
 			stage = "Security:TalentOAuth"
-			switch err := c.securityTalentOAuth(ctx, UpdateTeamOperation, r); {
+			switch err := c.securityTalentOAuth(ctx, UpdateOwnerTeamPersonOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -9250,10 +12468,310 @@ func (c *Client) sendUpdateTeam(ctx context.Context, request *UpdateTeamReq, par
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
-	result, err := decodeUpdateTeamResponse(resp)
+	result, err := decodeUpdateOwnerTeamPersonResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdateUserTeam invokes UpdateUserTeam operation.
+//
+// Обновление свойств команды ее капитаном.
+//
+// # Причины 4xx ошибок
+//
+// Таблица не включает в себя ошибки валидации
+// возвращаемые с 422 статусом.
+//
+//	Код | Описание
+//	-------+--------------------------------------------------------------------------------------------------
+//	`403`  | Пользователь не является капитаном команды
+//	`403`  | Мероприятие завершено
+//	`404`  | Команда не найдена
+//	`409`  | У пользователя уже имеется команда на мероприятии
+//	`409`  | Команда с таким названием уже имеется на мероприятии
+//
+// PATCH /users/me/teams/{team_id}
+func (c *Client) UpdateUserTeam(ctx context.Context, request *OwnerTeamUpdate, params UpdateUserTeamParams) (UpdateUserTeamRes, error) {
+	res, err := c.sendUpdateUserTeam(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUpdateUserTeam(ctx context.Context, request *OwnerTeamUpdate, params UpdateUserTeamParams) (res UpdateUserTeamRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("UpdateUserTeam"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.URLTemplateKey.String("/users/me/teams/{team_id}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateUserTeamOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/users/me/teams/"
+	{
+		// Encode "team_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdateUserTeamRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, UpdateUserTeamOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdateUserTeamResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdateUserTeamPerson invokes UpdateUserTeamPerson operation.
+//
+// Изменение статуса участия в команде от ее участника.
+//
+// # Причины 4xx ошибок
+//
+//	Код | Описание
+//	-------+------------------------------------------------------------------------------------------------------------------------------------
+//	`403`  | Мероприятие команды завершено
+//	`404`  | Команда не найдена
+//	`404`  | Пользователь не является участником команды
+//	`409`  | У пользователя уже имеется команда на мероприятии
+//	`422`  | У пользователя отсутствует заявка на мероприятие команды
+//	`422`  | Достижение допустимого количества участников команды
+//	`422`  | Достижение допустимого количества запросов в команды для пользователя
+//
+// PATCH /users/me/teams/{team_id}/persons/me
+func (c *Client) UpdateUserTeamPerson(ctx context.Context, request *UserTeamPersonUpdate, params UpdateUserTeamPersonParams) (UpdateUserTeamPersonRes, error) {
+	res, err := c.sendUpdateUserTeamPerson(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUpdateUserTeamPerson(ctx context.Context, request *UserTeamPersonUpdate, params UpdateUserTeamPersonParams) (res UpdateUserTeamPersonRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("UpdateUserTeamPerson"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.URLTemplateKey.String("/users/me/teams/{team_id}/persons/me"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UpdateUserTeamPersonOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/users/me/teams/"
+	{
+		// Encode "team_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/persons/me"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdateUserTeamPersonRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, UpdateUserTeamPersonOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdateUserTeamPersonResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -9264,9 +12782,8 @@ func (c *Client) sendUpdateTeam(ctx context.Context, request *UpdateTeamReq, par
 // UploadFile invokes UploadFile operation.
 //
 // Позволяет повторно получить ссылку на загрузку того
-// же файла или сформировать
-// ссылку для загрузки новой версии файла (того же типа,
-// но другого размера).
+// же файла или сформировать ссылку для загрузки новой
+// версии файла (того же типа, но другого размера).
 //
 // PUT /files/{file_id}
 func (c *Client) UploadFile(ctx context.Context, request *UploadFileReq, params UploadFileParams) (UploadFileRes, error) {
@@ -9381,7 +12898,13 @@ func (c *Client) sendUploadFile(ctx context.Context, request *UploadFileReq, par
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeUploadFileResponse(resp)
@@ -9568,7 +13091,13 @@ func (c *Client) sendValidateAuthorization(ctx context.Context, params ValidateA
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeValidateAuthorizationResponse(resp)
@@ -9645,7 +13174,13 @@ func (c *Client) sendValidateTeamContact(ctx context.Context, request TeamContac
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	stage = "DecodeResponse"
 	result, err := decodeValidateTeamContactResponse(resp)
