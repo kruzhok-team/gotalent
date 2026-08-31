@@ -12,6 +12,62 @@ import (
 	"github.com/ogen-go/ogen/json"
 )
 
+func encodeAdminCreateEventRequest(
+	req *AdminEventCreate,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeAdminCreateEventLimitRequest(
+	req *EventLimitWrite,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeAdminUpdateEventRequest(
+	req *AdminEventUpdate,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeAdminUpdateEventLimitRequest(
+	req *EventLimitWrite,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodeConfirmEventSignupRequest(
 	req OptConfirmEventSignupReq,
 	r *http.Request,
@@ -33,7 +89,7 @@ func encodeConfirmEventSignupRequest(
 }
 
 func encodeCreateEventRequest(
-	req *CreateEventReq,
+	req *OrganizationEventCreate,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -233,7 +289,7 @@ func encodeSignupRequest(
 }
 
 func encodeUpdateEventRequest(
-	req *UpdateEventReq,
+	req *OrganizationEventUpdate,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

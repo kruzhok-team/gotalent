@@ -7,6 +7,11 @@ type OperationName = string
 
 const (
 	AddEventDiplomaRoleOperation                 OperationName = "AddEventDiplomaRole"
+	AdminCreateEventOperation                    OperationName = "AdminCreateEvent"
+	AdminCreateEventLimitOperation               OperationName = "AdminCreateEventLimit"
+	AdminDeleteEventLimitOperation               OperationName = "AdminDeleteEventLimit"
+	AdminUpdateEventOperation                    OperationName = "AdminUpdateEvent"
+	AdminUpdateEventLimitOperation               OperationName = "AdminUpdateEventLimit"
 	ArchiveEventRequestsFilesOperation           OperationName = "ArchiveEventRequestsFiles"
 	AuthorizeClientOperation                     OperationName = "AuthorizeClient"
 	CancelEventDeferredNotificationOperation     OperationName = "CancelEventDeferredNotification"
@@ -33,6 +38,7 @@ const (
 	DeleteEventLimitOperation                    OperationName = "DeleteEventLimit"
 	DeleteFileReferenceOperation                 OperationName = "DeleteFileReference"
 	DeleteMutationLockOperation                  OperationName = "DeleteMutationLock"
+	DeleteUserTeamOperation                      OperationName = "DeleteUserTeam"
 	DisconnectSocialAuthOperation                OperationName = "DisconnectSocialAuth"
 	EventDeferredNotificationTemplateIDOperation OperationName = "EventDeferredNotificationTemplateID"
 	EventSignupOperation                         OperationName = "EventSignup"
@@ -55,6 +61,8 @@ const (
 	ListSubjectsOperation                        OperationName = "ListSubjects"
 	ListTeamsOperation                           OperationName = "ListTeams"
 	ListUserConsentsOperation                    OperationName = "ListUserConsents"
+	ListUserTeamPersonsOperation                 OperationName = "ListUserTeamPersons"
+	ListUserTeamsOperation                       OperationName = "ListUserTeams"
 	LoginSocialAuthOperation                     OperationName = "LoginSocialAuth"
 	PatchMutationLockOperation                   OperationName = "PatchMutationLock"
 	ReadEventOperation                           OperationName = "ReadEvent"

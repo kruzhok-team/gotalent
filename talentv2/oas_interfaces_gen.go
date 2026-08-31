@@ -5,20 +5,24 @@ type AddEventDiplomaRoleRes interface {
 	addEventDiplomaRoleRes()
 }
 
-type ArchiveEventRequestsFilesRes interface {
-	archiveEventRequestsFilesRes()
+type AdminCreateEventLimitRes interface {
+	adminCreateEventLimitRes()
 }
 
-type CancelEventDeferredNotificationRes interface {
-	cancelEventDeferredNotificationRes()
+type AdminCreateEventRes interface {
+	adminCreateEventRes()
+}
+
+type AdminUpdateEventLimitRes interface {
+	adminUpdateEventLimitRes()
+}
+
+type AdminUpdateEventRes interface {
+	adminUpdateEventRes()
 }
 
 type CheckUserConsentRes interface {
 	checkUserConsentRes()
-}
-
-type CityNameRes interface {
-	cityNameRes()
 }
 
 type CompleteSocialAuthRes interface {
@@ -29,20 +33,8 @@ type ConfirmEventSignupRes interface {
 	confirmEventSignupRes()
 }
 
-type ConfirmFileUploadRes interface {
-	confirmFileUploadRes()
-}
-
 type ConfirmSignupEmailRes interface {
 	confirmSignupEmailRes()
-}
-
-type CreateEventDeferredNotificationRes interface {
-	createEventDeferredNotificationRes()
-}
-
-type CreateEventDiplomaSettingsRes interface {
-	createEventDiplomaSettingsRes()
 }
 
 type CreateEventLimitRes interface {
@@ -61,20 +53,8 @@ type CreateEventTeamRes interface {
 	createEventTeamRes()
 }
 
-type CreateFileMetaRes interface {
-	createFileMetaRes()
-}
-
-type CreateFileReferenceRes interface {
-	createFileReferenceRes()
-}
-
 type CreateMutationLockRes interface {
 	createMutationLockRes()
-}
-
-type CreateOrganizationSubjectRes interface {
-	createOrganizationSubjectRes()
 }
 
 type CreateUserTeamPersonRes interface {
@@ -83,26 +63,6 @@ type CreateUserTeamPersonRes interface {
 
 type CreateUserTeamRes interface {
 	createUserTeamRes()
-}
-
-type DeleteEventLimitRes interface {
-	deleteEventLimitRes()
-}
-
-type DeleteFileReferenceRes interface {
-	deleteFileReferenceRes()
-}
-
-type DeleteMutationLockRes interface {
-	deleteMutationLockRes()
-}
-
-type DisconnectSocialAuthRes interface {
-	disconnectSocialAuthRes()
-}
-
-type EventDeferredNotificationTemplateIDRes interface {
-	eventDeferredNotificationTemplateIDRes()
 }
 
 type EventSignupRes interface {
@@ -121,64 +81,16 @@ type IssueAccessTokenRes interface {
 	issueAccessTokenRes()
 }
 
-type ListEventsRes interface {
-	listEventsRes()
-}
-
-type ListFileMetaRes interface {
-	listFileMetaRes()
-}
-
-type ListOrganizationsRes interface {
-	listOrganizationsRes()
-}
-
-type ListSocialAuthsRes interface {
-	listSocialAuthsRes()
-}
-
-type ListUserConsentsRes interface {
-	listUserConsentsRes()
-}
-
 type LoginSocialAuthRes interface {
 	loginSocialAuthRes()
-}
-
-type PatchMutationLockRes interface {
-	patchMutationLockRes()
-}
-
-type ReadEventDeferredNotificationRes interface {
-	readEventDeferredNotificationRes()
 }
 
 type ReadEventDiplomaSettingsRes interface {
 	readEventDiplomaSettingsRes()
 }
 
-type ReadEventLimitRes interface {
-	readEventLimitRes()
-}
-
-type ReadEventRequestRes interface {
-	readEventRequestRes()
-}
-
-type ReadFileMetaRes interface {
-	readFileMetaRes()
-}
-
 type ReadFileRes interface {
 	readFileRes()
-}
-
-type ReadGeoDataRes interface {
-	readGeoDataRes()
-}
-
-type RegionNameRes interface {
-	regionNameRes()
 }
 
 type SignupInitialDataRes interface {
@@ -191,14 +103,6 @@ type SignupRes interface {
 
 type SubmitUserConsentRes interface {
 	submitUserConsentRes()
-}
-
-type UpdateEventDeferredNotificationRes interface {
-	updateEventDeferredNotificationRes()
-}
-
-type UpdateEventDiplomaSettingsRes interface {
-	updateEventDiplomaSettingsRes()
 }
 
 type UpdateEventLimitRes interface {
@@ -217,10 +121,6 @@ type UpdateEventTeamRes interface {
 	updateEventTeamRes()
 }
 
-type UpdateFileMetaRes interface {
-	updateFileMetaRes()
-}
-
 type UpdateOwnerTeamPersonRes interface {
 	updateOwnerTeamPersonRes()
 }
@@ -231,10 +131,6 @@ type UpdateUserTeamPersonRes interface {
 
 type UpdateUserTeamRes interface {
 	updateUserTeamRes()
-}
-
-type UploadFileRes interface {
-	uploadFileRes()
 }
 
 type ValidateTeamContactRes interface {

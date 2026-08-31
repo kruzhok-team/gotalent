@@ -14,6 +14,30 @@ type AddEventDiplomaRoleParams struct {
 	RoleID int32
 }
 
+// AdminCreateEventLimitParams is parameters of AdminCreateEventLimit operation.
+type AdminCreateEventLimitParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// AdminDeleteEventLimitParams is parameters of AdminDeleteEventLimit operation.
+type AdminDeleteEventLimitParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// AdminUpdateEventParams is parameters of AdminUpdateEvent operation.
+type AdminUpdateEventParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
+// AdminUpdateEventLimitParams is parameters of AdminUpdateEventLimit operation.
+type AdminUpdateEventLimitParams struct {
+	// ID мероприятия.
+	EventID int32
+}
+
 // ArchiveEventRequestsFilesParams is parameters of ArchiveEventRequestsFiles operation.
 type ArchiveEventRequestsFilesParams struct {
 	FieldID   OptInt32 `json:",omitempty,omitzero"`
@@ -171,6 +195,12 @@ type DeleteMutationLockParams struct {
 	ObjectNamespace string
 	// Ключ объекта зависящего от блокируемых файлов.
 	ObjectKey string
+}
+
+// DeleteUserTeamParams is parameters of DeleteUserTeam operation.
+type DeleteUserTeamParams struct {
+	// ID команды.
+	TeamID int32
 }
 
 // DisconnectSocialAuthParams is parameters of DisconnectSocialAuth operation.
@@ -467,6 +497,40 @@ type ListUserConsentsParams struct {
 	TalentID int32
 }
 
+// ListUserTeamPersonsParams is parameters of ListUserTeamPersons operation.
+type ListUserTeamPersonsParams struct {
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32 `json:",omitempty,omitzero"`
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32 `json:",omitempty,omitzero"`
+	// Статусы подтверждения капитаном.
+	OwnerAccepted []TeamPersonAccepted `json:",omitempty"`
+	// Статусы подтверждения участником.
+	UserAccepted []TeamPersonAccepted `json:",omitempty"`
+	// Критерий сортировки результатов.
+	OrderBy OptListUserTeamPersonsOrderBy `json:",omitempty,omitzero"`
+	// ID команды.
+	TeamID int32
+}
+
+// ListUserTeamsParams is parameters of ListUserTeams operation.
+type ListUserTeamsParams struct {
+	// Пропуск объектов с идентификатором равном или менее
+	// указанного.
+	IDOffset OptInt32 `json:",omitempty,omitzero"`
+	// Максимум объектов возвращаемых в теле ответа.
+	Limit OptInt32 `json:",omitempty,omitzero"`
+	// Фильтрация по мероприятию команды.
+	EventID OptInt32 `json:",omitempty,omitzero"`
+	// Статусы подтверждения капитаном.
+	OwnerAccepted []TeamPersonAccepted `json:",omitempty"`
+	// Статусы подтверждения участником.
+	UserAccepted []TeamPersonAccepted `json:",omitempty"`
+	// Критерий сортировки результатов.
+	OrderBy OptListUserTeamsOrderBy `json:",omitempty,omitzero"`
+}
+
 // LoginSocialAuthParams is parameters of LoginSocialAuth operation.
 type LoginSocialAuthParams struct {
 	Provider string
@@ -518,6 +582,8 @@ type ReadEventRequestParams struct {
 
 // ReadEventTeamParams is parameters of ReadEventTeam operation.
 type ReadEventTeamParams struct {
+	// Включить в ответ массив участников команды.
+	Persons OptBool `json:",omitempty,omitzero"`
 	// ID мероприятия.
 	EventID int32
 	// ID команды.
@@ -558,6 +624,8 @@ type ReadTeamParams struct {
 
 // ReadUserTeamParams is parameters of ReadUserTeam operation.
 type ReadUserTeamParams struct {
+	// Включить в ответ массив участников команды.
+	Persons OptBool `json:",omitempty,omitzero"`
 	// ID команды.
 	TeamID int32
 }

@@ -52,6 +52,21 @@ var operationRolesTalentOAuth = map[string][]string{
 	AddEventDiplomaRoleOperation: []string{
 		"events",
 	},
+	AdminCreateEventOperation: []string{
+		"admin:events-write",
+	},
+	AdminCreateEventLimitOperation: []string{
+		"admin:events-write",
+	},
+	AdminDeleteEventLimitOperation: []string{
+		"admin:events-write",
+	},
+	AdminUpdateEventOperation: []string{
+		"admin:events-write",
+	},
+	AdminUpdateEventLimitOperation: []string{
+		"admin:events-write",
+	},
 	ArchiveEventRequestsFilesOperation: []string{
 		"events",
 	},
@@ -110,6 +125,9 @@ var operationRolesTalentOAuth = map[string][]string{
 	DeleteFileReferenceOperation: []string{
 		"files",
 	},
+	DeleteUserTeamOperation: []string{
+		"teams",
+	},
 	DisconnectSocialAuthOperation: []string{
 		"user",
 	},
@@ -132,6 +150,12 @@ var operationRolesTalentOAuth = map[string][]string{
 	ListTeamsOperation: []string{},
 	ListUserConsentsOperation: []string{
 		"user:read",
+	},
+	ListUserTeamPersonsOperation: []string{
+		"teams",
+	},
+	ListUserTeamsOperation: []string{
+		"teams:read",
 	},
 	ReadEventDeferredNotificationOperation: []string{
 		"events:read",

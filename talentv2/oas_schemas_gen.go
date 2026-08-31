@@ -101,6 +101,899 @@ type AddEventDiplomaRoleNoContent struct{}
 
 func (*AddEventDiplomaRoleNoContent) addEventDiplomaRoleRes() {}
 
+// AdminDeleteEventLimitNoContent is response for AdminDeleteEventLimit operation.
+type AdminDeleteEventLimitNoContent struct{}
+
+// Merged schema.
+// Ref: #/components/schemas/AdminEventCreate
+type AdminEventCreate struct {
+	// ID организации мероприятия.
+	OrganizationID int32 `json:"organization_id"`
+	// ID мета-мероприятия.
+	MetaEventID OptNilInt32 `json:"meta_event_id"`
+	// Мероприятие находится в статусе черновика. На такое
+	// мероприятие нельзя зарегистрироваться.
+	Draft OptBool `json:"draft"`
+	// Статус публичности мероприятия.
+	Public OptBool `json:"public"`
+	// Исключение мероприятия из календаря.
+	Hidden OptBool `json:"hidden"`
+	// Название мероприятия.
+	Title string `json:"title"`
+	// Дата начала мероприятия.
+	Start OptNilDateTime `json:"start"`
+	// Дата окончания мероприятия.
+	End    OptNilDateTime `json:"end"`
+	Format OptEventFormat `json:"format"`
+	// ID [площадки] на которой проводится мероприятие.
+	//
+	// [площадки]: /venue-api/docs/
+	VenueID OptNilInt32 `json:"venue_id"`
+	// Доступность упрощенной регистрации на мероприятие.
+	SimplifiedRegistration OptBool `json:"simplified_registration"`
+	// Автоматическое добавление в участники организации
+	// пользователя с подтвержденной заявки.
+	AutocreateMember OptBool `json:"autocreate_member"`
+	// Допуск на создания достижений на мероприятие.
+	AchievementsAllowed OptBool `json:"achievements_allowed"`
+	// Допуск на создания заявок на мероприятие.
+	RequestsAllowed OptBool `json:"requests_allowed"`
+	// Доступность чекина.
+	SelfCheckIn         OptBool               `json:"self_check_in"`
+	TeamsInvolved       OptEventTeamsInvolved `json:"teams_involved"`
+	OwnerCanModerate    OptBool               `json:"owner_can_moderate"`
+	UserInMultipleTeams OptBool               `json:"user_in_multiple_teams"`
+	SupportI18n         OptBool               `json:"support_i18n"`
+	// Учитывается ли время или только даты в полях `start` и `end`.
+	TimeMatters OptBool `json:"time_matters"`
+	// Максимальное количество участников в команде.
+	MaxUsers             OptNilInt32                  `json:"max_users"`
+	TeamAssignmentMethod OptEventTeamAssignmentMethod `json:"team_assignment_method"`
+	// Планируемое начало мероприятия-анонса.
+	ExpectedStart OptNilDateTime `json:"expected_start"`
+	// Альтернативное название мероприятия.
+	AltTitle OptString `json:"alt_title"`
+	// Адрес online мероприятия.
+	URL OptURI `json:"url"`
+	// Идентификатор типа мероприятия.
+	TypeID OptNilInt32 `json:"type_id"`
+	// Описание мероприятия.
+	Description OptString `json:"description"`
+	// Сообщение о заполненной анкете.
+	QuestionnaireCompletedMessage OptString `json:"questionnaire_completed_message"`
+	// Дополнительный текст для Email уведомления о
+	// регистрации на мероприятие.
+	//
+	// 	Текст интерпретируется в соответствии с форматом
+	// 	markdown.
+	NotificationEmailMessage OptString `json:"notification_email_message"`
+	// Ссылка на обложку мероприятия.
+	CoverURL               OptURI    `json:"cover_url"`
+	Keywords               OptString `json:"keywords"`
+	MentorsAllowed         OptBool   `json:"mentors_allowed"`
+	GirCollection          OptBool   `json:"gir_collection"`
+	Promoted               OptBool   `json:"promoted"`
+	TeamCreateNotification OptBool   `json:"team_create_notification"`
+	AchievementRoles       []int32   `json:"achievement_roles"`
+	Brands                 []int32   `json:"brands"`
+}
+
+// GetOrganizationID returns the value of OrganizationID.
+func (s *AdminEventCreate) GetOrganizationID() int32 {
+	return s.OrganizationID
+}
+
+// GetMetaEventID returns the value of MetaEventID.
+func (s *AdminEventCreate) GetMetaEventID() OptNilInt32 {
+	return s.MetaEventID
+}
+
+// GetDraft returns the value of Draft.
+func (s *AdminEventCreate) GetDraft() OptBool {
+	return s.Draft
+}
+
+// GetPublic returns the value of Public.
+func (s *AdminEventCreate) GetPublic() OptBool {
+	return s.Public
+}
+
+// GetHidden returns the value of Hidden.
+func (s *AdminEventCreate) GetHidden() OptBool {
+	return s.Hidden
+}
+
+// GetTitle returns the value of Title.
+func (s *AdminEventCreate) GetTitle() string {
+	return s.Title
+}
+
+// GetStart returns the value of Start.
+func (s *AdminEventCreate) GetStart() OptNilDateTime {
+	return s.Start
+}
+
+// GetEnd returns the value of End.
+func (s *AdminEventCreate) GetEnd() OptNilDateTime {
+	return s.End
+}
+
+// GetFormat returns the value of Format.
+func (s *AdminEventCreate) GetFormat() OptEventFormat {
+	return s.Format
+}
+
+// GetVenueID returns the value of VenueID.
+func (s *AdminEventCreate) GetVenueID() OptNilInt32 {
+	return s.VenueID
+}
+
+// GetSimplifiedRegistration returns the value of SimplifiedRegistration.
+func (s *AdminEventCreate) GetSimplifiedRegistration() OptBool {
+	return s.SimplifiedRegistration
+}
+
+// GetAutocreateMember returns the value of AutocreateMember.
+func (s *AdminEventCreate) GetAutocreateMember() OptBool {
+	return s.AutocreateMember
+}
+
+// GetAchievementsAllowed returns the value of AchievementsAllowed.
+func (s *AdminEventCreate) GetAchievementsAllowed() OptBool {
+	return s.AchievementsAllowed
+}
+
+// GetRequestsAllowed returns the value of RequestsAllowed.
+func (s *AdminEventCreate) GetRequestsAllowed() OptBool {
+	return s.RequestsAllowed
+}
+
+// GetSelfCheckIn returns the value of SelfCheckIn.
+func (s *AdminEventCreate) GetSelfCheckIn() OptBool {
+	return s.SelfCheckIn
+}
+
+// GetTeamsInvolved returns the value of TeamsInvolved.
+func (s *AdminEventCreate) GetTeamsInvolved() OptEventTeamsInvolved {
+	return s.TeamsInvolved
+}
+
+// GetOwnerCanModerate returns the value of OwnerCanModerate.
+func (s *AdminEventCreate) GetOwnerCanModerate() OptBool {
+	return s.OwnerCanModerate
+}
+
+// GetUserInMultipleTeams returns the value of UserInMultipleTeams.
+func (s *AdminEventCreate) GetUserInMultipleTeams() OptBool {
+	return s.UserInMultipleTeams
+}
+
+// GetSupportI18n returns the value of SupportI18n.
+func (s *AdminEventCreate) GetSupportI18n() OptBool {
+	return s.SupportI18n
+}
+
+// GetTimeMatters returns the value of TimeMatters.
+func (s *AdminEventCreate) GetTimeMatters() OptBool {
+	return s.TimeMatters
+}
+
+// GetMaxUsers returns the value of MaxUsers.
+func (s *AdminEventCreate) GetMaxUsers() OptNilInt32 {
+	return s.MaxUsers
+}
+
+// GetTeamAssignmentMethod returns the value of TeamAssignmentMethod.
+func (s *AdminEventCreate) GetTeamAssignmentMethod() OptEventTeamAssignmentMethod {
+	return s.TeamAssignmentMethod
+}
+
+// GetExpectedStart returns the value of ExpectedStart.
+func (s *AdminEventCreate) GetExpectedStart() OptNilDateTime {
+	return s.ExpectedStart
+}
+
+// GetAltTitle returns the value of AltTitle.
+func (s *AdminEventCreate) GetAltTitle() OptString {
+	return s.AltTitle
+}
+
+// GetURL returns the value of URL.
+func (s *AdminEventCreate) GetURL() OptURI {
+	return s.URL
+}
+
+// GetTypeID returns the value of TypeID.
+func (s *AdminEventCreate) GetTypeID() OptNilInt32 {
+	return s.TypeID
+}
+
+// GetDescription returns the value of Description.
+func (s *AdminEventCreate) GetDescription() OptString {
+	return s.Description
+}
+
+// GetQuestionnaireCompletedMessage returns the value of QuestionnaireCompletedMessage.
+func (s *AdminEventCreate) GetQuestionnaireCompletedMessage() OptString {
+	return s.QuestionnaireCompletedMessage
+}
+
+// GetNotificationEmailMessage returns the value of NotificationEmailMessage.
+func (s *AdminEventCreate) GetNotificationEmailMessage() OptString {
+	return s.NotificationEmailMessage
+}
+
+// GetCoverURL returns the value of CoverURL.
+func (s *AdminEventCreate) GetCoverURL() OptURI {
+	return s.CoverURL
+}
+
+// GetKeywords returns the value of Keywords.
+func (s *AdminEventCreate) GetKeywords() OptString {
+	return s.Keywords
+}
+
+// GetMentorsAllowed returns the value of MentorsAllowed.
+func (s *AdminEventCreate) GetMentorsAllowed() OptBool {
+	return s.MentorsAllowed
+}
+
+// GetGirCollection returns the value of GirCollection.
+func (s *AdminEventCreate) GetGirCollection() OptBool {
+	return s.GirCollection
+}
+
+// GetPromoted returns the value of Promoted.
+func (s *AdminEventCreate) GetPromoted() OptBool {
+	return s.Promoted
+}
+
+// GetTeamCreateNotification returns the value of TeamCreateNotification.
+func (s *AdminEventCreate) GetTeamCreateNotification() OptBool {
+	return s.TeamCreateNotification
+}
+
+// GetAchievementRoles returns the value of AchievementRoles.
+func (s *AdminEventCreate) GetAchievementRoles() []int32 {
+	return s.AchievementRoles
+}
+
+// GetBrands returns the value of Brands.
+func (s *AdminEventCreate) GetBrands() []int32 {
+	return s.Brands
+}
+
+// SetOrganizationID sets the value of OrganizationID.
+func (s *AdminEventCreate) SetOrganizationID(val int32) {
+	s.OrganizationID = val
+}
+
+// SetMetaEventID sets the value of MetaEventID.
+func (s *AdminEventCreate) SetMetaEventID(val OptNilInt32) {
+	s.MetaEventID = val
+}
+
+// SetDraft sets the value of Draft.
+func (s *AdminEventCreate) SetDraft(val OptBool) {
+	s.Draft = val
+}
+
+// SetPublic sets the value of Public.
+func (s *AdminEventCreate) SetPublic(val OptBool) {
+	s.Public = val
+}
+
+// SetHidden sets the value of Hidden.
+func (s *AdminEventCreate) SetHidden(val OptBool) {
+	s.Hidden = val
+}
+
+// SetTitle sets the value of Title.
+func (s *AdminEventCreate) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetStart sets the value of Start.
+func (s *AdminEventCreate) SetStart(val OptNilDateTime) {
+	s.Start = val
+}
+
+// SetEnd sets the value of End.
+func (s *AdminEventCreate) SetEnd(val OptNilDateTime) {
+	s.End = val
+}
+
+// SetFormat sets the value of Format.
+func (s *AdminEventCreate) SetFormat(val OptEventFormat) {
+	s.Format = val
+}
+
+// SetVenueID sets the value of VenueID.
+func (s *AdminEventCreate) SetVenueID(val OptNilInt32) {
+	s.VenueID = val
+}
+
+// SetSimplifiedRegistration sets the value of SimplifiedRegistration.
+func (s *AdminEventCreate) SetSimplifiedRegistration(val OptBool) {
+	s.SimplifiedRegistration = val
+}
+
+// SetAutocreateMember sets the value of AutocreateMember.
+func (s *AdminEventCreate) SetAutocreateMember(val OptBool) {
+	s.AutocreateMember = val
+}
+
+// SetAchievementsAllowed sets the value of AchievementsAllowed.
+func (s *AdminEventCreate) SetAchievementsAllowed(val OptBool) {
+	s.AchievementsAllowed = val
+}
+
+// SetRequestsAllowed sets the value of RequestsAllowed.
+func (s *AdminEventCreate) SetRequestsAllowed(val OptBool) {
+	s.RequestsAllowed = val
+}
+
+// SetSelfCheckIn sets the value of SelfCheckIn.
+func (s *AdminEventCreate) SetSelfCheckIn(val OptBool) {
+	s.SelfCheckIn = val
+}
+
+// SetTeamsInvolved sets the value of TeamsInvolved.
+func (s *AdminEventCreate) SetTeamsInvolved(val OptEventTeamsInvolved) {
+	s.TeamsInvolved = val
+}
+
+// SetOwnerCanModerate sets the value of OwnerCanModerate.
+func (s *AdminEventCreate) SetOwnerCanModerate(val OptBool) {
+	s.OwnerCanModerate = val
+}
+
+// SetUserInMultipleTeams sets the value of UserInMultipleTeams.
+func (s *AdminEventCreate) SetUserInMultipleTeams(val OptBool) {
+	s.UserInMultipleTeams = val
+}
+
+// SetSupportI18n sets the value of SupportI18n.
+func (s *AdminEventCreate) SetSupportI18n(val OptBool) {
+	s.SupportI18n = val
+}
+
+// SetTimeMatters sets the value of TimeMatters.
+func (s *AdminEventCreate) SetTimeMatters(val OptBool) {
+	s.TimeMatters = val
+}
+
+// SetMaxUsers sets the value of MaxUsers.
+func (s *AdminEventCreate) SetMaxUsers(val OptNilInt32) {
+	s.MaxUsers = val
+}
+
+// SetTeamAssignmentMethod sets the value of TeamAssignmentMethod.
+func (s *AdminEventCreate) SetTeamAssignmentMethod(val OptEventTeamAssignmentMethod) {
+	s.TeamAssignmentMethod = val
+}
+
+// SetExpectedStart sets the value of ExpectedStart.
+func (s *AdminEventCreate) SetExpectedStart(val OptNilDateTime) {
+	s.ExpectedStart = val
+}
+
+// SetAltTitle sets the value of AltTitle.
+func (s *AdminEventCreate) SetAltTitle(val OptString) {
+	s.AltTitle = val
+}
+
+// SetURL sets the value of URL.
+func (s *AdminEventCreate) SetURL(val OptURI) {
+	s.URL = val
+}
+
+// SetTypeID sets the value of TypeID.
+func (s *AdminEventCreate) SetTypeID(val OptNilInt32) {
+	s.TypeID = val
+}
+
+// SetDescription sets the value of Description.
+func (s *AdminEventCreate) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetQuestionnaireCompletedMessage sets the value of QuestionnaireCompletedMessage.
+func (s *AdminEventCreate) SetQuestionnaireCompletedMessage(val OptString) {
+	s.QuestionnaireCompletedMessage = val
+}
+
+// SetNotificationEmailMessage sets the value of NotificationEmailMessage.
+func (s *AdminEventCreate) SetNotificationEmailMessage(val OptString) {
+	s.NotificationEmailMessage = val
+}
+
+// SetCoverURL sets the value of CoverURL.
+func (s *AdminEventCreate) SetCoverURL(val OptURI) {
+	s.CoverURL = val
+}
+
+// SetKeywords sets the value of Keywords.
+func (s *AdminEventCreate) SetKeywords(val OptString) {
+	s.Keywords = val
+}
+
+// SetMentorsAllowed sets the value of MentorsAllowed.
+func (s *AdminEventCreate) SetMentorsAllowed(val OptBool) {
+	s.MentorsAllowed = val
+}
+
+// SetGirCollection sets the value of GirCollection.
+func (s *AdminEventCreate) SetGirCollection(val OptBool) {
+	s.GirCollection = val
+}
+
+// SetPromoted sets the value of Promoted.
+func (s *AdminEventCreate) SetPromoted(val OptBool) {
+	s.Promoted = val
+}
+
+// SetTeamCreateNotification sets the value of TeamCreateNotification.
+func (s *AdminEventCreate) SetTeamCreateNotification(val OptBool) {
+	s.TeamCreateNotification = val
+}
+
+// SetAchievementRoles sets the value of AchievementRoles.
+func (s *AdminEventCreate) SetAchievementRoles(val []int32) {
+	s.AchievementRoles = val
+}
+
+// SetBrands sets the value of Brands.
+func (s *AdminEventCreate) SetBrands(val []int32) {
+	s.Brands = val
+}
+
+// Merged schema.
+// Ref: #/components/schemas/AdminEventUpdate
+type AdminEventUpdate struct {
+	// ID организации мероприятия.
+	OrganizationID OptInt32 `json:"organization_id"`
+	// ID мета-мероприятия.
+	MetaEventID OptNilInt32 `json:"meta_event_id"`
+	// Мероприятие находится в статусе черновика. На такое
+	// мероприятие нельзя зарегистрироваться.
+	Draft OptBool `json:"draft"`
+	// Статус публичности мероприятия.
+	Public OptBool `json:"public"`
+	// Исключение мероприятия из календаря.
+	Hidden OptBool `json:"hidden"`
+	// Название мероприятия.
+	Title OptString `json:"title"`
+	// Дата начала мероприятия.
+	Start OptNilDateTime `json:"start"`
+	// Дата окончания мероприятия.
+	End    OptNilDateTime `json:"end"`
+	Format OptEventFormat `json:"format"`
+	// ID [площадки] на которой проводится мероприятие.
+	//
+	// [площадки]: /venue-api/docs/
+	VenueID OptNilInt32 `json:"venue_id"`
+	// Доступность упрощенной регистрации на мероприятие.
+	SimplifiedRegistration OptBool `json:"simplified_registration"`
+	// Автоматическое добавление в участники организации
+	// пользователя с подтвержденной заявки.
+	AutocreateMember OptBool `json:"autocreate_member"`
+	// Допуск на создания достижений на мероприятие.
+	AchievementsAllowed OptBool `json:"achievements_allowed"`
+	// Допуск на создания заявок на мероприятие.
+	RequestsAllowed OptBool `json:"requests_allowed"`
+	// Доступность чекина.
+	SelfCheckIn         OptBool               `json:"self_check_in"`
+	TeamsInvolved       OptEventTeamsInvolved `json:"teams_involved"`
+	OwnerCanModerate    OptBool               `json:"owner_can_moderate"`
+	UserInMultipleTeams OptBool               `json:"user_in_multiple_teams"`
+	SupportI18n         OptBool               `json:"support_i18n"`
+	// Учитывается ли время или только даты в полях `start` и `end`.
+	TimeMatters OptBool `json:"time_matters"`
+	// Максимальное количество участников в команде.
+	MaxUsers             OptNilInt32                  `json:"max_users"`
+	TeamAssignmentMethod OptEventTeamAssignmentMethod `json:"team_assignment_method"`
+	// Планируемое начало мероприятия-анонса.
+	ExpectedStart OptNilDateTime `json:"expected_start"`
+	// Альтернативное название мероприятия.
+	AltTitle OptString `json:"alt_title"`
+	// Адрес online мероприятия.
+	URL OptURI `json:"url"`
+	// Идентификатор типа мероприятия.
+	TypeID OptNilInt32 `json:"type_id"`
+	// Описание мероприятия.
+	Description OptString `json:"description"`
+	// Сообщение о заполненной анкете.
+	QuestionnaireCompletedMessage OptString `json:"questionnaire_completed_message"`
+	// Дополнительный текст для Email уведомления о
+	// регистрации на мероприятие.
+	//
+	// 	Текст интерпретируется в соответствии с форматом
+	// 	markdown.
+	NotificationEmailMessage OptString `json:"notification_email_message"`
+	// Ссылка на обложку мероприятия.
+	CoverURL               OptURI    `json:"cover_url"`
+	Keywords               OptString `json:"keywords"`
+	MentorsAllowed         OptBool   `json:"mentors_allowed"`
+	GirCollection          OptBool   `json:"gir_collection"`
+	Promoted               OptBool   `json:"promoted"`
+	TeamCreateNotification OptBool   `json:"team_create_notification"`
+	// Статус отмены мероприятия.
+	Canceled OptBool `json:"canceled"`
+	// Причина отмены мероприятия.
+	CancellationReason OptString `json:"cancellation_reason"`
+}
+
+// GetOrganizationID returns the value of OrganizationID.
+func (s *AdminEventUpdate) GetOrganizationID() OptInt32 {
+	return s.OrganizationID
+}
+
+// GetMetaEventID returns the value of MetaEventID.
+func (s *AdminEventUpdate) GetMetaEventID() OptNilInt32 {
+	return s.MetaEventID
+}
+
+// GetDraft returns the value of Draft.
+func (s *AdminEventUpdate) GetDraft() OptBool {
+	return s.Draft
+}
+
+// GetPublic returns the value of Public.
+func (s *AdminEventUpdate) GetPublic() OptBool {
+	return s.Public
+}
+
+// GetHidden returns the value of Hidden.
+func (s *AdminEventUpdate) GetHidden() OptBool {
+	return s.Hidden
+}
+
+// GetTitle returns the value of Title.
+func (s *AdminEventUpdate) GetTitle() OptString {
+	return s.Title
+}
+
+// GetStart returns the value of Start.
+func (s *AdminEventUpdate) GetStart() OptNilDateTime {
+	return s.Start
+}
+
+// GetEnd returns the value of End.
+func (s *AdminEventUpdate) GetEnd() OptNilDateTime {
+	return s.End
+}
+
+// GetFormat returns the value of Format.
+func (s *AdminEventUpdate) GetFormat() OptEventFormat {
+	return s.Format
+}
+
+// GetVenueID returns the value of VenueID.
+func (s *AdminEventUpdate) GetVenueID() OptNilInt32 {
+	return s.VenueID
+}
+
+// GetSimplifiedRegistration returns the value of SimplifiedRegistration.
+func (s *AdminEventUpdate) GetSimplifiedRegistration() OptBool {
+	return s.SimplifiedRegistration
+}
+
+// GetAutocreateMember returns the value of AutocreateMember.
+func (s *AdminEventUpdate) GetAutocreateMember() OptBool {
+	return s.AutocreateMember
+}
+
+// GetAchievementsAllowed returns the value of AchievementsAllowed.
+func (s *AdminEventUpdate) GetAchievementsAllowed() OptBool {
+	return s.AchievementsAllowed
+}
+
+// GetRequestsAllowed returns the value of RequestsAllowed.
+func (s *AdminEventUpdate) GetRequestsAllowed() OptBool {
+	return s.RequestsAllowed
+}
+
+// GetSelfCheckIn returns the value of SelfCheckIn.
+func (s *AdminEventUpdate) GetSelfCheckIn() OptBool {
+	return s.SelfCheckIn
+}
+
+// GetTeamsInvolved returns the value of TeamsInvolved.
+func (s *AdminEventUpdate) GetTeamsInvolved() OptEventTeamsInvolved {
+	return s.TeamsInvolved
+}
+
+// GetOwnerCanModerate returns the value of OwnerCanModerate.
+func (s *AdminEventUpdate) GetOwnerCanModerate() OptBool {
+	return s.OwnerCanModerate
+}
+
+// GetUserInMultipleTeams returns the value of UserInMultipleTeams.
+func (s *AdminEventUpdate) GetUserInMultipleTeams() OptBool {
+	return s.UserInMultipleTeams
+}
+
+// GetSupportI18n returns the value of SupportI18n.
+func (s *AdminEventUpdate) GetSupportI18n() OptBool {
+	return s.SupportI18n
+}
+
+// GetTimeMatters returns the value of TimeMatters.
+func (s *AdminEventUpdate) GetTimeMatters() OptBool {
+	return s.TimeMatters
+}
+
+// GetMaxUsers returns the value of MaxUsers.
+func (s *AdminEventUpdate) GetMaxUsers() OptNilInt32 {
+	return s.MaxUsers
+}
+
+// GetTeamAssignmentMethod returns the value of TeamAssignmentMethod.
+func (s *AdminEventUpdate) GetTeamAssignmentMethod() OptEventTeamAssignmentMethod {
+	return s.TeamAssignmentMethod
+}
+
+// GetExpectedStart returns the value of ExpectedStart.
+func (s *AdminEventUpdate) GetExpectedStart() OptNilDateTime {
+	return s.ExpectedStart
+}
+
+// GetAltTitle returns the value of AltTitle.
+func (s *AdminEventUpdate) GetAltTitle() OptString {
+	return s.AltTitle
+}
+
+// GetURL returns the value of URL.
+func (s *AdminEventUpdate) GetURL() OptURI {
+	return s.URL
+}
+
+// GetTypeID returns the value of TypeID.
+func (s *AdminEventUpdate) GetTypeID() OptNilInt32 {
+	return s.TypeID
+}
+
+// GetDescription returns the value of Description.
+func (s *AdminEventUpdate) GetDescription() OptString {
+	return s.Description
+}
+
+// GetQuestionnaireCompletedMessage returns the value of QuestionnaireCompletedMessage.
+func (s *AdminEventUpdate) GetQuestionnaireCompletedMessage() OptString {
+	return s.QuestionnaireCompletedMessage
+}
+
+// GetNotificationEmailMessage returns the value of NotificationEmailMessage.
+func (s *AdminEventUpdate) GetNotificationEmailMessage() OptString {
+	return s.NotificationEmailMessage
+}
+
+// GetCoverURL returns the value of CoverURL.
+func (s *AdminEventUpdate) GetCoverURL() OptURI {
+	return s.CoverURL
+}
+
+// GetKeywords returns the value of Keywords.
+func (s *AdminEventUpdate) GetKeywords() OptString {
+	return s.Keywords
+}
+
+// GetMentorsAllowed returns the value of MentorsAllowed.
+func (s *AdminEventUpdate) GetMentorsAllowed() OptBool {
+	return s.MentorsAllowed
+}
+
+// GetGirCollection returns the value of GirCollection.
+func (s *AdminEventUpdate) GetGirCollection() OptBool {
+	return s.GirCollection
+}
+
+// GetPromoted returns the value of Promoted.
+func (s *AdminEventUpdate) GetPromoted() OptBool {
+	return s.Promoted
+}
+
+// GetTeamCreateNotification returns the value of TeamCreateNotification.
+func (s *AdminEventUpdate) GetTeamCreateNotification() OptBool {
+	return s.TeamCreateNotification
+}
+
+// GetCanceled returns the value of Canceled.
+func (s *AdminEventUpdate) GetCanceled() OptBool {
+	return s.Canceled
+}
+
+// GetCancellationReason returns the value of CancellationReason.
+func (s *AdminEventUpdate) GetCancellationReason() OptString {
+	return s.CancellationReason
+}
+
+// SetOrganizationID sets the value of OrganizationID.
+func (s *AdminEventUpdate) SetOrganizationID(val OptInt32) {
+	s.OrganizationID = val
+}
+
+// SetMetaEventID sets the value of MetaEventID.
+func (s *AdminEventUpdate) SetMetaEventID(val OptNilInt32) {
+	s.MetaEventID = val
+}
+
+// SetDraft sets the value of Draft.
+func (s *AdminEventUpdate) SetDraft(val OptBool) {
+	s.Draft = val
+}
+
+// SetPublic sets the value of Public.
+func (s *AdminEventUpdate) SetPublic(val OptBool) {
+	s.Public = val
+}
+
+// SetHidden sets the value of Hidden.
+func (s *AdminEventUpdate) SetHidden(val OptBool) {
+	s.Hidden = val
+}
+
+// SetTitle sets the value of Title.
+func (s *AdminEventUpdate) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetStart sets the value of Start.
+func (s *AdminEventUpdate) SetStart(val OptNilDateTime) {
+	s.Start = val
+}
+
+// SetEnd sets the value of End.
+func (s *AdminEventUpdate) SetEnd(val OptNilDateTime) {
+	s.End = val
+}
+
+// SetFormat sets the value of Format.
+func (s *AdminEventUpdate) SetFormat(val OptEventFormat) {
+	s.Format = val
+}
+
+// SetVenueID sets the value of VenueID.
+func (s *AdminEventUpdate) SetVenueID(val OptNilInt32) {
+	s.VenueID = val
+}
+
+// SetSimplifiedRegistration sets the value of SimplifiedRegistration.
+func (s *AdminEventUpdate) SetSimplifiedRegistration(val OptBool) {
+	s.SimplifiedRegistration = val
+}
+
+// SetAutocreateMember sets the value of AutocreateMember.
+func (s *AdminEventUpdate) SetAutocreateMember(val OptBool) {
+	s.AutocreateMember = val
+}
+
+// SetAchievementsAllowed sets the value of AchievementsAllowed.
+func (s *AdminEventUpdate) SetAchievementsAllowed(val OptBool) {
+	s.AchievementsAllowed = val
+}
+
+// SetRequestsAllowed sets the value of RequestsAllowed.
+func (s *AdminEventUpdate) SetRequestsAllowed(val OptBool) {
+	s.RequestsAllowed = val
+}
+
+// SetSelfCheckIn sets the value of SelfCheckIn.
+func (s *AdminEventUpdate) SetSelfCheckIn(val OptBool) {
+	s.SelfCheckIn = val
+}
+
+// SetTeamsInvolved sets the value of TeamsInvolved.
+func (s *AdminEventUpdate) SetTeamsInvolved(val OptEventTeamsInvolved) {
+	s.TeamsInvolved = val
+}
+
+// SetOwnerCanModerate sets the value of OwnerCanModerate.
+func (s *AdminEventUpdate) SetOwnerCanModerate(val OptBool) {
+	s.OwnerCanModerate = val
+}
+
+// SetUserInMultipleTeams sets the value of UserInMultipleTeams.
+func (s *AdminEventUpdate) SetUserInMultipleTeams(val OptBool) {
+	s.UserInMultipleTeams = val
+}
+
+// SetSupportI18n sets the value of SupportI18n.
+func (s *AdminEventUpdate) SetSupportI18n(val OptBool) {
+	s.SupportI18n = val
+}
+
+// SetTimeMatters sets the value of TimeMatters.
+func (s *AdminEventUpdate) SetTimeMatters(val OptBool) {
+	s.TimeMatters = val
+}
+
+// SetMaxUsers sets the value of MaxUsers.
+func (s *AdminEventUpdate) SetMaxUsers(val OptNilInt32) {
+	s.MaxUsers = val
+}
+
+// SetTeamAssignmentMethod sets the value of TeamAssignmentMethod.
+func (s *AdminEventUpdate) SetTeamAssignmentMethod(val OptEventTeamAssignmentMethod) {
+	s.TeamAssignmentMethod = val
+}
+
+// SetExpectedStart sets the value of ExpectedStart.
+func (s *AdminEventUpdate) SetExpectedStart(val OptNilDateTime) {
+	s.ExpectedStart = val
+}
+
+// SetAltTitle sets the value of AltTitle.
+func (s *AdminEventUpdate) SetAltTitle(val OptString) {
+	s.AltTitle = val
+}
+
+// SetURL sets the value of URL.
+func (s *AdminEventUpdate) SetURL(val OptURI) {
+	s.URL = val
+}
+
+// SetTypeID sets the value of TypeID.
+func (s *AdminEventUpdate) SetTypeID(val OptNilInt32) {
+	s.TypeID = val
+}
+
+// SetDescription sets the value of Description.
+func (s *AdminEventUpdate) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetQuestionnaireCompletedMessage sets the value of QuestionnaireCompletedMessage.
+func (s *AdminEventUpdate) SetQuestionnaireCompletedMessage(val OptString) {
+	s.QuestionnaireCompletedMessage = val
+}
+
+// SetNotificationEmailMessage sets the value of NotificationEmailMessage.
+func (s *AdminEventUpdate) SetNotificationEmailMessage(val OptString) {
+	s.NotificationEmailMessage = val
+}
+
+// SetCoverURL sets the value of CoverURL.
+func (s *AdminEventUpdate) SetCoverURL(val OptURI) {
+	s.CoverURL = val
+}
+
+// SetKeywords sets the value of Keywords.
+func (s *AdminEventUpdate) SetKeywords(val OptString) {
+	s.Keywords = val
+}
+
+// SetMentorsAllowed sets the value of MentorsAllowed.
+func (s *AdminEventUpdate) SetMentorsAllowed(val OptBool) {
+	s.MentorsAllowed = val
+}
+
+// SetGirCollection sets the value of GirCollection.
+func (s *AdminEventUpdate) SetGirCollection(val OptBool) {
+	s.GirCollection = val
+}
+
+// SetPromoted sets the value of Promoted.
+func (s *AdminEventUpdate) SetPromoted(val OptBool) {
+	s.Promoted = val
+}
+
+// SetTeamCreateNotification sets the value of TeamCreateNotification.
+func (s *AdminEventUpdate) SetTeamCreateNotification(val OptBool) {
+	s.TeamCreateNotification = val
+}
+
+// SetCanceled sets the value of Canceled.
+func (s *AdminEventUpdate) SetCanceled(val OptBool) {
+	s.Canceled = val
+}
+
+// SetCancellationReason sets the value of CancellationReason.
+func (s *AdminEventUpdate) SetCancellationReason(val OptString) {
+	s.CancellationReason = val
+}
+
 type ArchiveEventRequestsFilesOK struct {
 	Data io.Reader
 }
@@ -141,8 +1034,6 @@ func (s *ArchiveEventRequestsFilesOKHeaders) SetResponse(val ArchiveEventRequest
 	s.Response = val
 }
 
-func (*ArchiveEventRequestsFilesOKHeaders) archiveEventRequestsFilesRes() {}
-
 // AuthorizeClientFound is response for AuthorizeClient operation.
 type AuthorizeClientFound struct {
 	Location string
@@ -157,22 +1048,6 @@ func (s *AuthorizeClientFound) GetLocation() string {
 func (s *AuthorizeClientFound) SetLocation(val string) {
 	s.Location = val
 }
-
-type BadRequest struct {
-	Error string `json:"error"`
-}
-
-// GetError returns the value of Error.
-func (s *BadRequest) GetError() string {
-	return s.Error
-}
-
-// SetError sets the value of Error.
-func (s *BadRequest) SetError(val string) {
-	s.Error = val
-}
-
-func (*BadRequest) eventSignupRes() {}
 
 // Ref: #/components/schemas/CalendarEvent
 type CalendarEvent struct {
@@ -190,8 +1065,9 @@ type CalendarEvent struct {
 	// Дата окончания мероприятия.
 	End NilDateTime `json:"end"`
 	// Допуск на создания заявок на мероприятие.
-	RequestsAllowed bool        `json:"requests_allowed"`
-	ExpectedStart   NilDateTime `json:"expected_start"`
+	RequestsAllowed bool `json:"requests_allowed"`
+	// Планируемое начало мероприятия-анонса.
+	ExpectedStart NilDateTime `json:"expected_start"`
 	// Учитывается ли время или только даты в полях `start` и `end`.
 	TimeMatters bool                         `json:"time_matters"`
 	Limits      EventLimitOnlyDateEndRequest `json:"limits"`
@@ -376,8 +1252,6 @@ func (s *CityNameOK) SetRegionFias(val uuid.UUID) {
 	s.RegionFias = val
 }
 
-func (*CityNameOK) cityNameRes() {}
-
 type ClientCredentials struct {
 	Username string
 	Password string
@@ -507,48 +1381,7 @@ func (s *ConfirmSignupEmailCreated) SetSetCookie(val []string) {
 
 func (*ConfirmSignupEmailCreated) confirmSignupEmailRes() {}
 
-// Ref: #/components/schemas/Conflict
-type Conflict struct {
-	Error string `json:"error"`
-}
-
-// GetError returns the value of Error.
-func (s *Conflict) GetError() string {
-	return s.Error
-}
-
-// SetError sets the value of Error.
-func (s *Conflict) SetError(val string) {
-	s.Error = val
-}
-
-func (*Conflict) confirmSignupEmailRes()              {}
-func (*Conflict) createEventDeferredNotificationRes() {}
-func (*Conflict) createEventDiplomaSettingsRes()      {}
-func (*Conflict) createEventLimitRes()                {}
-func (*Conflict) createFileReferenceRes()             {}
-func (*Conflict) disconnectSocialAuthRes()            {}
-func (*Conflict) signupRes()                          {}
-
 type ContentLength int32
-
-// Ref: #/components/schemas/ContentTooLarge
-type ContentTooLarge struct {
-	Error string `json:"error"`
-}
-
-// GetError returns the value of Error.
-func (s *ContentTooLarge) GetError() string {
-	return s.Error
-}
-
-// SetError sets the value of Error.
-func (s *ContentTooLarge) SetError(val string) {
-	s.Error = val
-}
-
-func (*ContentTooLarge) createFileMetaRes() {}
-func (*ContentTooLarge) uploadFileRes()     {}
 
 // CountEventsOK is response for CountEvents operation.
 type CountEventsOK struct {
@@ -648,447 +1481,6 @@ func (s *CreateEventDiplomaSettingsReq) SetTemplate(val OptDiplomaTemplate) {
 // SetDiplomaIssueMode sets the value of DiplomaIssueMode.
 func (s *CreateEventDiplomaSettingsReq) SetDiplomaIssueMode(val OptDiplomaIssueMode) {
 	s.DiplomaIssueMode = val
-}
-
-// Merged schema.
-type CreateEventReq struct {
-	// ID мета-мероприятия.
-	MetaEventID OptNilInt32 `json:"meta_event_id"`
-	// Мероприятие находится в статусе черновика. На такое
-	// мероприятие нельзя зарегистрироваться.
-	Draft OptBool `json:"draft"`
-	// Статус публичности мероприятия.
-	Public OptBool `json:"public"`
-	// Исключение мероприятия из календаря.
-	Hidden OptBool `json:"hidden"`
-	// Название мероприятия.
-	Title string `json:"title"`
-	// Дата начала мероприятия.
-	Start OptNilDateTime `json:"start"`
-	// Дата окончания мероприятия.
-	End    OptNilDateTime `json:"end"`
-	Format OptEventFormat `json:"format"`
-	// ID [площадки] на которой проводится мероприятие.
-	//
-	// [площадки]: /venue-api/docs/
-	VenueID OptNilInt32 `json:"venue_id"`
-	// Доступность упрощенной регистрации на мероприятие.
-	SimplifiedRegistration OptBool `json:"simplified_registration"`
-	// Автоматическое добавление в участники организации
-	// пользователя с подтвержденной заявки.
-	AutocreateMember OptBool `json:"autocreate_member"`
-	// Допуск на создания достижений на мероприятие.
-	AchievementsAllowed OptBool `json:"achievements_allowed"`
-	// Допуск на создания заявок на мероприятие.
-	RequestsAllowed OptBool `json:"requests_allowed"`
-	// Доступность чекина.
-	SelfCheckIn         OptBool               `json:"self_check_in"`
-	TeamsInvolved       OptEventTeamsInvolved `json:"teams_involved"`
-	OwnerCanModerate    OptBool               `json:"owner_can_moderate"`
-	UserInMultipleTeams OptBool               `json:"user_in_multiple_teams"`
-	MentorsAllowed      OptBool               `json:"mentors_allowed"`
-	SupportI18n         OptBool               `json:"support_i18n"`
-	GirCollection       OptBool               `json:"gir_collection"`
-	Promoted            OptBool               `json:"promoted"`
-	// Учитывается ли время или только даты в полях `start` и `end`.
-	TimeMatters            OptBool                      `json:"time_matters"`
-	MaxUsers               OptNilInt32                  `json:"max_users"`
-	TeamCreateNotification OptBool                      `json:"team_create_notification"`
-	TeamAssignmentMethod   OptEventTeamAssignmentMethod `json:"team_assignment_method"`
-	ExpectedStart          OptNilDateTime               `json:"expected_start"`
-	// Альтернативное название мероприятия.
-	AltTitle OptString `json:"alt_title"`
-	// Адрес online мероприятия.
-	URL OptURI `json:"url"`
-	// Идентификатор типа мероприятия.
-	TypeID OptNilInt32 `json:"type_id"`
-	// Описание мероприятия.
-	Description OptString `json:"description"`
-	// Сообщение о заполненной анкете.
-	QuestionnaireCompletedMessage OptString `json:"questionnaire_completed_message"`
-	// Дополнительный текст для Email уведомления о
-	// регистрации на мероприятие.
-	//
-	// 	Текст интерпретируется в соответствии с форматом
-	// 	markdown.
-	NotificationEmailMessage OptString `json:"notification_email_message"`
-	// Ссылка на обложку мероприятия.
-	CoverURL OptURI    `json:"cover_url"`
-	Keywords OptString `json:"keywords"`
-	// ID организации мероприятия.
-	OrganizationID   int32   `json:"organization_id"`
-	AchievementRoles []int32 `json:"achievement_roles"`
-	Brands           []int32 `json:"brands"`
-}
-
-// GetMetaEventID returns the value of MetaEventID.
-func (s *CreateEventReq) GetMetaEventID() OptNilInt32 {
-	return s.MetaEventID
-}
-
-// GetDraft returns the value of Draft.
-func (s *CreateEventReq) GetDraft() OptBool {
-	return s.Draft
-}
-
-// GetPublic returns the value of Public.
-func (s *CreateEventReq) GetPublic() OptBool {
-	return s.Public
-}
-
-// GetHidden returns the value of Hidden.
-func (s *CreateEventReq) GetHidden() OptBool {
-	return s.Hidden
-}
-
-// GetTitle returns the value of Title.
-func (s *CreateEventReq) GetTitle() string {
-	return s.Title
-}
-
-// GetStart returns the value of Start.
-func (s *CreateEventReq) GetStart() OptNilDateTime {
-	return s.Start
-}
-
-// GetEnd returns the value of End.
-func (s *CreateEventReq) GetEnd() OptNilDateTime {
-	return s.End
-}
-
-// GetFormat returns the value of Format.
-func (s *CreateEventReq) GetFormat() OptEventFormat {
-	return s.Format
-}
-
-// GetVenueID returns the value of VenueID.
-func (s *CreateEventReq) GetVenueID() OptNilInt32 {
-	return s.VenueID
-}
-
-// GetSimplifiedRegistration returns the value of SimplifiedRegistration.
-func (s *CreateEventReq) GetSimplifiedRegistration() OptBool {
-	return s.SimplifiedRegistration
-}
-
-// GetAutocreateMember returns the value of AutocreateMember.
-func (s *CreateEventReq) GetAutocreateMember() OptBool {
-	return s.AutocreateMember
-}
-
-// GetAchievementsAllowed returns the value of AchievementsAllowed.
-func (s *CreateEventReq) GetAchievementsAllowed() OptBool {
-	return s.AchievementsAllowed
-}
-
-// GetRequestsAllowed returns the value of RequestsAllowed.
-func (s *CreateEventReq) GetRequestsAllowed() OptBool {
-	return s.RequestsAllowed
-}
-
-// GetSelfCheckIn returns the value of SelfCheckIn.
-func (s *CreateEventReq) GetSelfCheckIn() OptBool {
-	return s.SelfCheckIn
-}
-
-// GetTeamsInvolved returns the value of TeamsInvolved.
-func (s *CreateEventReq) GetTeamsInvolved() OptEventTeamsInvolved {
-	return s.TeamsInvolved
-}
-
-// GetOwnerCanModerate returns the value of OwnerCanModerate.
-func (s *CreateEventReq) GetOwnerCanModerate() OptBool {
-	return s.OwnerCanModerate
-}
-
-// GetUserInMultipleTeams returns the value of UserInMultipleTeams.
-func (s *CreateEventReq) GetUserInMultipleTeams() OptBool {
-	return s.UserInMultipleTeams
-}
-
-// GetMentorsAllowed returns the value of MentorsAllowed.
-func (s *CreateEventReq) GetMentorsAllowed() OptBool {
-	return s.MentorsAllowed
-}
-
-// GetSupportI18n returns the value of SupportI18n.
-func (s *CreateEventReq) GetSupportI18n() OptBool {
-	return s.SupportI18n
-}
-
-// GetGirCollection returns the value of GirCollection.
-func (s *CreateEventReq) GetGirCollection() OptBool {
-	return s.GirCollection
-}
-
-// GetPromoted returns the value of Promoted.
-func (s *CreateEventReq) GetPromoted() OptBool {
-	return s.Promoted
-}
-
-// GetTimeMatters returns the value of TimeMatters.
-func (s *CreateEventReq) GetTimeMatters() OptBool {
-	return s.TimeMatters
-}
-
-// GetMaxUsers returns the value of MaxUsers.
-func (s *CreateEventReq) GetMaxUsers() OptNilInt32 {
-	return s.MaxUsers
-}
-
-// GetTeamCreateNotification returns the value of TeamCreateNotification.
-func (s *CreateEventReq) GetTeamCreateNotification() OptBool {
-	return s.TeamCreateNotification
-}
-
-// GetTeamAssignmentMethod returns the value of TeamAssignmentMethod.
-func (s *CreateEventReq) GetTeamAssignmentMethod() OptEventTeamAssignmentMethod {
-	return s.TeamAssignmentMethod
-}
-
-// GetExpectedStart returns the value of ExpectedStart.
-func (s *CreateEventReq) GetExpectedStart() OptNilDateTime {
-	return s.ExpectedStart
-}
-
-// GetAltTitle returns the value of AltTitle.
-func (s *CreateEventReq) GetAltTitle() OptString {
-	return s.AltTitle
-}
-
-// GetURL returns the value of URL.
-func (s *CreateEventReq) GetURL() OptURI {
-	return s.URL
-}
-
-// GetTypeID returns the value of TypeID.
-func (s *CreateEventReq) GetTypeID() OptNilInt32 {
-	return s.TypeID
-}
-
-// GetDescription returns the value of Description.
-func (s *CreateEventReq) GetDescription() OptString {
-	return s.Description
-}
-
-// GetQuestionnaireCompletedMessage returns the value of QuestionnaireCompletedMessage.
-func (s *CreateEventReq) GetQuestionnaireCompletedMessage() OptString {
-	return s.QuestionnaireCompletedMessage
-}
-
-// GetNotificationEmailMessage returns the value of NotificationEmailMessage.
-func (s *CreateEventReq) GetNotificationEmailMessage() OptString {
-	return s.NotificationEmailMessage
-}
-
-// GetCoverURL returns the value of CoverURL.
-func (s *CreateEventReq) GetCoverURL() OptURI {
-	return s.CoverURL
-}
-
-// GetKeywords returns the value of Keywords.
-func (s *CreateEventReq) GetKeywords() OptString {
-	return s.Keywords
-}
-
-// GetOrganizationID returns the value of OrganizationID.
-func (s *CreateEventReq) GetOrganizationID() int32 {
-	return s.OrganizationID
-}
-
-// GetAchievementRoles returns the value of AchievementRoles.
-func (s *CreateEventReq) GetAchievementRoles() []int32 {
-	return s.AchievementRoles
-}
-
-// GetBrands returns the value of Brands.
-func (s *CreateEventReq) GetBrands() []int32 {
-	return s.Brands
-}
-
-// SetMetaEventID sets the value of MetaEventID.
-func (s *CreateEventReq) SetMetaEventID(val OptNilInt32) {
-	s.MetaEventID = val
-}
-
-// SetDraft sets the value of Draft.
-func (s *CreateEventReq) SetDraft(val OptBool) {
-	s.Draft = val
-}
-
-// SetPublic sets the value of Public.
-func (s *CreateEventReq) SetPublic(val OptBool) {
-	s.Public = val
-}
-
-// SetHidden sets the value of Hidden.
-func (s *CreateEventReq) SetHidden(val OptBool) {
-	s.Hidden = val
-}
-
-// SetTitle sets the value of Title.
-func (s *CreateEventReq) SetTitle(val string) {
-	s.Title = val
-}
-
-// SetStart sets the value of Start.
-func (s *CreateEventReq) SetStart(val OptNilDateTime) {
-	s.Start = val
-}
-
-// SetEnd sets the value of End.
-func (s *CreateEventReq) SetEnd(val OptNilDateTime) {
-	s.End = val
-}
-
-// SetFormat sets the value of Format.
-func (s *CreateEventReq) SetFormat(val OptEventFormat) {
-	s.Format = val
-}
-
-// SetVenueID sets the value of VenueID.
-func (s *CreateEventReq) SetVenueID(val OptNilInt32) {
-	s.VenueID = val
-}
-
-// SetSimplifiedRegistration sets the value of SimplifiedRegistration.
-func (s *CreateEventReq) SetSimplifiedRegistration(val OptBool) {
-	s.SimplifiedRegistration = val
-}
-
-// SetAutocreateMember sets the value of AutocreateMember.
-func (s *CreateEventReq) SetAutocreateMember(val OptBool) {
-	s.AutocreateMember = val
-}
-
-// SetAchievementsAllowed sets the value of AchievementsAllowed.
-func (s *CreateEventReq) SetAchievementsAllowed(val OptBool) {
-	s.AchievementsAllowed = val
-}
-
-// SetRequestsAllowed sets the value of RequestsAllowed.
-func (s *CreateEventReq) SetRequestsAllowed(val OptBool) {
-	s.RequestsAllowed = val
-}
-
-// SetSelfCheckIn sets the value of SelfCheckIn.
-func (s *CreateEventReq) SetSelfCheckIn(val OptBool) {
-	s.SelfCheckIn = val
-}
-
-// SetTeamsInvolved sets the value of TeamsInvolved.
-func (s *CreateEventReq) SetTeamsInvolved(val OptEventTeamsInvolved) {
-	s.TeamsInvolved = val
-}
-
-// SetOwnerCanModerate sets the value of OwnerCanModerate.
-func (s *CreateEventReq) SetOwnerCanModerate(val OptBool) {
-	s.OwnerCanModerate = val
-}
-
-// SetUserInMultipleTeams sets the value of UserInMultipleTeams.
-func (s *CreateEventReq) SetUserInMultipleTeams(val OptBool) {
-	s.UserInMultipleTeams = val
-}
-
-// SetMentorsAllowed sets the value of MentorsAllowed.
-func (s *CreateEventReq) SetMentorsAllowed(val OptBool) {
-	s.MentorsAllowed = val
-}
-
-// SetSupportI18n sets the value of SupportI18n.
-func (s *CreateEventReq) SetSupportI18n(val OptBool) {
-	s.SupportI18n = val
-}
-
-// SetGirCollection sets the value of GirCollection.
-func (s *CreateEventReq) SetGirCollection(val OptBool) {
-	s.GirCollection = val
-}
-
-// SetPromoted sets the value of Promoted.
-func (s *CreateEventReq) SetPromoted(val OptBool) {
-	s.Promoted = val
-}
-
-// SetTimeMatters sets the value of TimeMatters.
-func (s *CreateEventReq) SetTimeMatters(val OptBool) {
-	s.TimeMatters = val
-}
-
-// SetMaxUsers sets the value of MaxUsers.
-func (s *CreateEventReq) SetMaxUsers(val OptNilInt32) {
-	s.MaxUsers = val
-}
-
-// SetTeamCreateNotification sets the value of TeamCreateNotification.
-func (s *CreateEventReq) SetTeamCreateNotification(val OptBool) {
-	s.TeamCreateNotification = val
-}
-
-// SetTeamAssignmentMethod sets the value of TeamAssignmentMethod.
-func (s *CreateEventReq) SetTeamAssignmentMethod(val OptEventTeamAssignmentMethod) {
-	s.TeamAssignmentMethod = val
-}
-
-// SetExpectedStart sets the value of ExpectedStart.
-func (s *CreateEventReq) SetExpectedStart(val OptNilDateTime) {
-	s.ExpectedStart = val
-}
-
-// SetAltTitle sets the value of AltTitle.
-func (s *CreateEventReq) SetAltTitle(val OptString) {
-	s.AltTitle = val
-}
-
-// SetURL sets the value of URL.
-func (s *CreateEventReq) SetURL(val OptURI) {
-	s.URL = val
-}
-
-// SetTypeID sets the value of TypeID.
-func (s *CreateEventReq) SetTypeID(val OptNilInt32) {
-	s.TypeID = val
-}
-
-// SetDescription sets the value of Description.
-func (s *CreateEventReq) SetDescription(val OptString) {
-	s.Description = val
-}
-
-// SetQuestionnaireCompletedMessage sets the value of QuestionnaireCompletedMessage.
-func (s *CreateEventReq) SetQuestionnaireCompletedMessage(val OptString) {
-	s.QuestionnaireCompletedMessage = val
-}
-
-// SetNotificationEmailMessage sets the value of NotificationEmailMessage.
-func (s *CreateEventReq) SetNotificationEmailMessage(val OptString) {
-	s.NotificationEmailMessage = val
-}
-
-// SetCoverURL sets the value of CoverURL.
-func (s *CreateEventReq) SetCoverURL(val OptURI) {
-	s.CoverURL = val
-}
-
-// SetKeywords sets the value of Keywords.
-func (s *CreateEventReq) SetKeywords(val OptString) {
-	s.Keywords = val
-}
-
-// SetOrganizationID sets the value of OrganizationID.
-func (s *CreateEventReq) SetOrganizationID(val int32) {
-	s.OrganizationID = val
-}
-
-// SetAchievementRoles sets the value of AchievementRoles.
-func (s *CreateEventReq) SetAchievementRoles(val []int32) {
-	s.AchievementRoles = val
-}
-
-// SetBrands sets the value of Brands.
-func (s *CreateEventReq) SetBrands(val []int32) {
-	s.Brands = val
 }
 
 type CreateEventTeamPersonReq struct {
@@ -1265,8 +1657,6 @@ func (s *CreateFileMetaCreated) SetHeaders(val CreateFileMetaCreatedHeaders) {
 	s.Headers = val
 }
 
-func (*CreateFileMetaCreated) createFileMetaRes() {}
-
 type CreateFileMetaCreatedHeaders map[string]string
 
 func (s *CreateFileMetaCreatedHeaders) init() CreateFileMetaCreatedHeaders {
@@ -1368,16 +1758,6 @@ type CreateMutationLockUnprocessableEntity struct{}
 
 func (*CreateMutationLockUnprocessableEntity) createMutationLockRes() {}
 
-// CreateOrganizationSubjectConflict is response for CreateOrganizationSubject operation.
-type CreateOrganizationSubjectConflict struct{}
-
-func (*CreateOrganizationSubjectConflict) createOrganizationSubjectRes() {}
-
-// CreateOrganizationSubjectForbidden is response for CreateOrganizationSubject operation.
-type CreateOrganizationSubjectForbidden struct{}
-
-func (*CreateOrganizationSubjectForbidden) createOrganizationSubjectRes() {}
-
 type CreateUserTeamPersonCreated TeamPerson
 
 func (*CreateUserTeamPersonCreated) createUserTeamPersonRes() {}
@@ -1461,17 +1841,14 @@ type DeleteEventDiplomaRoleNoContent struct{}
 // DeleteEventLimitNoContent is response for DeleteEventLimit operation.
 type DeleteEventLimitNoContent struct{}
 
-func (*DeleteEventLimitNoContent) deleteEventLimitRes() {}
-
 // DeleteFileReferenceNoContent is response for DeleteFileReference operation.
 type DeleteFileReferenceNoContent struct{}
-
-func (*DeleteFileReferenceNoContent) deleteFileReferenceRes() {}
 
 // DeleteMutationLockNoContent is response for DeleteMutationLock operation.
 type DeleteMutationLockNoContent struct{}
 
-func (*DeleteMutationLockNoContent) deleteMutationLockRes() {}
+// DeleteUserTeamNoContent is response for DeleteUserTeam operation.
+type DeleteUserTeamNoContent struct{}
 
 // Для кого предусмотрена выдача дипломов.
 // Ref: #/components/schemas/DiplomaIssueMode
@@ -1567,8 +1944,6 @@ func (s *DiplomaTemplate) UnmarshalText(data []byte) error {
 
 // DisconnectSocialAuthNoContent is response for DisconnectSocialAuth operation.
 type DisconnectSocialAuthNoContent struct{}
-
-func (*DisconnectSocialAuthNoContent) disconnectSocialAuthRes() {}
 
 // Тип образования.
 // Ref: #/components/schemas/EducationalCategory
@@ -1726,14 +2101,16 @@ type Event struct {
 	GirCollection       bool               `json:"gir_collection"`
 	Promoted            bool               `json:"promoted"`
 	// Учитывается ли время или только даты в полях `start` и `end`.
-	TimeMatters            bool                      `json:"time_matters"`
+	TimeMatters bool `json:"time_matters"`
+	// Максимальное количество участников в команде.
 	MaxUsers               NilInt32                  `json:"max_users"`
 	TeamCreateNotification bool                      `json:"team_create_notification"`
 	TeamAssignmentMethod   EventTeamAssignmentMethod `json:"team_assignment_method"`
 	AchievementRolesCount  int32                     `json:"achievement_roles_count"`
 	AchievementsCount      int32                     `json:"achievements_count"`
 	RequestsCount          int32                     `json:"requests_count"`
-	ExpectedStart          NilDateTime               `json:"expected_start"`
+	// Планируемое начало мероприятия-анонса.
+	ExpectedStart NilDateTime `json:"expected_start"`
 	// Альтернативное название мероприятия.
 	AltTitle string `json:"alt_title"`
 	// Ссылка на обложку мероприятия.
@@ -2180,8 +2557,10 @@ func (s *Event) SetQuestionnaireCompletedMessage(val string) {
 	s.QuestionnaireCompletedMessage = val
 }
 
-func (*Event) createEventRes() {}
-func (*Event) updateEventRes() {}
+func (*Event) adminCreateEventRes() {}
+func (*Event) adminUpdateEventRes() {}
+func (*Event) createEventRes()      {}
+func (*Event) updateEventRes()      {}
 
 // Ref: #/components/schemas/EventBrand
 type EventBrand struct {
@@ -2330,11 +2709,6 @@ func (s *EventDeferredNotification) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*EventDeferredNotification) cancelEventDeferredNotificationRes() {}
-func (*EventDeferredNotification) createEventDeferredNotificationRes() {}
-func (*EventDeferredNotification) readEventDeferredNotificationRes()   {}
-func (*EventDeferredNotification) updateEventDeferredNotificationRes() {}
-
 // Интервал до начала мероприятия. Вычисляемая дата
 // является границей, до которой не отправляются
 // уведомления.
@@ -2375,26 +2749,7 @@ func (s *EventDeferredNotificationBeforeStart) SetMonths(val int32) {
 	s.Months = val
 }
 
-type EventDeferredNotificationLocked struct {
-	Error string `json:"error"`
-}
-
-// GetError returns the value of Error.
-func (s *EventDeferredNotificationLocked) GetError() string {
-	return s.Error
-}
-
-// SetError sets the value of Error.
-func (s *EventDeferredNotificationLocked) SetError(val string) {
-	s.Error = val
-}
-
-func (*EventDeferredNotificationLocked) cancelEventDeferredNotificationRes() {}
-func (*EventDeferredNotificationLocked) updateEventDeferredNotificationRes() {}
-
 type EventDeferredNotificationTemplateID int16
-
-func (*EventDeferredNotificationTemplateID) eventDeferredNotificationTemplateIDRes() {}
 
 // Ref: #/components/schemas/EventDiplomaSettings
 type EventDiplomaSettings struct {
@@ -2457,9 +2812,6 @@ func (s *EventDiplomaSettings) SetTemplate(val DiplomaTemplate) {
 func (s *EventDiplomaSettings) SetDiplomaIssueMode(val DiplomaIssueMode) {
 	s.DiplomaIssueMode = val
 }
-
-func (*EventDiplomaSettings) createEventDiplomaSettingsRes() {}
-func (*EventDiplomaSettings) updateEventDiplomaSettingsRes() {}
 
 // Ref: #/components/schemas/EventDiplomaSettingsWithRoles
 type EventDiplomaSettingsWithRoles struct {
@@ -2735,6 +3087,9 @@ type EventLimit struct {
 	CollectSnils bool `json:"collect_snils"`
 	// Собирать номера телефонов в заявках.
 	CollectPhones bool `json:"collect_phones"`
+	// Мета-мероприятие как группа мероприятий допускающая
+	// только одну заявку.
+	GroupEventsAsOne bool `json:"group_events_as_one"`
 	// Максимальное количество участников.
 	ParticipantLimit NilInt32 `json:"participant_limit"`
 	// Крайний срок подачи заявки.
@@ -2800,6 +3155,11 @@ func (s *EventLimit) GetCollectSnils() bool {
 // GetCollectPhones returns the value of CollectPhones.
 func (s *EventLimit) GetCollectPhones() bool {
 	return s.CollectPhones
+}
+
+// GetGroupEventsAsOne returns the value of GroupEventsAsOne.
+func (s *EventLimit) GetGroupEventsAsOne() bool {
+	return s.GroupEventsAsOne
 }
 
 // GetParticipantLimit returns the value of ParticipantLimit.
@@ -2922,6 +3282,11 @@ func (s *EventLimit) SetCollectPhones(val bool) {
 	s.CollectPhones = val
 }
 
+// SetGroupEventsAsOne sets the value of GroupEventsAsOne.
+func (s *EventLimit) SetGroupEventsAsOne(val bool) {
+	s.GroupEventsAsOne = val
+}
+
 // SetParticipantLimit sets the value of ParticipantLimit.
 func (s *EventLimit) SetParticipantLimit(val NilInt32) {
 	s.ParticipantLimit = val
@@ -3017,9 +3382,10 @@ func (s *EventLimit) SetDescription(val string) {
 	s.Description = val
 }
 
-func (*EventLimit) createEventLimitRes() {}
-func (*EventLimit) readEventLimitRes()   {}
-func (*EventLimit) updateEventLimitRes() {}
+func (*EventLimit) adminCreateEventLimitRes() {}
+func (*EventLimit) adminUpdateEventLimitRes() {}
+func (*EventLimit) createEventLimitRes()      {}
+func (*EventLimit) updateEventLimitRes()      {}
 
 // Ref: #/components/schemas/EventLimitOnlyDateEndRequest
 type EventLimitOnlyDateEndRequest struct {
@@ -3045,6 +3411,9 @@ type EventLimitWrite struct {
 	CollectSnils OptBool `json:"collect_snils"`
 	// Собирать номера телефонов в заявках.
 	CollectPhones OptBool `json:"collect_phones"`
+	// Мета-мероприятие как группа мероприятий допускающая
+	// только одну заявку.
+	GroupEventsAsOne OptBool `json:"group_events_as_one"`
 	// Максимальное количество участников.
 	ParticipantLimit OptNilInt32 `json:"participant_limit"`
 	// Крайний срок подачи заявки.
@@ -3100,6 +3469,11 @@ func (s *EventLimitWrite) GetCollectSnils() OptBool {
 // GetCollectPhones returns the value of CollectPhones.
 func (s *EventLimitWrite) GetCollectPhones() OptBool {
 	return s.CollectPhones
+}
+
+// GetGroupEventsAsOne returns the value of GroupEventsAsOne.
+func (s *EventLimitWrite) GetGroupEventsAsOne() OptBool {
+	return s.GroupEventsAsOne
 }
 
 // GetParticipantLimit returns the value of ParticipantLimit.
@@ -3210,6 +3584,11 @@ func (s *EventLimitWrite) SetCollectSnils(val OptBool) {
 // SetCollectPhones sets the value of CollectPhones.
 func (s *EventLimitWrite) SetCollectPhones(val OptBool) {
 	s.CollectPhones = val
+}
+
+// SetGroupEventsAsOne sets the value of GroupEventsAsOne.
+func (s *EventLimitWrite) SetGroupEventsAsOne(val OptBool) {
+	s.GroupEventsAsOne = val
 }
 
 // SetParticipantLimit sets the value of ParticipantLimit.
@@ -3742,7 +4121,6 @@ func (s *EventRequest) SetFields(val []EventRequestFieldsItem) {
 	s.Fields = val
 }
 
-func (*EventRequest) readEventRequestRes()   {}
 func (*EventRequest) updateEventRequestRes() {}
 
 type EventRequestFieldsItem struct {
@@ -4585,10 +4963,6 @@ func (s *FileMeta) SetVersion(val int32) {
 	s.Version = val
 }
 
-func (*FileMeta) confirmFileUploadRes() {}
-func (*FileMeta) readFileMetaRes()      {}
-func (*FileMeta) updateFileMetaRes()    {}
-
 type FileMetaName string
 
 // Ref: #/components/schemas/FilePresignedRequest
@@ -4629,8 +5003,6 @@ func (s *FilePresignedRequest) SetMethod(val string) {
 func (s *FilePresignedRequest) SetHeaders(val FilePresignedRequestHeaders) {
 	s.Headers = val
 }
-
-func (*FilePresignedRequest) uploadFileRes() {}
 
 type FilePresignedRequestHeaders map[string]string
 
@@ -4682,8 +5054,6 @@ func (s *FileReference) SetFileID(val uuid.UUID) {
 func (s *FileReference) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
 }
-
-func (*FileReference) createFileReferenceRes() {}
 
 // Ref: #/components/schemas/GeoData
 type GeoData struct {
@@ -4832,8 +5202,6 @@ func (s *GeoData) SetGeoLon(val string) {
 	s.GeoLon = val
 }
 
-func (*GeoData) readGeoDataRes() {}
-
 type GeodataAddress string
 
 type GeodataCity string
@@ -4892,12 +5260,38 @@ func (s *IssueTokenError) SetErrorURI(val OptString) {
 	s.ErrorURI = val
 }
 
-func (*IssueTokenError) issueAccessTokenRes() {}
+// IssueTokenErrorStatusCode wraps IssueTokenError with StatusCode.
+type IssueTokenErrorStatusCode struct {
+	StatusCode int
+	Response   IssueTokenError
+}
+
+// GetStatusCode returns the value of StatusCode.
+func (s *IssueTokenErrorStatusCode) GetStatusCode() int {
+	return s.StatusCode
+}
+
+// GetResponse returns the value of Response.
+func (s *IssueTokenErrorStatusCode) GetResponse() IssueTokenError {
+	return s.Response
+}
+
+// SetStatusCode sets the value of StatusCode.
+func (s *IssueTokenErrorStatusCode) SetStatusCode(val int) {
+	s.StatusCode = val
+}
+
+// SetResponse sets the value of Response.
+func (s *IssueTokenErrorStatusCode) SetResponse(val IssueTokenError) {
+	s.Response = val
+}
+
+func (*IssueTokenErrorStatusCode) issueAccessTokenRes() {}
 
 type IssueTokenSuccess struct {
 	AccessToken  string    `json:"access_token"`
 	TokenType    string    `json:"token_type"`
-	ExpiresIn    OptInt32  `json:"expires_in"`
+	ExpiresIn    int32     `json:"expires_in"`
 	RefreshToken OptString `json:"refresh_token"`
 	Scope        OptString `json:"scope"`
 }
@@ -4913,7 +5307,7 @@ func (s *IssueTokenSuccess) GetTokenType() string {
 }
 
 // GetExpiresIn returns the value of ExpiresIn.
-func (s *IssueTokenSuccess) GetExpiresIn() OptInt32 {
+func (s *IssueTokenSuccess) GetExpiresIn() int32 {
 	return s.ExpiresIn
 }
 
@@ -4938,7 +5332,7 @@ func (s *IssueTokenSuccess) SetTokenType(val string) {
 }
 
 // SetExpiresIn sets the value of ExpiresIn.
-func (s *IssueTokenSuccess) SetExpiresIn(val OptInt32) {
+func (s *IssueTokenSuccess) SetExpiresIn(val int32) {
 	s.ExpiresIn = val
 }
 
@@ -4952,33 +5346,7 @@ func (s *IssueTokenSuccess) SetScope(val OptString) {
 	s.Scope = val
 }
 
-// IssueTokenSuccessHeaders wraps IssueTokenSuccess with response headers.
-type IssueTokenSuccessHeaders struct {
-	SetCookie []string
-	Response  IssueTokenSuccess
-}
-
-// GetSetCookie returns the value of SetCookie.
-func (s *IssueTokenSuccessHeaders) GetSetCookie() []string {
-	return s.SetCookie
-}
-
-// GetResponse returns the value of Response.
-func (s *IssueTokenSuccessHeaders) GetResponse() IssueTokenSuccess {
-	return s.Response
-}
-
-// SetSetCookie sets the value of SetCookie.
-func (s *IssueTokenSuccessHeaders) SetSetCookie(val []string) {
-	s.SetCookie = val
-}
-
-// SetResponse sets the value of Response.
-func (s *IssueTokenSuccessHeaders) SetResponse(val IssueTokenSuccess) {
-	s.Response = val
-}
-
-func (*IssueTokenSuccessHeaders) issueAccessTokenRes() {}
+func (*IssueTokenSuccess) issueAccessTokenRes() {}
 
 // ListAddAchievementEventsHeaders wraps []AddAchievementEvent with response headers.
 type ListAddAchievementEventsHeaders struct {
@@ -5190,8 +5558,6 @@ func (s *ListEventsHeaders) SetXCount(val int64) {
 func (s *ListEventsHeaders) SetResponse(val []ListEventsItem) {
 	s.Response = val
 }
-
-func (*ListEventsHeaders) listEventsRes() {}
 
 // Merged schema.
 type ListEventsItem struct {
@@ -5479,8 +5845,6 @@ func (s *ListFileMetaOKHeaders) SetResponse(val []FileMeta) {
 	s.Response = val
 }
 
-func (*ListFileMetaOKHeaders) listFileMetaRes() {}
-
 type ListFileMetaOrderBy string
 
 const (
@@ -5676,8 +6040,6 @@ func (s *ListOrganizationsHeaders) SetResponse(val []OrganizationMeta) {
 	s.Response = val
 }
 
-func (*ListOrganizationsHeaders) listOrganizationsRes() {}
-
 type ListOrganizationsOrderBy string
 
 const (
@@ -5744,8 +6106,6 @@ func (s *ListSocialAuthsOKHeaders) SetXCount(val int64) {
 func (s *ListSocialAuthsOKHeaders) SetResponse(val []SocialAuth) {
 	s.Response = val
 }
-
-func (*ListSocialAuthsOKHeaders) listSocialAuthsRes() {}
 
 // ListSubjectsHeaders wraps []Subject with response headers.
 type ListSubjectsHeaders struct {
@@ -5839,9 +6199,112 @@ func (s *ListUserConsentsItem) SetKind(val UserConsentKind) {
 	s.Kind = val
 }
 
-type ListUserConsentsOKApplicationJSON []ListUserConsentsItem
+type ListUserTeamPersonsOrderBy string
 
-func (*ListUserConsentsOKApplicationJSON) listUserConsentsRes() {}
+const (
+	ListUserTeamPersonsOrderByIDAsc  ListUserTeamPersonsOrderBy = "id_asc"
+	ListUserTeamPersonsOrderByIDDesc ListUserTeamPersonsOrderBy = "id_desc"
+)
+
+// AllValues returns all ListUserTeamPersonsOrderBy values.
+func (ListUserTeamPersonsOrderBy) AllValues() []ListUserTeamPersonsOrderBy {
+	return []ListUserTeamPersonsOrderBy{
+		ListUserTeamPersonsOrderByIDAsc,
+		ListUserTeamPersonsOrderByIDDesc,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ListUserTeamPersonsOrderBy) MarshalText() ([]byte, error) {
+	switch s {
+	case ListUserTeamPersonsOrderByIDAsc:
+		return []byte(s), nil
+	case ListUserTeamPersonsOrderByIDDesc:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ListUserTeamPersonsOrderBy) UnmarshalText(data []byte) error {
+	switch ListUserTeamPersonsOrderBy(data) {
+	case ListUserTeamPersonsOrderByIDAsc:
+		*s = ListUserTeamPersonsOrderByIDAsc
+		return nil
+	case ListUserTeamPersonsOrderByIDDesc:
+		*s = ListUserTeamPersonsOrderByIDDesc
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type ListUserTeamsOKItem struct {
+	Person TeamPerson `json:"person"`
+	Team   TeamPublic `json:"team"`
+}
+
+// GetPerson returns the value of Person.
+func (s *ListUserTeamsOKItem) GetPerson() TeamPerson {
+	return s.Person
+}
+
+// GetTeam returns the value of Team.
+func (s *ListUserTeamsOKItem) GetTeam() TeamPublic {
+	return s.Team
+}
+
+// SetPerson sets the value of Person.
+func (s *ListUserTeamsOKItem) SetPerson(val TeamPerson) {
+	s.Person = val
+}
+
+// SetTeam sets the value of Team.
+func (s *ListUserTeamsOKItem) SetTeam(val TeamPublic) {
+	s.Team = val
+}
+
+type ListUserTeamsOrderBy string
+
+const (
+	ListUserTeamsOrderByIDAsc  ListUserTeamsOrderBy = "id_asc"
+	ListUserTeamsOrderByIDDesc ListUserTeamsOrderBy = "id_desc"
+)
+
+// AllValues returns all ListUserTeamsOrderBy values.
+func (ListUserTeamsOrderBy) AllValues() []ListUserTeamsOrderBy {
+	return []ListUserTeamsOrderBy{
+		ListUserTeamsOrderByIDAsc,
+		ListUserTeamsOrderByIDDesc,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ListUserTeamsOrderBy) MarshalText() ([]byte, error) {
+	switch s {
+	case ListUserTeamsOrderByIDAsc:
+		return []byte(s), nil
+	case ListUserTeamsOrderByIDDesc:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ListUserTeamsOrderBy) UnmarshalText(data []byte) error {
+	switch ListUserTeamsOrderBy(data) {
+	case ListUserTeamsOrderByIDAsc:
+		*s = ListUserTeamsOrderByIDAsc
+		return nil
+	case ListUserTeamsOrderByIDDesc:
+		*s = ListUserTeamsOrderByIDDesc
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 // LoginSocialAuthFound is response for LoginSocialAuth operation.
 type LoginSocialAuthFound struct {
@@ -5927,8 +6390,6 @@ func (s *MutationLockPatched) GetActive() bool {
 func (s *MutationLockPatched) SetActive(val bool) {
 	s.Active = val
 }
-
-func (*MutationLockPatched) patchMutationLockRes() {}
 
 // NewNilDateTime returns new NilDateTime with value set to v.
 func NewNilDateTime(v time.Time) NilDateTime {
@@ -6154,70 +6615,6 @@ func (o NilUUID) Or(d uuid.UUID) uuid.UUID {
 	}
 	return d
 }
-
-// Ref: #/components/schemas/NotFound
-type NotFound struct {
-	Error string `json:"error"`
-}
-
-// GetError returns the value of Error.
-func (s *NotFound) GetError() string {
-	return s.Error
-}
-
-// SetError sets the value of Error.
-func (s *NotFound) SetError(val string) {
-	s.Error = val
-}
-
-func (*NotFound) addEventDiplomaRoleRes()                 {}
-func (*NotFound) archiveEventRequestsFilesRes()           {}
-func (*NotFound) cancelEventDeferredNotificationRes()     {}
-func (*NotFound) cityNameRes()                            {}
-func (*NotFound) confirmEventSignupRes()                  {}
-func (*NotFound) confirmFileUploadRes()                   {}
-func (*NotFound) createEventDeferredNotificationRes()     {}
-func (*NotFound) createEventDiplomaSettingsRes()          {}
-func (*NotFound) createEventLimitRes()                    {}
-func (*NotFound) createFileReferenceRes()                 {}
-func (*NotFound) deleteEventLimitRes()                    {}
-func (*NotFound) deleteFileReferenceRes()                 {}
-func (*NotFound) deleteMutationLockRes()                  {}
-func (*NotFound) eventDeferredNotificationTemplateIDRes() {}
-func (*NotFound) eventSignupRes()                         {}
-func (*NotFound) patchMutationLockRes()                   {}
-func (*NotFound) readEventDeferredNotificationRes()       {}
-func (*NotFound) readEventDiplomaSettingsRes()            {}
-func (*NotFound) readEventLimitRes()                      {}
-func (*NotFound) readEventRequestRes()                    {}
-func (*NotFound) readFileMetaRes()                        {}
-func (*NotFound) readFileRes()                            {}
-func (*NotFound) readGeoDataRes()                         {}
-func (*NotFound) regionNameRes()                          {}
-func (*NotFound) updateEventDeferredNotificationRes()     {}
-func (*NotFound) updateEventDiplomaSettingsRes()          {}
-func (*NotFound) updateEventLimitRes()                    {}
-func (*NotFound) updateEventRequestRes()                  {}
-func (*NotFound) updateEventRes()                         {}
-func (*NotFound) updateFileMetaRes()                      {}
-func (*NotFound) uploadFileRes()                          {}
-
-type NotImplemented struct {
-	Error string `json:"error"`
-}
-
-// GetError returns the value of Error.
-func (s *NotImplemented) GetError() string {
-	return s.Error
-}
-
-// SetError sets the value of Error.
-func (s *NotImplemented) SetError(val string) {
-	s.Error = val
-}
-
-func (*NotImplemented) confirmSignupEmailRes() {}
-func (*NotImplemented) signupRes()             {}
 
 // NewOptBool returns new OptBool with value set to v.
 func NewOptBool(v bool) OptBool {
@@ -7231,6 +7628,98 @@ func (o OptListTeamsOrderBy) Or(d ListTeamsOrderBy) ListTeamsOrderBy {
 	return d
 }
 
+// NewOptListUserTeamPersonsOrderBy returns new OptListUserTeamPersonsOrderBy with value set to v.
+func NewOptListUserTeamPersonsOrderBy(v ListUserTeamPersonsOrderBy) OptListUserTeamPersonsOrderBy {
+	return OptListUserTeamPersonsOrderBy{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptListUserTeamPersonsOrderBy is optional ListUserTeamPersonsOrderBy.
+type OptListUserTeamPersonsOrderBy struct {
+	Value ListUserTeamPersonsOrderBy
+	Set   bool
+}
+
+// IsSet returns true if OptListUserTeamPersonsOrderBy was set.
+func (o OptListUserTeamPersonsOrderBy) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptListUserTeamPersonsOrderBy) Reset() {
+	var v ListUserTeamPersonsOrderBy
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptListUserTeamPersonsOrderBy) SetTo(v ListUserTeamPersonsOrderBy) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptListUserTeamPersonsOrderBy) Get() (v ListUserTeamPersonsOrderBy, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptListUserTeamPersonsOrderBy) Or(d ListUserTeamPersonsOrderBy) ListUserTeamPersonsOrderBy {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptListUserTeamsOrderBy returns new OptListUserTeamsOrderBy with value set to v.
+func NewOptListUserTeamsOrderBy(v ListUserTeamsOrderBy) OptListUserTeamsOrderBy {
+	return OptListUserTeamsOrderBy{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptListUserTeamsOrderBy is optional ListUserTeamsOrderBy.
+type OptListUserTeamsOrderBy struct {
+	Value ListUserTeamsOrderBy
+	Set   bool
+}
+
+// IsSet returns true if OptListUserTeamsOrderBy was set.
+func (o OptListUserTeamsOrderBy) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptListUserTeamsOrderBy) Reset() {
+	var v ListUserTeamsOrderBy
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptListUserTeamsOrderBy) SetTo(v ListUserTeamsOrderBy) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptListUserTeamsOrderBy) Get() (v ListUserTeamsOrderBy, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptListUserTeamsOrderBy) Or(d ListUserTeamsOrderBy) ListUserTeamsOrderBy {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilDateTime returns new OptNilDateTime with value set to v.
 func NewOptNilDateTime(v time.Time) OptNilDateTime {
 	return OptNilDateTime{
@@ -7904,8 +8393,9 @@ type OrganizationEvent struct {
 	// Допуск на создания заявок на мероприятие.
 	RequestsAllowed bool `json:"requests_allowed"`
 	// Доступность чекина.
-	SelfCheckIn       bool                         `json:"self_check_in"`
-	TeamsInvolved     EventTeamsInvolved           `json:"teams_involved"`
+	SelfCheckIn   bool               `json:"self_check_in"`
+	TeamsInvolved EventTeamsInvolved `json:"teams_involved"`
+	// Максимальное количество участников в команде.
 	MaxUsers          NilInt32                     `json:"max_users"`
 	Limits            EventLimitOnlyDateEndRequest `json:"limits"`
 	AchievementsCount int32                        `json:"achievements_count"`
@@ -8179,6 +8669,808 @@ func (s *OrganizationEvent) SetEdgesIncoming(val []EventEdge) {
 	s.EdgesIncoming = val
 }
 
+// Merged schema.
+// Ref: #/components/schemas/OrganizationEventCreate
+type OrganizationEventCreate struct {
+	// ID организации мероприятия.
+	OrganizationID int32 `json:"organization_id"`
+	// ID мета-мероприятия.
+	MetaEventID OptNilInt32 `json:"meta_event_id"`
+	// Мероприятие находится в статусе черновика. На такое
+	// мероприятие нельзя зарегистрироваться.
+	Draft OptBool `json:"draft"`
+	// Статус публичности мероприятия.
+	Public OptBool `json:"public"`
+	// Исключение мероприятия из календаря.
+	Hidden OptBool `json:"hidden"`
+	// Название мероприятия.
+	Title string `json:"title"`
+	// Дата начала мероприятия.
+	Start OptNilDateTime `json:"start"`
+	// Дата окончания мероприятия.
+	End    OptNilDateTime `json:"end"`
+	Format OptEventFormat `json:"format"`
+	// ID [площадки] на которой проводится мероприятие.
+	//
+	// [площадки]: /venue-api/docs/
+	VenueID OptNilInt32 `json:"venue_id"`
+	// Доступность упрощенной регистрации на мероприятие.
+	SimplifiedRegistration OptBool `json:"simplified_registration"`
+	// Автоматическое добавление в участники организации
+	// пользователя с подтвержденной заявки.
+	AutocreateMember OptBool `json:"autocreate_member"`
+	// Допуск на создания достижений на мероприятие.
+	AchievementsAllowed OptBool `json:"achievements_allowed"`
+	// Допуск на создания заявок на мероприятие.
+	RequestsAllowed OptBool `json:"requests_allowed"`
+	// Доступность чекина.
+	SelfCheckIn         OptBool               `json:"self_check_in"`
+	TeamsInvolved       OptEventTeamsInvolved `json:"teams_involved"`
+	OwnerCanModerate    OptBool               `json:"owner_can_moderate"`
+	UserInMultipleTeams OptBool               `json:"user_in_multiple_teams"`
+	SupportI18n         OptBool               `json:"support_i18n"`
+	// Учитывается ли время или только даты в полях `start` и `end`.
+	TimeMatters OptBool `json:"time_matters"`
+	// Максимальное количество участников в команде.
+	MaxUsers             OptNilInt32                  `json:"max_users"`
+	TeamAssignmentMethod OptEventTeamAssignmentMethod `json:"team_assignment_method"`
+	// Планируемое начало мероприятия-анонса.
+	ExpectedStart OptNilDateTime `json:"expected_start"`
+	// Альтернативное название мероприятия.
+	AltTitle OptString `json:"alt_title"`
+	// Адрес online мероприятия.
+	URL OptURI `json:"url"`
+	// Идентификатор типа мероприятия.
+	TypeID OptNilInt32 `json:"type_id"`
+	// Описание мероприятия.
+	Description OptString `json:"description"`
+	// Сообщение о заполненной анкете.
+	QuestionnaireCompletedMessage OptString `json:"questionnaire_completed_message"`
+	// Дополнительный текст для Email уведомления о
+	// регистрации на мероприятие.
+	//
+	// 	Текст интерпретируется в соответствии с форматом
+	// 	markdown.
+	NotificationEmailMessage OptString `json:"notification_email_message"`
+	// Ссылка на обложку мероприятия.
+	CoverURL         OptURI    `json:"cover_url"`
+	Keywords         OptString `json:"keywords"`
+	AchievementRoles []int32   `json:"achievement_roles"`
+	Brands           []int32   `json:"brands"`
+}
+
+// GetOrganizationID returns the value of OrganizationID.
+func (s *OrganizationEventCreate) GetOrganizationID() int32 {
+	return s.OrganizationID
+}
+
+// GetMetaEventID returns the value of MetaEventID.
+func (s *OrganizationEventCreate) GetMetaEventID() OptNilInt32 {
+	return s.MetaEventID
+}
+
+// GetDraft returns the value of Draft.
+func (s *OrganizationEventCreate) GetDraft() OptBool {
+	return s.Draft
+}
+
+// GetPublic returns the value of Public.
+func (s *OrganizationEventCreate) GetPublic() OptBool {
+	return s.Public
+}
+
+// GetHidden returns the value of Hidden.
+func (s *OrganizationEventCreate) GetHidden() OptBool {
+	return s.Hidden
+}
+
+// GetTitle returns the value of Title.
+func (s *OrganizationEventCreate) GetTitle() string {
+	return s.Title
+}
+
+// GetStart returns the value of Start.
+func (s *OrganizationEventCreate) GetStart() OptNilDateTime {
+	return s.Start
+}
+
+// GetEnd returns the value of End.
+func (s *OrganizationEventCreate) GetEnd() OptNilDateTime {
+	return s.End
+}
+
+// GetFormat returns the value of Format.
+func (s *OrganizationEventCreate) GetFormat() OptEventFormat {
+	return s.Format
+}
+
+// GetVenueID returns the value of VenueID.
+func (s *OrganizationEventCreate) GetVenueID() OptNilInt32 {
+	return s.VenueID
+}
+
+// GetSimplifiedRegistration returns the value of SimplifiedRegistration.
+func (s *OrganizationEventCreate) GetSimplifiedRegistration() OptBool {
+	return s.SimplifiedRegistration
+}
+
+// GetAutocreateMember returns the value of AutocreateMember.
+func (s *OrganizationEventCreate) GetAutocreateMember() OptBool {
+	return s.AutocreateMember
+}
+
+// GetAchievementsAllowed returns the value of AchievementsAllowed.
+func (s *OrganizationEventCreate) GetAchievementsAllowed() OptBool {
+	return s.AchievementsAllowed
+}
+
+// GetRequestsAllowed returns the value of RequestsAllowed.
+func (s *OrganizationEventCreate) GetRequestsAllowed() OptBool {
+	return s.RequestsAllowed
+}
+
+// GetSelfCheckIn returns the value of SelfCheckIn.
+func (s *OrganizationEventCreate) GetSelfCheckIn() OptBool {
+	return s.SelfCheckIn
+}
+
+// GetTeamsInvolved returns the value of TeamsInvolved.
+func (s *OrganizationEventCreate) GetTeamsInvolved() OptEventTeamsInvolved {
+	return s.TeamsInvolved
+}
+
+// GetOwnerCanModerate returns the value of OwnerCanModerate.
+func (s *OrganizationEventCreate) GetOwnerCanModerate() OptBool {
+	return s.OwnerCanModerate
+}
+
+// GetUserInMultipleTeams returns the value of UserInMultipleTeams.
+func (s *OrganizationEventCreate) GetUserInMultipleTeams() OptBool {
+	return s.UserInMultipleTeams
+}
+
+// GetSupportI18n returns the value of SupportI18n.
+func (s *OrganizationEventCreate) GetSupportI18n() OptBool {
+	return s.SupportI18n
+}
+
+// GetTimeMatters returns the value of TimeMatters.
+func (s *OrganizationEventCreate) GetTimeMatters() OptBool {
+	return s.TimeMatters
+}
+
+// GetMaxUsers returns the value of MaxUsers.
+func (s *OrganizationEventCreate) GetMaxUsers() OptNilInt32 {
+	return s.MaxUsers
+}
+
+// GetTeamAssignmentMethod returns the value of TeamAssignmentMethod.
+func (s *OrganizationEventCreate) GetTeamAssignmentMethod() OptEventTeamAssignmentMethod {
+	return s.TeamAssignmentMethod
+}
+
+// GetExpectedStart returns the value of ExpectedStart.
+func (s *OrganizationEventCreate) GetExpectedStart() OptNilDateTime {
+	return s.ExpectedStart
+}
+
+// GetAltTitle returns the value of AltTitle.
+func (s *OrganizationEventCreate) GetAltTitle() OptString {
+	return s.AltTitle
+}
+
+// GetURL returns the value of URL.
+func (s *OrganizationEventCreate) GetURL() OptURI {
+	return s.URL
+}
+
+// GetTypeID returns the value of TypeID.
+func (s *OrganizationEventCreate) GetTypeID() OptNilInt32 {
+	return s.TypeID
+}
+
+// GetDescription returns the value of Description.
+func (s *OrganizationEventCreate) GetDescription() OptString {
+	return s.Description
+}
+
+// GetQuestionnaireCompletedMessage returns the value of QuestionnaireCompletedMessage.
+func (s *OrganizationEventCreate) GetQuestionnaireCompletedMessage() OptString {
+	return s.QuestionnaireCompletedMessage
+}
+
+// GetNotificationEmailMessage returns the value of NotificationEmailMessage.
+func (s *OrganizationEventCreate) GetNotificationEmailMessage() OptString {
+	return s.NotificationEmailMessage
+}
+
+// GetCoverURL returns the value of CoverURL.
+func (s *OrganizationEventCreate) GetCoverURL() OptURI {
+	return s.CoverURL
+}
+
+// GetKeywords returns the value of Keywords.
+func (s *OrganizationEventCreate) GetKeywords() OptString {
+	return s.Keywords
+}
+
+// GetAchievementRoles returns the value of AchievementRoles.
+func (s *OrganizationEventCreate) GetAchievementRoles() []int32 {
+	return s.AchievementRoles
+}
+
+// GetBrands returns the value of Brands.
+func (s *OrganizationEventCreate) GetBrands() []int32 {
+	return s.Brands
+}
+
+// SetOrganizationID sets the value of OrganizationID.
+func (s *OrganizationEventCreate) SetOrganizationID(val int32) {
+	s.OrganizationID = val
+}
+
+// SetMetaEventID sets the value of MetaEventID.
+func (s *OrganizationEventCreate) SetMetaEventID(val OptNilInt32) {
+	s.MetaEventID = val
+}
+
+// SetDraft sets the value of Draft.
+func (s *OrganizationEventCreate) SetDraft(val OptBool) {
+	s.Draft = val
+}
+
+// SetPublic sets the value of Public.
+func (s *OrganizationEventCreate) SetPublic(val OptBool) {
+	s.Public = val
+}
+
+// SetHidden sets the value of Hidden.
+func (s *OrganizationEventCreate) SetHidden(val OptBool) {
+	s.Hidden = val
+}
+
+// SetTitle sets the value of Title.
+func (s *OrganizationEventCreate) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetStart sets the value of Start.
+func (s *OrganizationEventCreate) SetStart(val OptNilDateTime) {
+	s.Start = val
+}
+
+// SetEnd sets the value of End.
+func (s *OrganizationEventCreate) SetEnd(val OptNilDateTime) {
+	s.End = val
+}
+
+// SetFormat sets the value of Format.
+func (s *OrganizationEventCreate) SetFormat(val OptEventFormat) {
+	s.Format = val
+}
+
+// SetVenueID sets the value of VenueID.
+func (s *OrganizationEventCreate) SetVenueID(val OptNilInt32) {
+	s.VenueID = val
+}
+
+// SetSimplifiedRegistration sets the value of SimplifiedRegistration.
+func (s *OrganizationEventCreate) SetSimplifiedRegistration(val OptBool) {
+	s.SimplifiedRegistration = val
+}
+
+// SetAutocreateMember sets the value of AutocreateMember.
+func (s *OrganizationEventCreate) SetAutocreateMember(val OptBool) {
+	s.AutocreateMember = val
+}
+
+// SetAchievementsAllowed sets the value of AchievementsAllowed.
+func (s *OrganizationEventCreate) SetAchievementsAllowed(val OptBool) {
+	s.AchievementsAllowed = val
+}
+
+// SetRequestsAllowed sets the value of RequestsAllowed.
+func (s *OrganizationEventCreate) SetRequestsAllowed(val OptBool) {
+	s.RequestsAllowed = val
+}
+
+// SetSelfCheckIn sets the value of SelfCheckIn.
+func (s *OrganizationEventCreate) SetSelfCheckIn(val OptBool) {
+	s.SelfCheckIn = val
+}
+
+// SetTeamsInvolved sets the value of TeamsInvolved.
+func (s *OrganizationEventCreate) SetTeamsInvolved(val OptEventTeamsInvolved) {
+	s.TeamsInvolved = val
+}
+
+// SetOwnerCanModerate sets the value of OwnerCanModerate.
+func (s *OrganizationEventCreate) SetOwnerCanModerate(val OptBool) {
+	s.OwnerCanModerate = val
+}
+
+// SetUserInMultipleTeams sets the value of UserInMultipleTeams.
+func (s *OrganizationEventCreate) SetUserInMultipleTeams(val OptBool) {
+	s.UserInMultipleTeams = val
+}
+
+// SetSupportI18n sets the value of SupportI18n.
+func (s *OrganizationEventCreate) SetSupportI18n(val OptBool) {
+	s.SupportI18n = val
+}
+
+// SetTimeMatters sets the value of TimeMatters.
+func (s *OrganizationEventCreate) SetTimeMatters(val OptBool) {
+	s.TimeMatters = val
+}
+
+// SetMaxUsers sets the value of MaxUsers.
+func (s *OrganizationEventCreate) SetMaxUsers(val OptNilInt32) {
+	s.MaxUsers = val
+}
+
+// SetTeamAssignmentMethod sets the value of TeamAssignmentMethod.
+func (s *OrganizationEventCreate) SetTeamAssignmentMethod(val OptEventTeamAssignmentMethod) {
+	s.TeamAssignmentMethod = val
+}
+
+// SetExpectedStart sets the value of ExpectedStart.
+func (s *OrganizationEventCreate) SetExpectedStart(val OptNilDateTime) {
+	s.ExpectedStart = val
+}
+
+// SetAltTitle sets the value of AltTitle.
+func (s *OrganizationEventCreate) SetAltTitle(val OptString) {
+	s.AltTitle = val
+}
+
+// SetURL sets the value of URL.
+func (s *OrganizationEventCreate) SetURL(val OptURI) {
+	s.URL = val
+}
+
+// SetTypeID sets the value of TypeID.
+func (s *OrganizationEventCreate) SetTypeID(val OptNilInt32) {
+	s.TypeID = val
+}
+
+// SetDescription sets the value of Description.
+func (s *OrganizationEventCreate) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetQuestionnaireCompletedMessage sets the value of QuestionnaireCompletedMessage.
+func (s *OrganizationEventCreate) SetQuestionnaireCompletedMessage(val OptString) {
+	s.QuestionnaireCompletedMessage = val
+}
+
+// SetNotificationEmailMessage sets the value of NotificationEmailMessage.
+func (s *OrganizationEventCreate) SetNotificationEmailMessage(val OptString) {
+	s.NotificationEmailMessage = val
+}
+
+// SetCoverURL sets the value of CoverURL.
+func (s *OrganizationEventCreate) SetCoverURL(val OptURI) {
+	s.CoverURL = val
+}
+
+// SetKeywords sets the value of Keywords.
+func (s *OrganizationEventCreate) SetKeywords(val OptString) {
+	s.Keywords = val
+}
+
+// SetAchievementRoles sets the value of AchievementRoles.
+func (s *OrganizationEventCreate) SetAchievementRoles(val []int32) {
+	s.AchievementRoles = val
+}
+
+// SetBrands sets the value of Brands.
+func (s *OrganizationEventCreate) SetBrands(val []int32) {
+	s.Brands = val
+}
+
+// Merged schema.
+// Ref: #/components/schemas/OrganizationEventUpdate
+type OrganizationEventUpdate struct {
+	// ID организации мероприятия.
+	OrganizationID OptInt32 `json:"organization_id"`
+	// ID мета-мероприятия.
+	MetaEventID OptNilInt32 `json:"meta_event_id"`
+	// Мероприятие находится в статусе черновика. На такое
+	// мероприятие нельзя зарегистрироваться.
+	Draft OptBool `json:"draft"`
+	// Статус публичности мероприятия.
+	Public OptBool `json:"public"`
+	// Исключение мероприятия из календаря.
+	Hidden OptBool `json:"hidden"`
+	// Название мероприятия.
+	Title OptString `json:"title"`
+	// Дата начала мероприятия.
+	Start OptNilDateTime `json:"start"`
+	// Дата окончания мероприятия.
+	End    OptNilDateTime `json:"end"`
+	Format OptEventFormat `json:"format"`
+	// ID [площадки] на которой проводится мероприятие.
+	//
+	// [площадки]: /venue-api/docs/
+	VenueID OptNilInt32 `json:"venue_id"`
+	// Доступность упрощенной регистрации на мероприятие.
+	SimplifiedRegistration OptBool `json:"simplified_registration"`
+	// Автоматическое добавление в участники организации
+	// пользователя с подтвержденной заявки.
+	AutocreateMember OptBool `json:"autocreate_member"`
+	// Допуск на создания достижений на мероприятие.
+	AchievementsAllowed OptBool `json:"achievements_allowed"`
+	// Допуск на создания заявок на мероприятие.
+	RequestsAllowed OptBool `json:"requests_allowed"`
+	// Доступность чекина.
+	SelfCheckIn         OptBool               `json:"self_check_in"`
+	TeamsInvolved       OptEventTeamsInvolved `json:"teams_involved"`
+	OwnerCanModerate    OptBool               `json:"owner_can_moderate"`
+	UserInMultipleTeams OptBool               `json:"user_in_multiple_teams"`
+	SupportI18n         OptBool               `json:"support_i18n"`
+	// Учитывается ли время или только даты в полях `start` и `end`.
+	TimeMatters OptBool `json:"time_matters"`
+	// Максимальное количество участников в команде.
+	MaxUsers             OptNilInt32                  `json:"max_users"`
+	TeamAssignmentMethod OptEventTeamAssignmentMethod `json:"team_assignment_method"`
+	// Планируемое начало мероприятия-анонса.
+	ExpectedStart OptNilDateTime `json:"expected_start"`
+	// Альтернативное название мероприятия.
+	AltTitle OptString `json:"alt_title"`
+	// Адрес online мероприятия.
+	URL OptURI `json:"url"`
+	// Идентификатор типа мероприятия.
+	TypeID OptNilInt32 `json:"type_id"`
+	// Описание мероприятия.
+	Description OptString `json:"description"`
+	// Сообщение о заполненной анкете.
+	QuestionnaireCompletedMessage OptString `json:"questionnaire_completed_message"`
+	// Дополнительный текст для Email уведомления о
+	// регистрации на мероприятие.
+	//
+	// 	Текст интерпретируется в соответствии с форматом
+	// 	markdown.
+	NotificationEmailMessage OptString `json:"notification_email_message"`
+	// Ссылка на обложку мероприятия.
+	CoverURL OptURI    `json:"cover_url"`
+	Keywords OptString `json:"keywords"`
+	// Статус отмены мероприятия.
+	Canceled OptBool `json:"canceled"`
+	// Причина отмены мероприятия.
+	CancellationReason OptString `json:"cancellation_reason"`
+}
+
+// GetOrganizationID returns the value of OrganizationID.
+func (s *OrganizationEventUpdate) GetOrganizationID() OptInt32 {
+	return s.OrganizationID
+}
+
+// GetMetaEventID returns the value of MetaEventID.
+func (s *OrganizationEventUpdate) GetMetaEventID() OptNilInt32 {
+	return s.MetaEventID
+}
+
+// GetDraft returns the value of Draft.
+func (s *OrganizationEventUpdate) GetDraft() OptBool {
+	return s.Draft
+}
+
+// GetPublic returns the value of Public.
+func (s *OrganizationEventUpdate) GetPublic() OptBool {
+	return s.Public
+}
+
+// GetHidden returns the value of Hidden.
+func (s *OrganizationEventUpdate) GetHidden() OptBool {
+	return s.Hidden
+}
+
+// GetTitle returns the value of Title.
+func (s *OrganizationEventUpdate) GetTitle() OptString {
+	return s.Title
+}
+
+// GetStart returns the value of Start.
+func (s *OrganizationEventUpdate) GetStart() OptNilDateTime {
+	return s.Start
+}
+
+// GetEnd returns the value of End.
+func (s *OrganizationEventUpdate) GetEnd() OptNilDateTime {
+	return s.End
+}
+
+// GetFormat returns the value of Format.
+func (s *OrganizationEventUpdate) GetFormat() OptEventFormat {
+	return s.Format
+}
+
+// GetVenueID returns the value of VenueID.
+func (s *OrganizationEventUpdate) GetVenueID() OptNilInt32 {
+	return s.VenueID
+}
+
+// GetSimplifiedRegistration returns the value of SimplifiedRegistration.
+func (s *OrganizationEventUpdate) GetSimplifiedRegistration() OptBool {
+	return s.SimplifiedRegistration
+}
+
+// GetAutocreateMember returns the value of AutocreateMember.
+func (s *OrganizationEventUpdate) GetAutocreateMember() OptBool {
+	return s.AutocreateMember
+}
+
+// GetAchievementsAllowed returns the value of AchievementsAllowed.
+func (s *OrganizationEventUpdate) GetAchievementsAllowed() OptBool {
+	return s.AchievementsAllowed
+}
+
+// GetRequestsAllowed returns the value of RequestsAllowed.
+func (s *OrganizationEventUpdate) GetRequestsAllowed() OptBool {
+	return s.RequestsAllowed
+}
+
+// GetSelfCheckIn returns the value of SelfCheckIn.
+func (s *OrganizationEventUpdate) GetSelfCheckIn() OptBool {
+	return s.SelfCheckIn
+}
+
+// GetTeamsInvolved returns the value of TeamsInvolved.
+func (s *OrganizationEventUpdate) GetTeamsInvolved() OptEventTeamsInvolved {
+	return s.TeamsInvolved
+}
+
+// GetOwnerCanModerate returns the value of OwnerCanModerate.
+func (s *OrganizationEventUpdate) GetOwnerCanModerate() OptBool {
+	return s.OwnerCanModerate
+}
+
+// GetUserInMultipleTeams returns the value of UserInMultipleTeams.
+func (s *OrganizationEventUpdate) GetUserInMultipleTeams() OptBool {
+	return s.UserInMultipleTeams
+}
+
+// GetSupportI18n returns the value of SupportI18n.
+func (s *OrganizationEventUpdate) GetSupportI18n() OptBool {
+	return s.SupportI18n
+}
+
+// GetTimeMatters returns the value of TimeMatters.
+func (s *OrganizationEventUpdate) GetTimeMatters() OptBool {
+	return s.TimeMatters
+}
+
+// GetMaxUsers returns the value of MaxUsers.
+func (s *OrganizationEventUpdate) GetMaxUsers() OptNilInt32 {
+	return s.MaxUsers
+}
+
+// GetTeamAssignmentMethod returns the value of TeamAssignmentMethod.
+func (s *OrganizationEventUpdate) GetTeamAssignmentMethod() OptEventTeamAssignmentMethod {
+	return s.TeamAssignmentMethod
+}
+
+// GetExpectedStart returns the value of ExpectedStart.
+func (s *OrganizationEventUpdate) GetExpectedStart() OptNilDateTime {
+	return s.ExpectedStart
+}
+
+// GetAltTitle returns the value of AltTitle.
+func (s *OrganizationEventUpdate) GetAltTitle() OptString {
+	return s.AltTitle
+}
+
+// GetURL returns the value of URL.
+func (s *OrganizationEventUpdate) GetURL() OptURI {
+	return s.URL
+}
+
+// GetTypeID returns the value of TypeID.
+func (s *OrganizationEventUpdate) GetTypeID() OptNilInt32 {
+	return s.TypeID
+}
+
+// GetDescription returns the value of Description.
+func (s *OrganizationEventUpdate) GetDescription() OptString {
+	return s.Description
+}
+
+// GetQuestionnaireCompletedMessage returns the value of QuestionnaireCompletedMessage.
+func (s *OrganizationEventUpdate) GetQuestionnaireCompletedMessage() OptString {
+	return s.QuestionnaireCompletedMessage
+}
+
+// GetNotificationEmailMessage returns the value of NotificationEmailMessage.
+func (s *OrganizationEventUpdate) GetNotificationEmailMessage() OptString {
+	return s.NotificationEmailMessage
+}
+
+// GetCoverURL returns the value of CoverURL.
+func (s *OrganizationEventUpdate) GetCoverURL() OptURI {
+	return s.CoverURL
+}
+
+// GetKeywords returns the value of Keywords.
+func (s *OrganizationEventUpdate) GetKeywords() OptString {
+	return s.Keywords
+}
+
+// GetCanceled returns the value of Canceled.
+func (s *OrganizationEventUpdate) GetCanceled() OptBool {
+	return s.Canceled
+}
+
+// GetCancellationReason returns the value of CancellationReason.
+func (s *OrganizationEventUpdate) GetCancellationReason() OptString {
+	return s.CancellationReason
+}
+
+// SetOrganizationID sets the value of OrganizationID.
+func (s *OrganizationEventUpdate) SetOrganizationID(val OptInt32) {
+	s.OrganizationID = val
+}
+
+// SetMetaEventID sets the value of MetaEventID.
+func (s *OrganizationEventUpdate) SetMetaEventID(val OptNilInt32) {
+	s.MetaEventID = val
+}
+
+// SetDraft sets the value of Draft.
+func (s *OrganizationEventUpdate) SetDraft(val OptBool) {
+	s.Draft = val
+}
+
+// SetPublic sets the value of Public.
+func (s *OrganizationEventUpdate) SetPublic(val OptBool) {
+	s.Public = val
+}
+
+// SetHidden sets the value of Hidden.
+func (s *OrganizationEventUpdate) SetHidden(val OptBool) {
+	s.Hidden = val
+}
+
+// SetTitle sets the value of Title.
+func (s *OrganizationEventUpdate) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetStart sets the value of Start.
+func (s *OrganizationEventUpdate) SetStart(val OptNilDateTime) {
+	s.Start = val
+}
+
+// SetEnd sets the value of End.
+func (s *OrganizationEventUpdate) SetEnd(val OptNilDateTime) {
+	s.End = val
+}
+
+// SetFormat sets the value of Format.
+func (s *OrganizationEventUpdate) SetFormat(val OptEventFormat) {
+	s.Format = val
+}
+
+// SetVenueID sets the value of VenueID.
+func (s *OrganizationEventUpdate) SetVenueID(val OptNilInt32) {
+	s.VenueID = val
+}
+
+// SetSimplifiedRegistration sets the value of SimplifiedRegistration.
+func (s *OrganizationEventUpdate) SetSimplifiedRegistration(val OptBool) {
+	s.SimplifiedRegistration = val
+}
+
+// SetAutocreateMember sets the value of AutocreateMember.
+func (s *OrganizationEventUpdate) SetAutocreateMember(val OptBool) {
+	s.AutocreateMember = val
+}
+
+// SetAchievementsAllowed sets the value of AchievementsAllowed.
+func (s *OrganizationEventUpdate) SetAchievementsAllowed(val OptBool) {
+	s.AchievementsAllowed = val
+}
+
+// SetRequestsAllowed sets the value of RequestsAllowed.
+func (s *OrganizationEventUpdate) SetRequestsAllowed(val OptBool) {
+	s.RequestsAllowed = val
+}
+
+// SetSelfCheckIn sets the value of SelfCheckIn.
+func (s *OrganizationEventUpdate) SetSelfCheckIn(val OptBool) {
+	s.SelfCheckIn = val
+}
+
+// SetTeamsInvolved sets the value of TeamsInvolved.
+func (s *OrganizationEventUpdate) SetTeamsInvolved(val OptEventTeamsInvolved) {
+	s.TeamsInvolved = val
+}
+
+// SetOwnerCanModerate sets the value of OwnerCanModerate.
+func (s *OrganizationEventUpdate) SetOwnerCanModerate(val OptBool) {
+	s.OwnerCanModerate = val
+}
+
+// SetUserInMultipleTeams sets the value of UserInMultipleTeams.
+func (s *OrganizationEventUpdate) SetUserInMultipleTeams(val OptBool) {
+	s.UserInMultipleTeams = val
+}
+
+// SetSupportI18n sets the value of SupportI18n.
+func (s *OrganizationEventUpdate) SetSupportI18n(val OptBool) {
+	s.SupportI18n = val
+}
+
+// SetTimeMatters sets the value of TimeMatters.
+func (s *OrganizationEventUpdate) SetTimeMatters(val OptBool) {
+	s.TimeMatters = val
+}
+
+// SetMaxUsers sets the value of MaxUsers.
+func (s *OrganizationEventUpdate) SetMaxUsers(val OptNilInt32) {
+	s.MaxUsers = val
+}
+
+// SetTeamAssignmentMethod sets the value of TeamAssignmentMethod.
+func (s *OrganizationEventUpdate) SetTeamAssignmentMethod(val OptEventTeamAssignmentMethod) {
+	s.TeamAssignmentMethod = val
+}
+
+// SetExpectedStart sets the value of ExpectedStart.
+func (s *OrganizationEventUpdate) SetExpectedStart(val OptNilDateTime) {
+	s.ExpectedStart = val
+}
+
+// SetAltTitle sets the value of AltTitle.
+func (s *OrganizationEventUpdate) SetAltTitle(val OptString) {
+	s.AltTitle = val
+}
+
+// SetURL sets the value of URL.
+func (s *OrganizationEventUpdate) SetURL(val OptURI) {
+	s.URL = val
+}
+
+// SetTypeID sets the value of TypeID.
+func (s *OrganizationEventUpdate) SetTypeID(val OptNilInt32) {
+	s.TypeID = val
+}
+
+// SetDescription sets the value of Description.
+func (s *OrganizationEventUpdate) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetQuestionnaireCompletedMessage sets the value of QuestionnaireCompletedMessage.
+func (s *OrganizationEventUpdate) SetQuestionnaireCompletedMessage(val OptString) {
+	s.QuestionnaireCompletedMessage = val
+}
+
+// SetNotificationEmailMessage sets the value of NotificationEmailMessage.
+func (s *OrganizationEventUpdate) SetNotificationEmailMessage(val OptString) {
+	s.NotificationEmailMessage = val
+}
+
+// SetCoverURL sets the value of CoverURL.
+func (s *OrganizationEventUpdate) SetCoverURL(val OptURI) {
+	s.CoverURL = val
+}
+
+// SetKeywords sets the value of Keywords.
+func (s *OrganizationEventUpdate) SetKeywords(val OptString) {
+	s.Keywords = val
+}
+
+// SetCanceled sets the value of Canceled.
+func (s *OrganizationEventUpdate) SetCanceled(val OptBool) {
+	s.Canceled = val
+}
+
+// SetCancellationReason sets the value of CancellationReason.
+func (s *OrganizationEventUpdate) SetCancellationReason(val OptString) {
+	s.CancellationReason = val
+}
+
 // Ref: #/components/schemas/OrganizationMeta
 type OrganizationMeta struct {
 	ID                   int32               `json:"id"`
@@ -8347,8 +9639,6 @@ func (s *OrganizationSubject) SetOrganizationID(val int32) {
 func (s *OrganizationSubject) SetSubjectID(val int32) {
 	s.SubjectID = val
 }
-
-func (*OrganizationSubject) createOrganizationSubjectRes() {}
 
 // Ref: #/components/schemas/OrganizationSubjectBody
 type OrganizationSubjectBody struct {
@@ -8740,50 +10030,6 @@ func (s *PatchMutationLockReq) SetActive(val bool) {
 	s.Active = val
 }
 
-// Ref: #/components/schemas/PermissionDenied
-type PermissionDenied struct {
-	Error string `json:"error"`
-}
-
-// GetError returns the value of Error.
-func (s *PermissionDenied) GetError() string {
-	return s.Error
-}
-
-// SetError sets the value of Error.
-func (s *PermissionDenied) SetError(val string) {
-	s.Error = val
-}
-
-func (*PermissionDenied) archiveEventRequestsFilesRes()       {}
-func (*PermissionDenied) cancelEventDeferredNotificationRes() {}
-func (*PermissionDenied) checkUserConsentRes()                {}
-func (*PermissionDenied) confirmFileUploadRes()               {}
-func (*PermissionDenied) createEventDeferredNotificationRes() {}
-func (*PermissionDenied) createEventLimitRes()                {}
-func (*PermissionDenied) createEventRes()                     {}
-func (*PermissionDenied) createFileReferenceRes()             {}
-func (*PermissionDenied) deleteEventLimitRes()                {}
-func (*PermissionDenied) deleteFileReferenceRes()             {}
-func (*PermissionDenied) deleteMutationLockRes()              {}
-func (*PermissionDenied) disconnectSocialAuthRes()            {}
-func (*PermissionDenied) eventSignupRes()                     {}
-func (*PermissionDenied) listSocialAuthsRes()                 {}
-func (*PermissionDenied) listUserConsentsRes()                {}
-func (*PermissionDenied) patchMutationLockRes()               {}
-func (*PermissionDenied) readEventDeferredNotificationRes()   {}
-func (*PermissionDenied) readEventRequestRes()                {}
-func (*PermissionDenied) readFileMetaRes()                    {}
-func (*PermissionDenied) readFileRes()                        {}
-func (*PermissionDenied) signupRes()                          {}
-func (*PermissionDenied) submitUserConsentRes()               {}
-func (*PermissionDenied) updateEventDeferredNotificationRes() {}
-func (*PermissionDenied) updateEventLimitRes()                {}
-func (*PermissionDenied) updateEventRequestRes()              {}
-func (*PermissionDenied) updateEventRes()                     {}
-func (*PermissionDenied) updateFileMetaRes()                  {}
-func (*PermissionDenied) uploadFileRes()                      {}
-
 // Статус задачи в очереди.
 // Ref: #/components/schemas/QueueStatus
 type QueueStatus string
@@ -8960,8 +10206,6 @@ func (s *RegionNameOK) GetName() string {
 func (s *RegionNameOK) SetName(val string) {
 	s.Name = val
 }
-
-func (*RegionNameOK) regionNameRes() {}
 
 // Ref: #/components/schemas/Signup
 type Signup struct {
@@ -9845,6 +11089,7 @@ type TeamPersonWithUserPersonUser struct {
 	LastName   string       `json:"last_name"`
 	FirstName  string       `json:"first_name"`
 	MiddleName OptString    `json:"middle_name"`
+	PublicPage bool         `json:"public_page"`
 }
 
 // GetID returns the value of ID.
@@ -9872,6 +11117,11 @@ func (s *TeamPersonWithUserPersonUser) GetMiddleName() OptString {
 	return s.MiddleName
 }
 
+// GetPublicPage returns the value of PublicPage.
+func (s *TeamPersonWithUserPersonUser) GetPublicPage() bool {
+	return s.PublicPage
+}
+
 // SetID sets the value of ID.
 func (s *TeamPersonWithUserPersonUser) SetID(val int32) {
 	s.ID = val
@@ -9895,6 +11145,11 @@ func (s *TeamPersonWithUserPersonUser) SetFirstName(val string) {
 // SetMiddleName sets the value of MiddleName.
 func (s *TeamPersonWithUserPersonUser) SetMiddleName(val OptString) {
 	s.MiddleName = val
+}
+
+// SetPublicPage sets the value of PublicPage.
+func (s *TeamPersonWithUserPersonUser) SetPublicPage(val bool) {
+	s.PublicPage = val
 }
 
 // Merged schema.
@@ -10475,45 +11730,6 @@ type UUIDs []uuid.UUID
 
 func (*UUIDs) createMutationLockRes() {}
 
-// Ref: #/components/schemas/Unauthorized
-type Unauthorized struct {
-	Error string `json:"error"`
-}
-
-// GetError returns the value of Error.
-func (s *Unauthorized) GetError() string {
-	return s.Error
-}
-
-// SetError sets the value of Error.
-func (s *Unauthorized) SetError(val string) {
-	s.Error = val
-}
-
-func (*Unauthorized) listFileMetaRes() {}
-func (*Unauthorized) readFileMetaRes() {}
-func (*Unauthorized) readFileRes()     {}
-
-// Ref: #/components/schemas/UnproccessableEntity
-type UnproccessableEntity struct {
-	Error string `json:"error"`
-}
-
-// GetError returns the value of Error.
-func (s *UnproccessableEntity) GetError() string {
-	return s.Error
-}
-
-// SetError sets the value of Error.
-func (s *UnproccessableEntity) SetError(val string) {
-	s.Error = val
-}
-
-func (*UnproccessableEntity) archiveEventRequestsFilesRes() {}
-func (*UnproccessableEntity) createFileMetaRes()            {}
-func (*UnproccessableEntity) listEventsRes()                {}
-func (*UnproccessableEntity) listOrganizationsRes()         {}
-
 type UpdateEventDeferredNotificationReq struct {
 	BeforeStart OptEventDeferredNotificationBeforeStart `json:"before_start"`
 	Template    OptEventDeferredNotificationTemplateID  `json:"template"`
@@ -10599,449 +11815,6 @@ func (s *UpdateEventDiplomaSettingsReq) SetDiplomaIssueMode(val OptDiplomaIssueM
 	s.DiplomaIssueMode = val
 }
 
-// Merged schema.
-type UpdateEventReq struct {
-	// ID мета-мероприятия.
-	MetaEventID OptNilInt32 `json:"meta_event_id"`
-	// Мероприятие находится в статусе черновика. На такое
-	// мероприятие нельзя зарегистрироваться.
-	Draft OptBool `json:"draft"`
-	// Статус публичности мероприятия.
-	Public OptBool `json:"public"`
-	// Исключение мероприятия из календаря.
-	Hidden OptBool `json:"hidden"`
-	// Название мероприятия.
-	Title OptString `json:"title"`
-	// Дата начала мероприятия.
-	Start OptNilDateTime `json:"start"`
-	// Дата окончания мероприятия.
-	End    OptNilDateTime `json:"end"`
-	Format OptEventFormat `json:"format"`
-	// ID [площадки] на которой проводится мероприятие.
-	//
-	// [площадки]: /venue-api/docs/
-	VenueID OptNilInt32 `json:"venue_id"`
-	// Доступность упрощенной регистрации на мероприятие.
-	SimplifiedRegistration OptBool `json:"simplified_registration"`
-	// Автоматическое добавление в участники организации
-	// пользователя с подтвержденной заявки.
-	AutocreateMember OptBool `json:"autocreate_member"`
-	// Допуск на создания достижений на мероприятие.
-	AchievementsAllowed OptBool `json:"achievements_allowed"`
-	// Допуск на создания заявок на мероприятие.
-	RequestsAllowed OptBool `json:"requests_allowed"`
-	// Доступность чекина.
-	SelfCheckIn         OptBool               `json:"self_check_in"`
-	TeamsInvolved       OptEventTeamsInvolved `json:"teams_involved"`
-	OwnerCanModerate    OptBool               `json:"owner_can_moderate"`
-	UserInMultipleTeams OptBool               `json:"user_in_multiple_teams"`
-	MentorsAllowed      OptBool               `json:"mentors_allowed"`
-	SupportI18n         OptBool               `json:"support_i18n"`
-	GirCollection       OptBool               `json:"gir_collection"`
-	Promoted            OptBool               `json:"promoted"`
-	// Учитывается ли время или только даты в полях `start` и `end`.
-	TimeMatters            OptBool                      `json:"time_matters"`
-	MaxUsers               OptNilInt32                  `json:"max_users"`
-	TeamCreateNotification OptBool                      `json:"team_create_notification"`
-	TeamAssignmentMethod   OptEventTeamAssignmentMethod `json:"team_assignment_method"`
-	ExpectedStart          OptNilDateTime               `json:"expected_start"`
-	// Альтернативное название мероприятия.
-	AltTitle OptString `json:"alt_title"`
-	// Адрес online мероприятия.
-	URL OptURI `json:"url"`
-	// Идентификатор типа мероприятия.
-	TypeID OptNilInt32 `json:"type_id"`
-	// Описание мероприятия.
-	Description OptString `json:"description"`
-	// Сообщение о заполненной анкете.
-	QuestionnaireCompletedMessage OptString `json:"questionnaire_completed_message"`
-	// Дополнительный текст для Email уведомления о
-	// регистрации на мероприятие.
-	//
-	// 	Текст интерпретируется в соответствии с форматом
-	// 	markdown.
-	NotificationEmailMessage OptString `json:"notification_email_message"`
-	// Ссылка на обложку мероприятия.
-	CoverURL OptURI    `json:"cover_url"`
-	Keywords OptString `json:"keywords"`
-	// ID организации мероприятия.
-	OrganizationID OptNilInt32 `json:"organization_id"`
-	// Статус отмены мероприятия.
-	Canceled OptBool `json:"canceled"`
-	// Причина отмены мероприятия.
-	CancellationReason OptString `json:"cancellation_reason"`
-}
-
-// GetMetaEventID returns the value of MetaEventID.
-func (s *UpdateEventReq) GetMetaEventID() OptNilInt32 {
-	return s.MetaEventID
-}
-
-// GetDraft returns the value of Draft.
-func (s *UpdateEventReq) GetDraft() OptBool {
-	return s.Draft
-}
-
-// GetPublic returns the value of Public.
-func (s *UpdateEventReq) GetPublic() OptBool {
-	return s.Public
-}
-
-// GetHidden returns the value of Hidden.
-func (s *UpdateEventReq) GetHidden() OptBool {
-	return s.Hidden
-}
-
-// GetTitle returns the value of Title.
-func (s *UpdateEventReq) GetTitle() OptString {
-	return s.Title
-}
-
-// GetStart returns the value of Start.
-func (s *UpdateEventReq) GetStart() OptNilDateTime {
-	return s.Start
-}
-
-// GetEnd returns the value of End.
-func (s *UpdateEventReq) GetEnd() OptNilDateTime {
-	return s.End
-}
-
-// GetFormat returns the value of Format.
-func (s *UpdateEventReq) GetFormat() OptEventFormat {
-	return s.Format
-}
-
-// GetVenueID returns the value of VenueID.
-func (s *UpdateEventReq) GetVenueID() OptNilInt32 {
-	return s.VenueID
-}
-
-// GetSimplifiedRegistration returns the value of SimplifiedRegistration.
-func (s *UpdateEventReq) GetSimplifiedRegistration() OptBool {
-	return s.SimplifiedRegistration
-}
-
-// GetAutocreateMember returns the value of AutocreateMember.
-func (s *UpdateEventReq) GetAutocreateMember() OptBool {
-	return s.AutocreateMember
-}
-
-// GetAchievementsAllowed returns the value of AchievementsAllowed.
-func (s *UpdateEventReq) GetAchievementsAllowed() OptBool {
-	return s.AchievementsAllowed
-}
-
-// GetRequestsAllowed returns the value of RequestsAllowed.
-func (s *UpdateEventReq) GetRequestsAllowed() OptBool {
-	return s.RequestsAllowed
-}
-
-// GetSelfCheckIn returns the value of SelfCheckIn.
-func (s *UpdateEventReq) GetSelfCheckIn() OptBool {
-	return s.SelfCheckIn
-}
-
-// GetTeamsInvolved returns the value of TeamsInvolved.
-func (s *UpdateEventReq) GetTeamsInvolved() OptEventTeamsInvolved {
-	return s.TeamsInvolved
-}
-
-// GetOwnerCanModerate returns the value of OwnerCanModerate.
-func (s *UpdateEventReq) GetOwnerCanModerate() OptBool {
-	return s.OwnerCanModerate
-}
-
-// GetUserInMultipleTeams returns the value of UserInMultipleTeams.
-func (s *UpdateEventReq) GetUserInMultipleTeams() OptBool {
-	return s.UserInMultipleTeams
-}
-
-// GetMentorsAllowed returns the value of MentorsAllowed.
-func (s *UpdateEventReq) GetMentorsAllowed() OptBool {
-	return s.MentorsAllowed
-}
-
-// GetSupportI18n returns the value of SupportI18n.
-func (s *UpdateEventReq) GetSupportI18n() OptBool {
-	return s.SupportI18n
-}
-
-// GetGirCollection returns the value of GirCollection.
-func (s *UpdateEventReq) GetGirCollection() OptBool {
-	return s.GirCollection
-}
-
-// GetPromoted returns the value of Promoted.
-func (s *UpdateEventReq) GetPromoted() OptBool {
-	return s.Promoted
-}
-
-// GetTimeMatters returns the value of TimeMatters.
-func (s *UpdateEventReq) GetTimeMatters() OptBool {
-	return s.TimeMatters
-}
-
-// GetMaxUsers returns the value of MaxUsers.
-func (s *UpdateEventReq) GetMaxUsers() OptNilInt32 {
-	return s.MaxUsers
-}
-
-// GetTeamCreateNotification returns the value of TeamCreateNotification.
-func (s *UpdateEventReq) GetTeamCreateNotification() OptBool {
-	return s.TeamCreateNotification
-}
-
-// GetTeamAssignmentMethod returns the value of TeamAssignmentMethod.
-func (s *UpdateEventReq) GetTeamAssignmentMethod() OptEventTeamAssignmentMethod {
-	return s.TeamAssignmentMethod
-}
-
-// GetExpectedStart returns the value of ExpectedStart.
-func (s *UpdateEventReq) GetExpectedStart() OptNilDateTime {
-	return s.ExpectedStart
-}
-
-// GetAltTitle returns the value of AltTitle.
-func (s *UpdateEventReq) GetAltTitle() OptString {
-	return s.AltTitle
-}
-
-// GetURL returns the value of URL.
-func (s *UpdateEventReq) GetURL() OptURI {
-	return s.URL
-}
-
-// GetTypeID returns the value of TypeID.
-func (s *UpdateEventReq) GetTypeID() OptNilInt32 {
-	return s.TypeID
-}
-
-// GetDescription returns the value of Description.
-func (s *UpdateEventReq) GetDescription() OptString {
-	return s.Description
-}
-
-// GetQuestionnaireCompletedMessage returns the value of QuestionnaireCompletedMessage.
-func (s *UpdateEventReq) GetQuestionnaireCompletedMessage() OptString {
-	return s.QuestionnaireCompletedMessage
-}
-
-// GetNotificationEmailMessage returns the value of NotificationEmailMessage.
-func (s *UpdateEventReq) GetNotificationEmailMessage() OptString {
-	return s.NotificationEmailMessage
-}
-
-// GetCoverURL returns the value of CoverURL.
-func (s *UpdateEventReq) GetCoverURL() OptURI {
-	return s.CoverURL
-}
-
-// GetKeywords returns the value of Keywords.
-func (s *UpdateEventReq) GetKeywords() OptString {
-	return s.Keywords
-}
-
-// GetOrganizationID returns the value of OrganizationID.
-func (s *UpdateEventReq) GetOrganizationID() OptNilInt32 {
-	return s.OrganizationID
-}
-
-// GetCanceled returns the value of Canceled.
-func (s *UpdateEventReq) GetCanceled() OptBool {
-	return s.Canceled
-}
-
-// GetCancellationReason returns the value of CancellationReason.
-func (s *UpdateEventReq) GetCancellationReason() OptString {
-	return s.CancellationReason
-}
-
-// SetMetaEventID sets the value of MetaEventID.
-func (s *UpdateEventReq) SetMetaEventID(val OptNilInt32) {
-	s.MetaEventID = val
-}
-
-// SetDraft sets the value of Draft.
-func (s *UpdateEventReq) SetDraft(val OptBool) {
-	s.Draft = val
-}
-
-// SetPublic sets the value of Public.
-func (s *UpdateEventReq) SetPublic(val OptBool) {
-	s.Public = val
-}
-
-// SetHidden sets the value of Hidden.
-func (s *UpdateEventReq) SetHidden(val OptBool) {
-	s.Hidden = val
-}
-
-// SetTitle sets the value of Title.
-func (s *UpdateEventReq) SetTitle(val OptString) {
-	s.Title = val
-}
-
-// SetStart sets the value of Start.
-func (s *UpdateEventReq) SetStart(val OptNilDateTime) {
-	s.Start = val
-}
-
-// SetEnd sets the value of End.
-func (s *UpdateEventReq) SetEnd(val OptNilDateTime) {
-	s.End = val
-}
-
-// SetFormat sets the value of Format.
-func (s *UpdateEventReq) SetFormat(val OptEventFormat) {
-	s.Format = val
-}
-
-// SetVenueID sets the value of VenueID.
-func (s *UpdateEventReq) SetVenueID(val OptNilInt32) {
-	s.VenueID = val
-}
-
-// SetSimplifiedRegistration sets the value of SimplifiedRegistration.
-func (s *UpdateEventReq) SetSimplifiedRegistration(val OptBool) {
-	s.SimplifiedRegistration = val
-}
-
-// SetAutocreateMember sets the value of AutocreateMember.
-func (s *UpdateEventReq) SetAutocreateMember(val OptBool) {
-	s.AutocreateMember = val
-}
-
-// SetAchievementsAllowed sets the value of AchievementsAllowed.
-func (s *UpdateEventReq) SetAchievementsAllowed(val OptBool) {
-	s.AchievementsAllowed = val
-}
-
-// SetRequestsAllowed sets the value of RequestsAllowed.
-func (s *UpdateEventReq) SetRequestsAllowed(val OptBool) {
-	s.RequestsAllowed = val
-}
-
-// SetSelfCheckIn sets the value of SelfCheckIn.
-func (s *UpdateEventReq) SetSelfCheckIn(val OptBool) {
-	s.SelfCheckIn = val
-}
-
-// SetTeamsInvolved sets the value of TeamsInvolved.
-func (s *UpdateEventReq) SetTeamsInvolved(val OptEventTeamsInvolved) {
-	s.TeamsInvolved = val
-}
-
-// SetOwnerCanModerate sets the value of OwnerCanModerate.
-func (s *UpdateEventReq) SetOwnerCanModerate(val OptBool) {
-	s.OwnerCanModerate = val
-}
-
-// SetUserInMultipleTeams sets the value of UserInMultipleTeams.
-func (s *UpdateEventReq) SetUserInMultipleTeams(val OptBool) {
-	s.UserInMultipleTeams = val
-}
-
-// SetMentorsAllowed sets the value of MentorsAllowed.
-func (s *UpdateEventReq) SetMentorsAllowed(val OptBool) {
-	s.MentorsAllowed = val
-}
-
-// SetSupportI18n sets the value of SupportI18n.
-func (s *UpdateEventReq) SetSupportI18n(val OptBool) {
-	s.SupportI18n = val
-}
-
-// SetGirCollection sets the value of GirCollection.
-func (s *UpdateEventReq) SetGirCollection(val OptBool) {
-	s.GirCollection = val
-}
-
-// SetPromoted sets the value of Promoted.
-func (s *UpdateEventReq) SetPromoted(val OptBool) {
-	s.Promoted = val
-}
-
-// SetTimeMatters sets the value of TimeMatters.
-func (s *UpdateEventReq) SetTimeMatters(val OptBool) {
-	s.TimeMatters = val
-}
-
-// SetMaxUsers sets the value of MaxUsers.
-func (s *UpdateEventReq) SetMaxUsers(val OptNilInt32) {
-	s.MaxUsers = val
-}
-
-// SetTeamCreateNotification sets the value of TeamCreateNotification.
-func (s *UpdateEventReq) SetTeamCreateNotification(val OptBool) {
-	s.TeamCreateNotification = val
-}
-
-// SetTeamAssignmentMethod sets the value of TeamAssignmentMethod.
-func (s *UpdateEventReq) SetTeamAssignmentMethod(val OptEventTeamAssignmentMethod) {
-	s.TeamAssignmentMethod = val
-}
-
-// SetExpectedStart sets the value of ExpectedStart.
-func (s *UpdateEventReq) SetExpectedStart(val OptNilDateTime) {
-	s.ExpectedStart = val
-}
-
-// SetAltTitle sets the value of AltTitle.
-func (s *UpdateEventReq) SetAltTitle(val OptString) {
-	s.AltTitle = val
-}
-
-// SetURL sets the value of URL.
-func (s *UpdateEventReq) SetURL(val OptURI) {
-	s.URL = val
-}
-
-// SetTypeID sets the value of TypeID.
-func (s *UpdateEventReq) SetTypeID(val OptNilInt32) {
-	s.TypeID = val
-}
-
-// SetDescription sets the value of Description.
-func (s *UpdateEventReq) SetDescription(val OptString) {
-	s.Description = val
-}
-
-// SetQuestionnaireCompletedMessage sets the value of QuestionnaireCompletedMessage.
-func (s *UpdateEventReq) SetQuestionnaireCompletedMessage(val OptString) {
-	s.QuestionnaireCompletedMessage = val
-}
-
-// SetNotificationEmailMessage sets the value of NotificationEmailMessage.
-func (s *UpdateEventReq) SetNotificationEmailMessage(val OptString) {
-	s.NotificationEmailMessage = val
-}
-
-// SetCoverURL sets the value of CoverURL.
-func (s *UpdateEventReq) SetCoverURL(val OptURI) {
-	s.CoverURL = val
-}
-
-// SetKeywords sets the value of Keywords.
-func (s *UpdateEventReq) SetKeywords(val OptString) {
-	s.Keywords = val
-}
-
-// SetOrganizationID sets the value of OrganizationID.
-func (s *UpdateEventReq) SetOrganizationID(val OptNilInt32) {
-	s.OrganizationID = val
-}
-
-// SetCanceled sets the value of Canceled.
-func (s *UpdateEventReq) SetCanceled(val OptBool) {
-	s.Canceled = val
-}
-
-// SetCancellationReason sets the value of CancellationReason.
-func (s *UpdateEventReq) SetCancellationReason(val OptString) {
-	s.CancellationReason = val
-}
-
 type UpdateFileMetaReq struct {
 	Name OptFileMetaName `json:"name"`
 }
@@ -11069,11 +11842,6 @@ func (s *UploadFileReq) GetContentLength() ContentLength {
 func (s *UploadFileReq) SetContentLength(val ContentLength) {
 	s.ContentLength = val
 }
-
-// UploadFileUnprocessableEntity is response for UploadFile operation.
-type UploadFileUnprocessableEntity struct{}
-
-func (*UploadFileUnprocessableEntity) uploadFileRes() {}
 
 // Ref: #/components/schemas/UserConsentKind
 type UserConsentKind string
@@ -11213,6 +11981,10 @@ func (s *ValidationErrors) init() ValidationErrors {
 	return m
 }
 
+func (*ValidationErrors) adminCreateEventLimitRes() {}
+func (*ValidationErrors) adminCreateEventRes()      {}
+func (*ValidationErrors) adminUpdateEventLimitRes() {}
+func (*ValidationErrors) adminUpdateEventRes()      {}
 func (*ValidationErrors) confirmEventSignupRes()    {}
 func (*ValidationErrors) confirmSignupEmailRes()    {}
 func (*ValidationErrors) createEventLimitRes()      {}

@@ -36,13 +36,46 @@ type Invoker interface {
 	//
 	// PUT /events/{event_id}/diploma-role/{role_id}
 	AddEventDiplomaRole(ctx context.Context, params AddEventDiplomaRoleParams) (AddEventDiplomaRoleRes, error)
+	// AdminCreateEvent invokes AdminCreateEvent operation.
+	//
+	// Создание мероприятия администратором платформы.
+	//
+	// POST /admin/events
+	AdminCreateEvent(ctx context.Context, request *AdminEventCreate) (AdminCreateEventRes, error)
+	// AdminCreateEventLimit invokes AdminCreateEventLimit operation.
+	//
+	// Создание ограничений мероприятия администратором
+	// платформы.
+	//
+	// POST /admin/events/{event_id}/limit
+	AdminCreateEventLimit(ctx context.Context, request *EventLimitWrite, params AdminCreateEventLimitParams) (AdminCreateEventLimitRes, error)
+	// AdminDeleteEventLimit invokes AdminDeleteEventLimit operation.
+	//
+	// Удаление ограничений мероприятия администратором
+	// платформы.
+	//
+	// DELETE /admin/events/{event_id}/limit
+	AdminDeleteEventLimit(ctx context.Context, params AdminDeleteEventLimitParams) error
+	// AdminUpdateEvent invokes AdminUpdateEvent operation.
+	//
+	// Обновление мероприятия администратором платформы.
+	//
+	// PATCH /admin/events/{event_id}
+	AdminUpdateEvent(ctx context.Context, request *AdminEventUpdate, params AdminUpdateEventParams) (AdminUpdateEventRes, error)
+	// AdminUpdateEventLimit invokes AdminUpdateEventLimit operation.
+	//
+	// Обновление ограничений мероприятия администратором
+	// платформы.
+	//
+	// PATCH /admin/events/{event_id}/limit
+	AdminUpdateEventLimit(ctx context.Context, request *EventLimitWrite, params AdminUpdateEventLimitParams) (AdminUpdateEventLimitRes, error)
 	// ArchiveEventRequestsFiles invokes ArchiveEventRequestsFiles operation.
 	//
 	// Обязательно нужно указать один из параметров: `field_id`
 	// или `request_id`.
 	//
 	// GET /events/{event_id}/requests-files
-	ArchiveEventRequestsFiles(ctx context.Context, params ArchiveEventRequestsFilesParams) (ArchiveEventRequestsFilesRes, error)
+	ArchiveEventRequestsFiles(ctx context.Context, params ArchiveEventRequestsFilesParams) (*ArchiveEventRequestsFilesOKHeaders, error)
 	// AuthorizeClient invokes AuthorizeClient operation.
 	//
 	// Пользователь авторизует доступ клиента к ресурсам
@@ -58,7 +91,7 @@ type Invoker interface {
 	// возвращен `404` ответ.
 	//
 	// DELETE /events/{event_id}/deferred-notification
-	CancelEventDeferredNotification(ctx context.Context, params CancelEventDeferredNotificationParams) (CancelEventDeferredNotificationRes, error)
+	CancelEventDeferredNotification(ctx context.Context, params CancelEventDeferredNotificationParams) (*EventDeferredNotification, error)
 	// CheckUserConsent invokes CheckUserConsent operation.
 	//
 	// Проверка наличия согласия пользователя.
@@ -70,7 +103,7 @@ type Invoker interface {
 	// Название города по ФИАС ID.
 	//
 	// GET /geo/fias/city/{fias}
-	CityName(ctx context.Context, params CityNameParams) (CityNameRes, error)
+	CityName(ctx context.Context, params CityNameParams) (*CityNameOK, error)
 	// CompleteSocialAuth invokes CompleteSocialAuth operation.
 	//
 	// Завершение авторизации.
@@ -82,11 +115,6 @@ type Invoker interface {
 	// Для предварительной валидации запроса, без
 	// подтверждения заявки, нужно указать параметр `dry_run=true`.
 	//
-	// `4xx` ответы:
-	//
-	//  - `404` - если не найдена подтверждаемая заявка;
-	//  - `422` - если токен не валиден.
-	//
 	// POST /events/confirm-signup/{event_request_id}/{token}
 	ConfirmEventSignup(ctx context.Context, request OptConfirmEventSignupReq, params ConfirmEventSignupParams) (ConfirmEventSignupRes, error)
 	// ConfirmFileUpload invokes ConfirmFileUpload operation.
@@ -94,7 +122,7 @@ type Invoker interface {
 	// Подтверждение загрузки файла.
 	//
 	// POST /files/{file_id}/confirm-upload
-	ConfirmFileUpload(ctx context.Context, params ConfirmFileUploadParams) (ConfirmFileUploadRes, error)
+	ConfirmFileUpload(ctx context.Context, params ConfirmFileUploadParams) (*FileMeta, error)
 	// ConfirmSignupEmail invokes ConfirmSignupEmail operation.
 	//
 	// Завершение регистрации пользователя подтверждением
@@ -110,30 +138,31 @@ type Invoker interface {
 	CountEvents(ctx context.Context, params CountEventsParams) (*CountEventsOK, error)
 	// CreateEvent invokes CreateEvent operation.
 	//
+	// Создание мероприятия администратором организации.
+	//
 	// При полном отсутствии в запросе массива `achievement_roles`,
 	// мероприятию назначаются роли достижений по-умолчанию.
 	// Пустой же массив приведет к созданию мероприятия без
 	// ролей.
 	//
 	// POST /events
-	CreateEvent(ctx context.Context, request *CreateEventReq) (CreateEventRes, error)
+	CreateEvent(ctx context.Context, request *OrganizationEventCreate) (CreateEventRes, error)
 	// CreateEventDeferredNotification invokes CreateEventDeferredNotification operation.
 	//
 	// Создание отложенного уведомления.
 	//
 	// POST /events/{event_id}/deferred-notification
-	CreateEventDeferredNotification(ctx context.Context, request *CreateEventDeferredNotificationReq, params CreateEventDeferredNotificationParams) (CreateEventDeferredNotificationRes, error)
+	CreateEventDeferredNotification(ctx context.Context, request *CreateEventDeferredNotificationReq, params CreateEventDeferredNotificationParams) (*EventDeferredNotification, error)
 	// CreateEventDiplomaSettings invokes CreateEventDiplomaSettings operation.
 	//
 	// Создание настроек дипломов мероприятия.
 	//
 	// POST /events/{event_id}/diploma-settings
-	CreateEventDiplomaSettings(ctx context.Context, request *CreateEventDiplomaSettingsReq, params CreateEventDiplomaSettingsParams) (CreateEventDiplomaSettingsRes, error)
+	CreateEventDiplomaSettings(ctx context.Context, request *CreateEventDiplomaSettingsReq, params CreateEventDiplomaSettingsParams) (*EventDiplomaSettings, error)
 	// CreateEventLimit invokes CreateEventLimit operation.
 	//
-	// Лимиты могут существовать только в единичном кол-ве на
-	// мероприятие. Попытка создать больше будет возвращать
-	// `409` ответ.
+	// Создание ограничений мероприятия администратором его
+	// организации.
 	//
 	// POST /events/{event_id}/limit
 	CreateEventLimit(ctx context.Context, request *EventLimitWrite, params CreateEventLimitParams) (CreateEventLimitRes, error)
@@ -151,16 +180,6 @@ type Invoker interface {
 	// Добавление в команду участника мероприятия
 	// администратором организации.
 	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+----------------------------------------------------------------------------------------------------------------------
-	// 	`403`  | Пользователь не является администратором организации
-	// 	`404`  | Мероприятие не найдено
-	// 	`404`  | Команда не найдена
-	// 	`409`  | У добавляемого пользователя уже имеется команда на мероприятии
-	// 	`422`  | Невалидный идентификатор пользователя
-	//
 	// POST /events/{event_id}/teams/{team_id}/persons
 	CreateEventTeamPerson(ctx context.Context, request *CreateEventTeamPersonReq, params CreateEventTeamPersonParams) (CreateEventTeamPersonRes, error)
 	// CreateFileMeta invokes CreateFileMeta operation.
@@ -168,13 +187,13 @@ type Invoker interface {
 	// Создание файла.
 	//
 	// POST /files
-	CreateFileMeta(ctx context.Context, request *CreateFileMetaReq) (CreateFileMetaRes, error)
+	CreateFileMeta(ctx context.Context, request *CreateFileMetaReq) (*CreateFileMetaCreated, error)
 	// CreateFileReference invokes CreateFileReference operation.
 	//
 	// Добавление ссылки на файл.
 	//
 	// PUT /files/{file_id}/references/{object_id}
-	CreateFileReference(ctx context.Context, params CreateFileReferenceParams) (CreateFileReferenceRes, error)
+	CreateFileReference(ctx context.Context, params CreateFileReferenceParams) (*FileReference, error)
 	// CreateMutationLock invokes CreateMutationLock operation.
 	//
 	// Блокировки создаются только для файлов, принадлежащих
@@ -191,27 +210,12 @@ type Invoker interface {
 	// 	запроса.
 	//
 	// POST /organization-subjects
-	CreateOrganizationSubject(ctx context.Context, request *OrganizationSubjectBody) (CreateOrganizationSubjectRes, error)
+	CreateOrganizationSubject(ctx context.Context, request *OrganizationSubjectBody) (*OrganizationSubject, error)
 	// CreateUserTeam invokes CreateUserTeam operation.
 	//
 	// Создание команды от аутентифицированного
 	// пользователя. Пользователь становится и ее капитаном
 	// и ее первым участником.
-	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+--------------------------------------------------------------------------------------------------------------------
-	// 	`403`  | Мероприятие завершено
-	// 	`404`  | Команда не найдена
-	// 	`409`  | У пользователя уже имеется команда на мероприятии
-	// 	`409`  | Команда с таким названием уже имеется на мероприятии
-	// 	`422`  | Невалидный идентификатор мероприятия
-	// 	`422`  | Невалидная контактная ссылка
-	// 	`422`  | Невалидное название команды
-	// 	`422`  | Мероприятие не допускает командного участия
-	// 	`422`  | Мероприятие не допускает управления параметром `assignment_participation`
-	// 	`422`  | Название команды уже занято на мероприятии
 	//
 	// POST /users/me/teams
 	CreateUserTeam(ctx context.Context, request *OwnerTeamCreate) (CreateUserTeamRes, error)
@@ -233,21 +237,6 @@ type Invoker interface {
 	//  - на запрос от самого участника, может вернуться уже
 	//    имеющаяся заявка на участие, отклоненная капитаном.
 	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+------------------------------------------------------------------------------------------------------------------------------------
-	// 	`403`  | Пользователь не является капитаном команды
-	// 	`403`  | Мероприятие команды завершено
-	// 	`404`  | Команда не найдена
-	// 	`409`  | У добавляемого пользователя уже имеется команда на мероприятии
-	// 	`422`  | Указан невалидный ID пользователя
-	// 	`422`  | Указан неправильный инвайт-код
-	// 	`422`  | У добавляемого пользователя отсутствует заявка на мероприятие команды
-	// 	`422`  | Достижение допустимого количества участников команды
-	// 	`422`  | Достижение допустимого количества приглашений в команду
-	// 	`422`  | Достижение допустимого количества запросов в команды для пользователя
-	//
 	// POST /users/me/teams/{team_id}/persons
 	CreateUserTeamPerson(ctx context.Context, request CreateUserTeamPersonReq, params CreateUserTeamPersonParams) (CreateUserTeamPersonRes, error)
 	// DeleteEventDiplomaRole invokes DeleteEventDiplomaRole operation.
@@ -258,22 +247,32 @@ type Invoker interface {
 	DeleteEventDiplomaRole(ctx context.Context, params DeleteEventDiplomaRoleParams) error
 	// DeleteEventLimit invokes DeleteEventLimit operation.
 	//
-	// Удаление лимитов мероприятия.
+	// Удаление ограничений мероприятия администратором его
+	// организации.
 	//
 	// DELETE /events/{event_id}/limit
-	DeleteEventLimit(ctx context.Context, params DeleteEventLimitParams) (DeleteEventLimitRes, error)
+	DeleteEventLimit(ctx context.Context, params DeleteEventLimitParams) error
 	// DeleteFileReference invokes DeleteFileReference operation.
 	//
 	// Удаление ссылки на файл.
 	//
 	// DELETE /files/{file_id}/references/{object_id}
-	DeleteFileReference(ctx context.Context, params DeleteFileReferenceParams) (DeleteFileReferenceRes, error)
+	DeleteFileReference(ctx context.Context, params DeleteFileReferenceParams) error
 	// DeleteMutationLock invokes DeleteMutationLock operation.
 	//
 	// Удаление блокировки.
 	//
 	// DELETE /mutation-locks/{object_namespace}/{object_key}
-	DeleteMutationLock(ctx context.Context, params DeleteMutationLockParams) (DeleteMutationLockRes, error)
+	DeleteMutationLock(ctx context.Context, params DeleteMutationLockParams) error
+	// DeleteUserTeam invokes DeleteUserTeam operation.
+	//
+	// Удаление команды ее капитаном.
+	//
+	// К удалению доступны только команды не содержащие
+	// других, помимо капитана, участников.
+	//
+	// DELETE /users/me/teams/{team_id}
+	DeleteUserTeam(ctx context.Context, params DeleteUserTeamParams) error
 	// DisconnectSocialAuth invokes DisconnectSocialAuth operation.
 	//
 	// Удаление авторизации возможно только если это не
@@ -285,13 +284,13 @@ type Invoker interface {
 	// возвращен 409 ответ.
 	//
 	// POST /auth/disconnect/{provider}/{uid}
-	DisconnectSocialAuth(ctx context.Context, params DisconnectSocialAuthParams) (DisconnectSocialAuthRes, error)
+	DisconnectSocialAuth(ctx context.Context, params DisconnectSocialAuthParams) error
 	// EventDeferredNotificationTemplateID invokes EventDeferredNotificationTemplateID operation.
 	//
 	// Идентификатор шаблона отложенного уведомления.
 	//
 	// GET /event-deferred-notification-templates/{name}
-	EventDeferredNotificationTemplateID(ctx context.Context, params EventDeferredNotificationTemplateIDParams) (EventDeferredNotificationTemplateIDRes, error)
+	EventDeferredNotificationTemplateID(ctx context.Context, params EventDeferredNotificationTemplateIDParams) (EventDeferredNotificationTemplateID, error)
 	// EventSignup invokes EventSignup operation.
 	//
 	// # Аутентификация
@@ -324,18 +323,25 @@ type Invoker interface {
 	//
 	// Является ли пользователь капитаном указанной команды.
 	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+---------------------------------------------------------------------------------
-	// 	`403`  | Пользователь не является капитаном команды
-	// 	`404`  | Команда не найдена
-	//
 	// POST /users/me/teams/{team_id}/is-owner
 	IsTeamOwner(ctx context.Context, params IsTeamOwnerParams) error
 	// IssueAccessToken invokes IssueAccessToken operation.
 	//
-	// Выдача токена доступа.
+	// Получение аутентификационного OAuth2 токена.
+	//
+	// Допускаемые форматы тела запроса:
+	//
+	//  - `application/json`
+	//  - `application/x-www-form-urlencoded`
+	//
+	// Реализованные гранты:
+	//
+	//  - [client_credentials]
+	//
+	// Скоупы, указанные в мета-данных сервера, не
+	// поддерживаются грантом `client_credentials`.
+	//
+	// [client_credentials]: https://tools.ietf.org/html/rfc6749#section-4.4
 	//
 	// POST /oauth/issue-token
 	IssueAccessToken(ctx context.Context) (IssueAccessTokenRes, error)
@@ -396,7 +402,7 @@ type Invoker interface {
 	//    параметра `search`.
 	//
 	// GET /events
-	ListEvents(ctx context.Context, params ListEventsParams) (ListEventsRes, error)
+	ListEvents(ctx context.Context, params ListEventsParams) (*ListEventsHeaders, error)
 	// ListFileMeta invokes ListFileMeta operation.
 	//
 	// # Неаутентифицированный запрос публичных файлов
@@ -411,7 +417,7 @@ type Invoker interface {
 	// `401` ответ.
 	//
 	// GET /files
-	ListFileMeta(ctx context.Context, params ListFileMetaParams) (ListFileMetaRes, error)
+	ListFileMeta(ctx context.Context, params ListFileMetaParams) (*ListFileMetaOKHeaders, error)
 	// ListOrganizationEvents invokes ListOrganizationEvents operation.
 	//
 	// Список мероприятий организации.
@@ -429,13 +435,13 @@ type Invoker interface {
 	// Список организаций.
 	//
 	// GET /organizations
-	ListOrganizations(ctx context.Context, params ListOrganizationsParams) (ListOrganizationsRes, error)
+	ListOrganizations(ctx context.Context, params ListOrganizationsParams) (*ListOrganizationsHeaders, error)
 	// ListSocialAuths invokes ListSocialAuths operation.
 	//
 	// Список авторизаций пользователя в соц. сетях.
 	//
 	// GET /social-auths/{talent_id}
-	ListSocialAuths(ctx context.Context, params ListSocialAuthsParams) (ListSocialAuthsRes, error)
+	ListSocialAuths(ctx context.Context, params ListSocialAuthsParams) (*ListSocialAuthsOKHeaders, error)
 	// ListSubjects invokes ListSubjects operation.
 	//
 	// Список тематик для организаций.
@@ -453,7 +459,28 @@ type Invoker interface {
 	// Список согласий пользователя.
 	//
 	// GET /users/{talent_id}/consents
-	ListUserConsents(ctx context.Context, params ListUserConsentsParams) (ListUserConsentsRes, error)
+	ListUserConsents(ctx context.Context, params ListUserConsentsParams) ([]ListUserConsentsItem, error)
+	// ListUserTeamPersons invokes ListUserTeamPersons operation.
+	//
+	// Список участий в команде во всех статусах:
+	//
+	//  - подтвержденные участники
+	//  - приглашения в команду от капитана
+	//  - запросы на вступление от участников
+	//  - отклоненные (какой-либо из сторон) участия
+	//
+	// GET /users/me/teams/{team_id}/persons
+	ListUserTeamPersons(ctx context.Context, params ListUserTeamPersonsParams) ([]TeamPersonWithUser, error)
+	// ListUserTeams invokes ListUserTeams operation.
+	//
+	// Список всех существующих, прошлых и будущих участий
+	// пользователя в командах.
+	//
+	// В качестве идентификатора используется идентификатор
+	// участия, возвращаемый в `[].person.id`.
+	//
+	// GET /users/me/teams
+	ListUserTeams(ctx context.Context, params ListUserTeamsParams) ([]ListUserTeamsOKItem, error)
 	// LoginSocialAuth invokes LoginSocialAuth operation.
 	//
 	// Авторизация во внешнем провайдере.
@@ -469,18 +496,12 @@ type Invoker interface {
 	// 	Неактивная блокировка равнозначна ее отсутствию.
 	//
 	// PATCH /mutation-locks/{object_namespace}/{object_key}
-	PatchMutationLock(ctx context.Context, request *PatchMutationLockReq, params PatchMutationLockParams) (PatchMutationLockRes, error)
+	PatchMutationLock(ctx context.Context, request *PatchMutationLockReq, params PatchMutationLockParams) (*MutationLockPatched, error)
 	// ReadEvent invokes ReadEvent operation.
 	//
 	// По умолчанию возвращаются только метаданные. Для
 	// получения полного набора свойств используйте
 	// параметр `extend`.
-	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+-------------------------------------------
-	// 	`404`  | Мероприятие не найдено
 	//
 	// GET /events/{event_id}
 	ReadEvent(ctx context.Context, params ReadEventParams) (ReadEventOK, error)
@@ -489,7 +510,7 @@ type Invoker interface {
 	// Чтение отложенного уведомления.
 	//
 	// GET /events/{event_id}/deferred-notification
-	ReadEventDeferredNotification(ctx context.Context, params ReadEventDeferredNotificationParams) (ReadEventDeferredNotificationRes, error)
+	ReadEventDeferredNotification(ctx context.Context, params ReadEventDeferredNotificationParams) (*EventDeferredNotification, error)
 	// ReadEventDiplomaSettings invokes ReadEventDiplomaSettings operation.
 	//
 	// Чтение настроек дипломов мероприятия.
@@ -498,30 +519,22 @@ type Invoker interface {
 	ReadEventDiplomaSettings(ctx context.Context, params ReadEventDiplomaSettingsParams) (ReadEventDiplomaSettingsRes, error)
 	// ReadEventLimit invokes ReadEventLimit operation.
 	//
-	// Чтение лимитов мероприятия.
+	// Публичное чтение ограничений мероприятия.
 	//
 	// GET /events/{event_id}/limit
-	ReadEventLimit(ctx context.Context, params ReadEventLimitParams) (ReadEventLimitRes, error)
+	ReadEventLimit(ctx context.Context, params ReadEventLimitParams) (*EventLimit, error)
 	// ReadEventRequest invokes ReadEventRequest operation.
 	//
 	// Ответ дополняется значениями заполненных в заявке
 	// полей при указании параметра `fields=true`.
 	//
 	// GET /events/requests/{event_request_id}
-	ReadEventRequest(ctx context.Context, params ReadEventRequestParams) (ReadEventRequestRes, error)
+	ReadEventRequest(ctx context.Context, params ReadEventRequestParams) (*EventRequest, error)
 	// ReadEventTeam invokes ReadEventTeam operation.
 	//
 	// Команда на мероприятие для администратора его
 	// организации. Включает проверку наличия актуального
 	// соглашения с организацией.
-	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+-----------------------------------------------------------------------------------------------------
-	// 	`403`  | Пользователь не является администратором организации
-	// 	`404`  | Мероприятие не найдено
-	// 	`404`  | Команда не найдена
 	//
 	// GET /events/{event_id}/teams/{team_id}
 	ReadEventTeam(ctx context.Context, params ReadEventTeamParams) (*TeamPrivateWithPersons, error)
@@ -545,37 +558,27 @@ type Invoker interface {
 	// `files:read`.
 	//
 	// GET /files/{file_id}/meta
-	ReadFileMeta(ctx context.Context, params ReadFileMetaParams) (ReadFileMetaRes, error)
+	ReadFileMeta(ctx context.Context, params ReadFileMetaParams) (*FileMeta, error)
 	// ReadGeoData invokes ReadGeoData operation.
 	//
 	// Все свойства, кроме отмеченных как `nullable`, могут
 	// содержать пустые строки в значениях.
 	//
 	// GET /geo/{geodata_id}
-	ReadGeoData(ctx context.Context, params ReadGeoDataParams) (ReadGeoDataRes, error)
+	ReadGeoData(ctx context.Context, params ReadGeoDataParams) (*GeoData, error)
 	// ReadPerson invokes ReadPerson operation.
 	//
 	// Чтение персоны, опционально ассоциированной с
 	// пользователем.
 	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+-----------------------------------
-	// 	`404`  | Персона не найдена
-	//
 	// GET /persons/{person_id}
 	ReadPerson(ctx context.Context, params ReadPersonParams) (*ReadPersonOK, error)
 	// ReadTeam invokes ReadTeam operation.
 	//
-	// Свойства команды, опционально содержащие список ее
-	// участников.
+	// Чтение публичных свойств команды.
 	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+-----------------------------------
-	// 	`404`  | Команда не найдена
+	// Опциональный массив `persons` включает в себя только
+	// подтвержденных участников.
 	//
 	// GET /teams/{team_id}
 	ReadTeam(ctx context.Context, params ReadTeamParams) (*TeamPublicWithPersons, error)
@@ -583,12 +586,8 @@ type Invoker interface {
 	//
 	// Чтение команды ее участником или капитаном.
 	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+-----------------------------------------------------------------------------------------------------------------
-	// 	`403`  | Пользователь не является ни участником, ни капитаном команды
-	// 	`404`  | Команда не найдена
+	// Опциональный массив `persons` включает в себя только
+	// подтвержденных участников.
 	//
 	// GET /users/me/teams/{team_id}
 	ReadUserTeam(ctx context.Context, params ReadUserTeamParams) (*TeamPrivateWithPersons, error)
@@ -597,7 +596,7 @@ type Invoker interface {
 	// Название региона по ФИАС ID.
 	//
 	// GET /geo/fias/region/{fias}
-	RegionName(ctx context.Context, params RegionNameParams) (RegionNameRes, error)
+	RegionName(ctx context.Context, params RegionNameParams) (*RegionNameOK, error)
 	// Signup invokes Signup operation.
 	//
 	// Регистрация пользователя.
@@ -624,26 +623,27 @@ type Invoker interface {
 	SuggestGeoField(ctx context.Context, params SuggestGeoFieldParams) ([]SuggestGeoFieldOKItem, error)
 	// UpdateEvent invokes UpdateEvent operation.
 	//
-	// Обновление свойств мероприятия.
+	// Обновление мероприятия администратором организации.
 	//
 	// PATCH /events/{event_id}
-	UpdateEvent(ctx context.Context, request *UpdateEventReq, params UpdateEventParams) (UpdateEventRes, error)
+	UpdateEvent(ctx context.Context, request *OrganizationEventUpdate, params UpdateEventParams) (UpdateEventRes, error)
 	// UpdateEventDeferredNotification invokes UpdateEventDeferredNotification operation.
 	//
 	// Если уведомление уже существует и оно находится в
 	// статусе `canceled`, оно будет переведено в статус `pending`.
 	//
 	// PATCH /events/{event_id}/deferred-notification
-	UpdateEventDeferredNotification(ctx context.Context, request *UpdateEventDeferredNotificationReq, params UpdateEventDeferredNotificationParams) (UpdateEventDeferredNotificationRes, error)
+	UpdateEventDeferredNotification(ctx context.Context, request *UpdateEventDeferredNotificationReq, params UpdateEventDeferredNotificationParams) (*EventDeferredNotification, error)
 	// UpdateEventDiplomaSettings invokes UpdateEventDiplomaSettings operation.
 	//
 	// Обновление настроек дипломов мероприятия.
 	//
 	// PATCH /events/{event_id}/diploma-settings
-	UpdateEventDiplomaSettings(ctx context.Context, request *UpdateEventDiplomaSettingsReq, params UpdateEventDiplomaSettingsParams) (UpdateEventDiplomaSettingsRes, error)
+	UpdateEventDiplomaSettings(ctx context.Context, request *UpdateEventDiplomaSettingsReq, params UpdateEventDiplomaSettingsParams) (*EventDiplomaSettings, error)
 	// UpdateEventLimit invokes UpdateEventLimit operation.
 	//
-	// Обновление лимитов мероприятия.
+	// Обновление ограничений мероприятия администратором
+	// его организации.
 	//
 	// PATCH /events/{event_id}/limit
 	UpdateEventLimit(ctx context.Context, request *EventLimitWrite, params UpdateEventLimitParams) (UpdateEventLimitRes, error)
@@ -659,32 +659,12 @@ type Invoker interface {
 	// Обновление свойств команды администратором
 	// организатора мероприятия.
 	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+-----------------------------------------------------------------------------------------------------------------------------------------
-	// 	`403`  | Пользователь не является администратором организации
-	// 	`404`  | Мероприятие не найдено
-	// 	`404`  | Команда не найдена
-	// 	`409`  | У назначаемого капитаном пользователя уже имеется команда на мероприятии
-	// 	`409`  | Команда с таким названием уже имеется на мероприятии
-	//
 	// PATCH /events/{event_id}/teams/{team_id}
 	UpdateEventTeam(ctx context.Context, request *OrganizationTeamUpdate, params UpdateEventTeamParams) (UpdateEventTeamRes, error)
 	// UpdateEventTeamPerson invokes UpdateEventTeamPerson operation.
 	//
 	// Изменение статуса участника команды администратором
 	// организации мероприятия.
-	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+----------------------------------------------------------------------------------------------------------------------------
-	// 	`403`  | Пользователь не является администратором организации
-	// 	`404`  | Мероприятие не найдено
-	// 	`404`  | Команда не найдена
-	// 	`404`  | Участник команды не найден
-	// 	`409`  | У подтверждаемого пользователя уже имеется команда на мероприятии
 	//
 	// PATCH /events/{event_id}/teams/{team_id}/persons/{team_person_id}
 	UpdateEventTeamPerson(ctx context.Context, request *OrganizationTeamPersonUpdate, params UpdateEventTeamPersonParams) (*TeamPerson, error)
@@ -693,23 +673,10 @@ type Invoker interface {
 	// Обновление информации о файле.
 	//
 	// PATCH /files/{file_id}/meta
-	UpdateFileMeta(ctx context.Context, request *UpdateFileMetaReq, params UpdateFileMetaParams) (UpdateFileMetaRes, error)
+	UpdateFileMeta(ctx context.Context, request *UpdateFileMetaReq, params UpdateFileMetaParams) (*FileMeta, error)
 	// UpdateOwnerTeamPerson invokes UpdateOwnerTeamPerson operation.
 	//
 	// Изменение статуса участника команды ее капитаном.
-	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+-----------------------------------------------------------------------------------------------------------
-	// 	`403`  | Пользователь не является капитаном команды
-	// 	`403`  | Мероприятие команды завершено
-	// 	`404`  | Команда не найдена
-	// 	`404`  | Не найден участник команды
-	// 	`409`  | У пользователя уже имеется команда на мероприятии
-	// 	`422`  | У пользователя отсутствует заявка на мероприятие команды
-	// 	`422`  | Достижение допустимого количества участников команды
-	// 	`422`  | Достижение допустимого количества приглашений в команду
 	//
 	// PATCH /users/me/teams/{team_id}/persons/{team_person_id}
 	UpdateOwnerTeamPerson(ctx context.Context, request *OwnerTeamPersonUpdate, params UpdateOwnerTeamPersonParams) (UpdateOwnerTeamPersonRes, error)
@@ -717,36 +684,11 @@ type Invoker interface {
 	//
 	// Обновление свойств команды ее капитаном.
 	//
-	// # Причины 4xx ошибок
-	//
-	// Таблица не включает в себя ошибки валидации
-	// возвращаемые с 422 статусом.
-	//
-	// 	Код | Описание
-	// 	-------+--------------------------------------------------------------------------------------------------
-	// 	`403`  | Пользователь не является капитаном команды
-	// 	`403`  | Мероприятие завершено
-	// 	`404`  | Команда не найдена
-	// 	`409`  | У пользователя уже имеется команда на мероприятии
-	// 	`409`  | Команда с таким названием уже имеется на мероприятии
-	//
 	// PATCH /users/me/teams/{team_id}
 	UpdateUserTeam(ctx context.Context, request *OwnerTeamUpdate, params UpdateUserTeamParams) (UpdateUserTeamRes, error)
 	// UpdateUserTeamPerson invokes UpdateUserTeamPerson operation.
 	//
 	// Изменение статуса участия в команде от ее участника.
-	//
-	// # Причины 4xx ошибок
-	//
-	// 	Код | Описание
-	// 	-------+------------------------------------------------------------------------------------------------------------------------------------
-	// 	`403`  | Мероприятие команды завершено
-	// 	`404`  | Команда не найдена
-	// 	`404`  | Пользователь не является участником команды
-	// 	`409`  | У пользователя уже имеется команда на мероприятии
-	// 	`422`  | У пользователя отсутствует заявка на мероприятие команды
-	// 	`422`  | Достижение допустимого количества участников команды
-	// 	`422`  | Достижение допустимого количества запросов в команды для пользователя
 	//
 	// PATCH /users/me/teams/{team_id}/persons/me
 	UpdateUserTeamPerson(ctx context.Context, request *UserTeamPersonUpdate, params UpdateUserTeamPersonParams) (UpdateUserTeamPersonRes, error)
@@ -757,7 +699,7 @@ type Invoker interface {
 	// версии файла (того же типа, но другого размера).
 	//
 	// PUT /files/{file_id}
-	UploadFile(ctx context.Context, request *UploadFileReq, params UploadFileParams) (UploadFileRes, error)
+	UploadFile(ctx context.Context, request *UploadFileReq, params UploadFileParams) (*FilePresignedRequest, error)
 	// ValidateAuthorization invokes ValidateAuthorization operation.
 	//
 	// Валидация авторизационных параметров.
@@ -963,18 +905,673 @@ func (c *Client) sendAddEventDiplomaRole(ctx context.Context, params AddEventDip
 	return result, nil
 }
 
+// AdminCreateEvent invokes AdminCreateEvent operation.
+//
+// Создание мероприятия администратором платформы.
+//
+// POST /admin/events
+func (c *Client) AdminCreateEvent(ctx context.Context, request *AdminEventCreate) (AdminCreateEventRes, error) {
+	res, err := c.sendAdminCreateEvent(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendAdminCreateEvent(ctx context.Context, request *AdminEventCreate) (res AdminCreateEventRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AdminCreateEvent"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.URLTemplateKey.String("/admin/events"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, AdminCreateEventOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/admin/events"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeAdminCreateEventRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, AdminCreateEventOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeAdminCreateEventResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// AdminCreateEventLimit invokes AdminCreateEventLimit operation.
+//
+// Создание ограничений мероприятия администратором
+// платформы.
+//
+// POST /admin/events/{event_id}/limit
+func (c *Client) AdminCreateEventLimit(ctx context.Context, request *EventLimitWrite, params AdminCreateEventLimitParams) (AdminCreateEventLimitRes, error) {
+	res, err := c.sendAdminCreateEventLimit(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendAdminCreateEventLimit(ctx context.Context, request *EventLimitWrite, params AdminCreateEventLimitParams) (res AdminCreateEventLimitRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AdminCreateEventLimit"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.URLTemplateKey.String("/admin/events/{event_id}/limit"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, AdminCreateEventLimitOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/admin/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/limit"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeAdminCreateEventLimitRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, AdminCreateEventLimitOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeAdminCreateEventLimitResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// AdminDeleteEventLimit invokes AdminDeleteEventLimit operation.
+//
+// Удаление ограничений мероприятия администратором
+// платформы.
+//
+// DELETE /admin/events/{event_id}/limit
+func (c *Client) AdminDeleteEventLimit(ctx context.Context, params AdminDeleteEventLimitParams) error {
+	_, err := c.sendAdminDeleteEventLimit(ctx, params)
+	return err
+}
+
+func (c *Client) sendAdminDeleteEventLimit(ctx context.Context, params AdminDeleteEventLimitParams) (res *AdminDeleteEventLimitNoContent, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AdminDeleteEventLimit"),
+		semconv.HTTPRequestMethodKey.String("DELETE"),
+		semconv.URLTemplateKey.String("/admin/events/{event_id}/limit"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, AdminDeleteEventLimitOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/admin/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/limit"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, AdminDeleteEventLimitOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeAdminDeleteEventLimitResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// AdminUpdateEvent invokes AdminUpdateEvent operation.
+//
+// Обновление мероприятия администратором платформы.
+//
+// PATCH /admin/events/{event_id}
+func (c *Client) AdminUpdateEvent(ctx context.Context, request *AdminEventUpdate, params AdminUpdateEventParams) (AdminUpdateEventRes, error) {
+	res, err := c.sendAdminUpdateEvent(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendAdminUpdateEvent(ctx context.Context, request *AdminEventUpdate, params AdminUpdateEventParams) (res AdminUpdateEventRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AdminUpdateEvent"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.URLTemplateKey.String("/admin/events/{event_id}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, AdminUpdateEventOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/admin/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeAdminUpdateEventRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, AdminUpdateEventOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeAdminUpdateEventResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// AdminUpdateEventLimit invokes AdminUpdateEventLimit operation.
+//
+// Обновление ограничений мероприятия администратором
+// платформы.
+//
+// PATCH /admin/events/{event_id}/limit
+func (c *Client) AdminUpdateEventLimit(ctx context.Context, request *EventLimitWrite, params AdminUpdateEventLimitParams) (AdminUpdateEventLimitRes, error) {
+	res, err := c.sendAdminUpdateEventLimit(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendAdminUpdateEventLimit(ctx context.Context, request *EventLimitWrite, params AdminUpdateEventLimitParams) (res AdminUpdateEventLimitRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AdminUpdateEventLimit"),
+		semconv.HTTPRequestMethodKey.String("PATCH"),
+		semconv.URLTemplateKey.String("/admin/events/{event_id}/limit"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, AdminUpdateEventLimitOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/admin/events/"
+	{
+		// Encode "event_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "event_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.EventID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/limit"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeAdminUpdateEventLimitRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, AdminUpdateEventLimitOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeAdminUpdateEventLimitResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // ArchiveEventRequestsFiles invokes ArchiveEventRequestsFiles operation.
 //
 // Обязательно нужно указать один из параметров: `field_id`
 // или `request_id`.
 //
 // GET /events/{event_id}/requests-files
-func (c *Client) ArchiveEventRequestsFiles(ctx context.Context, params ArchiveEventRequestsFilesParams) (ArchiveEventRequestsFilesRes, error) {
+func (c *Client) ArchiveEventRequestsFiles(ctx context.Context, params ArchiveEventRequestsFilesParams) (*ArchiveEventRequestsFilesOKHeaders, error) {
 	res, err := c.sendArchiveEventRequestsFiles(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendArchiveEventRequestsFiles(ctx context.Context, params ArchiveEventRequestsFilesParams) (res ArchiveEventRequestsFilesRes, err error) {
+func (c *Client) sendArchiveEventRequestsFiles(ctx context.Context, params ArchiveEventRequestsFilesParams) (res *ArchiveEventRequestsFilesOKHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ArchiveEventRequestsFiles"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -1256,12 +1853,12 @@ func (c *Client) sendAuthorizeClient(ctx context.Context) (res *AuthorizeClientF
 // возвращен `404` ответ.
 //
 // DELETE /events/{event_id}/deferred-notification
-func (c *Client) CancelEventDeferredNotification(ctx context.Context, params CancelEventDeferredNotificationParams) (CancelEventDeferredNotificationRes, error) {
+func (c *Client) CancelEventDeferredNotification(ctx context.Context, params CancelEventDeferredNotificationParams) (*EventDeferredNotification, error) {
 	res, err := c.sendCancelEventDeferredNotification(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendCancelEventDeferredNotification(ctx context.Context, params CancelEventDeferredNotificationParams) (res CancelEventDeferredNotificationRes, err error) {
+func (c *Client) sendCancelEventDeferredNotification(ctx context.Context, params CancelEventDeferredNotificationParams) (res *EventDeferredNotification, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CancelEventDeferredNotification"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -1538,12 +2135,12 @@ func (c *Client) sendCheckUserConsent(ctx context.Context, params CheckUserConse
 // Название города по ФИАС ID.
 //
 // GET /geo/fias/city/{fias}
-func (c *Client) CityName(ctx context.Context, params CityNameParams) (CityNameRes, error) {
+func (c *Client) CityName(ctx context.Context, params CityNameParams) (*CityNameOK, error) {
 	res, err := c.sendCityName(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendCityName(ctx context.Context, params CityNameParams) (res CityNameRes, err error) {
+func (c *Client) sendCityName(ctx context.Context, params CityNameParams) (res *CityNameOK, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CityName"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -1771,11 +2368,6 @@ func (c *Client) sendCompleteSocialAuth(ctx context.Context, params CompleteSoci
 // Для предварительной валидации запроса, без
 // подтверждения заявки, нужно указать параметр `dry_run=true`.
 //
-// `4xx` ответы:
-//
-//   - `404` - если не найдена подтверждаемая заявка;
-//   - `422` - если токен не валиден.
-//
 // POST /events/confirm-signup/{event_request_id}/{token}
 func (c *Client) ConfirmEventSignup(ctx context.Context, request OptConfirmEventSignupReq, params ConfirmEventSignupParams) (ConfirmEventSignupRes, error) {
 	res, err := c.sendConfirmEventSignup(ctx, request, params)
@@ -1918,12 +2510,12 @@ func (c *Client) sendConfirmEventSignup(ctx context.Context, request OptConfirmE
 // Подтверждение загрузки файла.
 //
 // POST /files/{file_id}/confirm-upload
-func (c *Client) ConfirmFileUpload(ctx context.Context, params ConfirmFileUploadParams) (ConfirmFileUploadRes, error) {
+func (c *Client) ConfirmFileUpload(ctx context.Context, params ConfirmFileUploadParams) (*FileMeta, error) {
 	res, err := c.sendConfirmFileUpload(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendConfirmFileUpload(ctx context.Context, params ConfirmFileUploadParams) (res ConfirmFileUploadRes, err error) {
+func (c *Client) sendConfirmFileUpload(ctx context.Context, params ConfirmFileUploadParams) (res *FileMeta, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ConfirmFileUpload"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -2421,18 +3013,20 @@ func (c *Client) sendCountEvents(ctx context.Context, params CountEventsParams) 
 
 // CreateEvent invokes CreateEvent operation.
 //
+// Создание мероприятия администратором организации.
+//
 // При полном отсутствии в запросе массива `achievement_roles`,
 // мероприятию назначаются роли достижений по-умолчанию.
 // Пустой же массив приведет к созданию мероприятия без
 // ролей.
 //
 // POST /events
-func (c *Client) CreateEvent(ctx context.Context, request *CreateEventReq) (CreateEventRes, error) {
+func (c *Client) CreateEvent(ctx context.Context, request *OrganizationEventCreate) (CreateEventRes, error) {
 	res, err := c.sendCreateEvent(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendCreateEvent(ctx context.Context, request *CreateEventReq) (res CreateEventRes, err error) {
+func (c *Client) sendCreateEvent(ctx context.Context, request *OrganizationEventCreate) (res CreateEventRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateEvent"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -2543,12 +3137,12 @@ func (c *Client) sendCreateEvent(ctx context.Context, request *CreateEventReq) (
 // Создание отложенного уведомления.
 //
 // POST /events/{event_id}/deferred-notification
-func (c *Client) CreateEventDeferredNotification(ctx context.Context, request *CreateEventDeferredNotificationReq, params CreateEventDeferredNotificationParams) (CreateEventDeferredNotificationRes, error) {
+func (c *Client) CreateEventDeferredNotification(ctx context.Context, request *CreateEventDeferredNotificationReq, params CreateEventDeferredNotificationParams) (*EventDeferredNotification, error) {
 	res, err := c.sendCreateEventDeferredNotification(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendCreateEventDeferredNotification(ctx context.Context, request *CreateEventDeferredNotificationReq, params CreateEventDeferredNotificationParams) (res CreateEventDeferredNotificationRes, err error) {
+func (c *Client) sendCreateEventDeferredNotification(ctx context.Context, request *CreateEventDeferredNotificationReq, params CreateEventDeferredNotificationParams) (res *EventDeferredNotification, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateEventDeferredNotification"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -2678,12 +3272,12 @@ func (c *Client) sendCreateEventDeferredNotification(ctx context.Context, reques
 // Создание настроек дипломов мероприятия.
 //
 // POST /events/{event_id}/diploma-settings
-func (c *Client) CreateEventDiplomaSettings(ctx context.Context, request *CreateEventDiplomaSettingsReq, params CreateEventDiplomaSettingsParams) (CreateEventDiplomaSettingsRes, error) {
+func (c *Client) CreateEventDiplomaSettings(ctx context.Context, request *CreateEventDiplomaSettingsReq, params CreateEventDiplomaSettingsParams) (*EventDiplomaSettings, error) {
 	res, err := c.sendCreateEventDiplomaSettings(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendCreateEventDiplomaSettings(ctx context.Context, request *CreateEventDiplomaSettingsReq, params CreateEventDiplomaSettingsParams) (res CreateEventDiplomaSettingsRes, err error) {
+func (c *Client) sendCreateEventDiplomaSettings(ctx context.Context, request *CreateEventDiplomaSettingsReq, params CreateEventDiplomaSettingsParams) (res *EventDiplomaSettings, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateEventDiplomaSettings"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -2810,9 +3404,8 @@ func (c *Client) sendCreateEventDiplomaSettings(ctx context.Context, request *Cr
 
 // CreateEventLimit invokes CreateEventLimit operation.
 //
-// Лимиты могут существовать только в единичном кол-ве на
-// мероприятие. Попытка создать больше будет возвращать
-// `409` ответ.
+// Создание ограничений мероприятия администратором его
+// организации.
 //
 // POST /events/{event_id}/limit
 func (c *Client) CreateEventLimit(ctx context.Context, request *EventLimitWrite, params CreateEventLimitParams) (CreateEventLimitRes, error) {
@@ -3088,16 +3681,6 @@ func (c *Client) sendCreateEventTeam(ctx context.Context, request *OrganizationT
 // Добавление в команду участника мероприятия
 // администратором организации.
 //
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+----------------------------------------------------------------------------------------------------------------------
-//	`403`  | Пользователь не является администратором организации
-//	`404`  | Мероприятие не найдено
-//	`404`  | Команда не найдена
-//	`409`  | У добавляемого пользователя уже имеется команда на мероприятии
-//	`422`  | Невалидный идентификатор пользователя
-//
 // POST /events/{event_id}/teams/{team_id}/persons
 func (c *Client) CreateEventTeamPerson(ctx context.Context, request *CreateEventTeamPersonReq, params CreateEventTeamPersonParams) (CreateEventTeamPersonRes, error) {
 	res, err := c.sendCreateEventTeamPerson(ctx, request, params)
@@ -3253,12 +3836,12 @@ func (c *Client) sendCreateEventTeamPerson(ctx context.Context, request *CreateE
 // Создание файла.
 //
 // POST /files
-func (c *Client) CreateFileMeta(ctx context.Context, request *CreateFileMetaReq) (CreateFileMetaRes, error) {
+func (c *Client) CreateFileMeta(ctx context.Context, request *CreateFileMetaReq) (*CreateFileMetaCreated, error) {
 	res, err := c.sendCreateFileMeta(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendCreateFileMeta(ctx context.Context, request *CreateFileMetaReq) (res CreateFileMetaRes, err error) {
+func (c *Client) sendCreateFileMeta(ctx context.Context, request *CreateFileMetaReq) (res *CreateFileMetaCreated, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateFileMeta"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -3369,12 +3952,12 @@ func (c *Client) sendCreateFileMeta(ctx context.Context, request *CreateFileMeta
 // Добавление ссылки на файл.
 //
 // PUT /files/{file_id}/references/{object_id}
-func (c *Client) CreateFileReference(ctx context.Context, params CreateFileReferenceParams) (CreateFileReferenceRes, error) {
+func (c *Client) CreateFileReference(ctx context.Context, params CreateFileReferenceParams) (*FileReference, error) {
 	res, err := c.sendCreateFileReference(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendCreateFileReference(ctx context.Context, params CreateFileReferenceParams) (res CreateFileReferenceRes, err error) {
+func (c *Client) sendCreateFileReference(ctx context.Context, params CreateFileReferenceParams) (res *FileReference, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateFileReference"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -3677,12 +4260,12 @@ func (c *Client) sendCreateMutationLock(ctx context.Context, request []uuid.UUID
 //	запроса.
 //
 // POST /organization-subjects
-func (c *Client) CreateOrganizationSubject(ctx context.Context, request *OrganizationSubjectBody) (CreateOrganizationSubjectRes, error) {
+func (c *Client) CreateOrganizationSubject(ctx context.Context, request *OrganizationSubjectBody) (*OrganizationSubject, error) {
 	res, err := c.sendCreateOrganizationSubject(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendCreateOrganizationSubject(ctx context.Context, request *OrganizationSubjectBody) (res CreateOrganizationSubjectRes, err error) {
+func (c *Client) sendCreateOrganizationSubject(ctx context.Context, request *OrganizationSubjectBody) (res *OrganizationSubject, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("CreateOrganizationSubject"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -3793,21 +4376,6 @@ func (c *Client) sendCreateOrganizationSubject(ctx context.Context, request *Org
 // Создание команды от аутентифицированного
 // пользователя. Пользователь становится и ее капитаном
 // и ее первым участником.
-//
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+--------------------------------------------------------------------------------------------------------------------
-//	`403`  | Мероприятие завершено
-//	`404`  | Команда не найдена
-//	`409`  | У пользователя уже имеется команда на мероприятии
-//	`409`  | Команда с таким названием уже имеется на мероприятии
-//	`422`  | Невалидный идентификатор мероприятия
-//	`422`  | Невалидная контактная ссылка
-//	`422`  | Невалидное название команды
-//	`422`  | Мероприятие не допускает командного участия
-//	`422`  | Мероприятие не допускает управления параметром `assignment_participation`
-//	`422`  | Название команды уже занято на мероприятии
 //
 // POST /users/me/teams
 func (c *Client) CreateUserTeam(ctx context.Context, request *OwnerTeamCreate) (CreateUserTeamRes, error) {
@@ -3938,21 +4506,6 @@ func (c *Client) sendCreateUserTeam(ctx context.Context, request *OwnerTeamCreat
 //     отклонивший свое участие
 //   - на запрос от самого участника, может вернуться уже
 //     имеющаяся заявка на участие, отклоненная капитаном.
-//
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+------------------------------------------------------------------------------------------------------------------------------------
-//	`403`  | Пользователь не является капитаном команды
-//	`403`  | Мероприятие команды завершено
-//	`404`  | Команда не найдена
-//	`409`  | У добавляемого пользователя уже имеется команда на мероприятии
-//	`422`  | Указан невалидный ID пользователя
-//	`422`  | Указан неправильный инвайт-код
-//	`422`  | У добавляемого пользователя отсутствует заявка на мероприятие команды
-//	`422`  | Достижение допустимого количества участников команды
-//	`422`  | Достижение допустимого количества приглашений в команду
-//	`422`  | Достижение допустимого количества запросов в команды для пользователя
 //
 // POST /users/me/teams/{team_id}/persons
 func (c *Client) CreateUserTeamPerson(ctx context.Context, request CreateUserTeamPersonReq, params CreateUserTeamPersonParams) (CreateUserTeamPersonRes, error) {
@@ -4237,15 +4790,16 @@ func (c *Client) sendDeleteEventDiplomaRole(ctx context.Context, params DeleteEv
 
 // DeleteEventLimit invokes DeleteEventLimit operation.
 //
-// Удаление лимитов мероприятия.
+// Удаление ограничений мероприятия администратором его
+// организации.
 //
 // DELETE /events/{event_id}/limit
-func (c *Client) DeleteEventLimit(ctx context.Context, params DeleteEventLimitParams) (DeleteEventLimitRes, error) {
-	res, err := c.sendDeleteEventLimit(ctx, params)
-	return res, err
+func (c *Client) DeleteEventLimit(ctx context.Context, params DeleteEventLimitParams) error {
+	_, err := c.sendDeleteEventLimit(ctx, params)
+	return err
 }
 
-func (c *Client) sendDeleteEventLimit(ctx context.Context, params DeleteEventLimitParams) (res DeleteEventLimitRes, err error) {
+func (c *Client) sendDeleteEventLimit(ctx context.Context, params DeleteEventLimitParams) (res *DeleteEventLimitNoContent, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("DeleteEventLimit"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -4372,12 +4926,12 @@ func (c *Client) sendDeleteEventLimit(ctx context.Context, params DeleteEventLim
 // Удаление ссылки на файл.
 //
 // DELETE /files/{file_id}/references/{object_id}
-func (c *Client) DeleteFileReference(ctx context.Context, params DeleteFileReferenceParams) (DeleteFileReferenceRes, error) {
-	res, err := c.sendDeleteFileReference(ctx, params)
-	return res, err
+func (c *Client) DeleteFileReference(ctx context.Context, params DeleteFileReferenceParams) error {
+	_, err := c.sendDeleteFileReference(ctx, params)
+	return err
 }
 
-func (c *Client) sendDeleteFileReference(ctx context.Context, params DeleteFileReferenceParams) (res DeleteFileReferenceRes, err error) {
+func (c *Client) sendDeleteFileReference(ctx context.Context, params DeleteFileReferenceParams) (res *DeleteFileReferenceNoContent, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("DeleteFileReference"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -4522,12 +5076,12 @@ func (c *Client) sendDeleteFileReference(ctx context.Context, params DeleteFileR
 // Удаление блокировки.
 //
 // DELETE /mutation-locks/{object_namespace}/{object_key}
-func (c *Client) DeleteMutationLock(ctx context.Context, params DeleteMutationLockParams) (DeleteMutationLockRes, error) {
-	res, err := c.sendDeleteMutationLock(ctx, params)
-	return res, err
+func (c *Client) DeleteMutationLock(ctx context.Context, params DeleteMutationLockParams) error {
+	_, err := c.sendDeleteMutationLock(ctx, params)
+	return err
 }
 
-func (c *Client) sendDeleteMutationLock(ctx context.Context, params DeleteMutationLockParams) (res DeleteMutationLockRes, err error) {
+func (c *Client) sendDeleteMutationLock(ctx context.Context, params DeleteMutationLockParams) (res *DeleteMutationLockNoContent, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("DeleteMutationLock"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -4667,6 +5221,140 @@ func (c *Client) sendDeleteMutationLock(ctx context.Context, params DeleteMutati
 	return result, nil
 }
 
+// DeleteUserTeam invokes DeleteUserTeam operation.
+//
+// Удаление команды ее капитаном.
+//
+// К удалению доступны только команды не содержащие
+// других, помимо капитана, участников.
+//
+// DELETE /users/me/teams/{team_id}
+func (c *Client) DeleteUserTeam(ctx context.Context, params DeleteUserTeamParams) error {
+	_, err := c.sendDeleteUserTeam(ctx, params)
+	return err
+}
+
+func (c *Client) sendDeleteUserTeam(ctx context.Context, params DeleteUserTeamParams) (res *DeleteUserTeamNoContent, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("DeleteUserTeam"),
+		semconv.HTTPRequestMethodKey.String("DELETE"),
+		semconv.URLTemplateKey.String("/users/me/teams/{team_id}"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, DeleteUserTeamOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/users/me/teams/"
+	{
+		// Encode "team_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, DeleteUserTeamOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeDeleteUserTeamResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // DisconnectSocialAuth invokes DisconnectSocialAuth operation.
 //
 // Удаление авторизации возможно только если это не
@@ -4678,12 +5366,12 @@ func (c *Client) sendDeleteMutationLock(ctx context.Context, params DeleteMutati
 // возвращен 409 ответ.
 //
 // POST /auth/disconnect/{provider}/{uid}
-func (c *Client) DisconnectSocialAuth(ctx context.Context, params DisconnectSocialAuthParams) (DisconnectSocialAuthRes, error) {
-	res, err := c.sendDisconnectSocialAuth(ctx, params)
-	return res, err
+func (c *Client) DisconnectSocialAuth(ctx context.Context, params DisconnectSocialAuthParams) error {
+	_, err := c.sendDisconnectSocialAuth(ctx, params)
+	return err
 }
 
-func (c *Client) sendDisconnectSocialAuth(ctx context.Context, params DisconnectSocialAuthParams) (res DisconnectSocialAuthRes, err error) {
+func (c *Client) sendDisconnectSocialAuth(ctx context.Context, params DisconnectSocialAuthParams) (res *DisconnectSocialAuthNoContent, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("DisconnectSocialAuth"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -4828,12 +5516,12 @@ func (c *Client) sendDisconnectSocialAuth(ctx context.Context, params Disconnect
 // Идентификатор шаблона отложенного уведомления.
 //
 // GET /event-deferred-notification-templates/{name}
-func (c *Client) EventDeferredNotificationTemplateID(ctx context.Context, params EventDeferredNotificationTemplateIDParams) (EventDeferredNotificationTemplateIDRes, error) {
+func (c *Client) EventDeferredNotificationTemplateID(ctx context.Context, params EventDeferredNotificationTemplateIDParams) (EventDeferredNotificationTemplateID, error) {
 	res, err := c.sendEventDeferredNotificationTemplateID(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendEventDeferredNotificationTemplateID(ctx context.Context, params EventDeferredNotificationTemplateIDParams) (res EventDeferredNotificationTemplateIDRes, err error) {
+func (c *Client) sendEventDeferredNotificationTemplateID(ctx context.Context, params EventDeferredNotificationTemplateIDParams) (res EventDeferredNotificationTemplateID, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("EventDeferredNotificationTemplateID"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -5397,13 +6085,6 @@ func (c *Client) sendIsOrganizationAdmin(ctx context.Context, params IsOrganizat
 //
 // Является ли пользователь капитаном указанной команды.
 //
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+---------------------------------------------------------------------------------
-//	`403`  | Пользователь не является капитаном команды
-//	`404`  | Команда не найдена
-//
 // POST /users/me/teams/{team_id}/is-owner
 func (c *Client) IsTeamOwner(ctx context.Context, params IsTeamOwnerParams) error {
 	_, err := c.sendIsTeamOwner(ctx, params)
@@ -5534,9 +6215,23 @@ func (c *Client) sendIsTeamOwner(ctx context.Context, params IsTeamOwnerParams) 
 
 // IssueAccessToken invokes IssueAccessToken operation.
 //
-// Выдача токена доступа.
+// Получение аутентификационного OAuth2 токена.
+//
+// Допускаемые форматы тела запроса:
+//
+//   - `application/json`
+//   - `application/x-www-form-urlencoded`
+//
+// Реализованные гранты:
+//
+//   - [client_credentials]
+//
+// Скоупы, указанные в мета-данных сервера, не
+// поддерживаются грантом `client_credentials`.
 //
 // POST /oauth/issue-token
+//
+// [client_credentials]: https://tools.ietf.org/html/rfc6749#section-4.4
 func (c *Client) IssueAccessToken(ctx context.Context) (IssueAccessTokenRes, error) {
 	res, err := c.sendIssueAccessToken(ctx)
 	return res, err
@@ -6716,12 +7411,12 @@ func (c *Client) sendListEventRoutes(ctx context.Context, params ListEventRoutes
 //     параметра `search`.
 //
 // GET /events
-func (c *Client) ListEvents(ctx context.Context, params ListEventsParams) (ListEventsRes, error) {
+func (c *Client) ListEvents(ctx context.Context, params ListEventsParams) (*ListEventsHeaders, error) {
 	res, err := c.sendListEvents(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendListEvents(ctx context.Context, params ListEventsParams) (res ListEventsRes, err error) {
+func (c *Client) sendListEvents(ctx context.Context, params ListEventsParams) (res *ListEventsHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListEvents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -7049,12 +7744,12 @@ func (c *Client) sendListEvents(ctx context.Context, params ListEventsParams) (r
 // `401` ответ.
 //
 // GET /files
-func (c *Client) ListFileMeta(ctx context.Context, params ListFileMetaParams) (ListFileMetaRes, error) {
+func (c *Client) ListFileMeta(ctx context.Context, params ListFileMetaParams) (*ListFileMetaOKHeaders, error) {
 	res, err := c.sendListFileMeta(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendListFileMeta(ctx context.Context, params ListFileMetaParams) (res ListFileMetaRes, err error) {
+func (c *Client) sendListFileMeta(ctx context.Context, params ListFileMetaParams) (res *ListFileMetaOKHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListFileMeta"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -7780,12 +8475,12 @@ func (c *Client) sendListOrganizationSubjects(ctx context.Context, params ListOr
 // Список организаций.
 //
 // GET /organizations
-func (c *Client) ListOrganizations(ctx context.Context, params ListOrganizationsParams) (ListOrganizationsRes, error) {
+func (c *Client) ListOrganizations(ctx context.Context, params ListOrganizationsParams) (*ListOrganizationsHeaders, error) {
 	res, err := c.sendListOrganizations(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendListOrganizations(ctx context.Context, params ListOrganizationsParams) (res ListOrganizationsRes, err error) {
+func (c *Client) sendListOrganizations(ctx context.Context, params ListOrganizationsParams) (res *ListOrganizationsHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListOrganizations"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -7975,12 +8670,12 @@ func (c *Client) sendListOrganizations(ctx context.Context, params ListOrganizat
 // Список авторизаций пользователя в соц. сетях.
 //
 // GET /social-auths/{talent_id}
-func (c *Client) ListSocialAuths(ctx context.Context, params ListSocialAuthsParams) (ListSocialAuthsRes, error) {
+func (c *Client) ListSocialAuths(ctx context.Context, params ListSocialAuthsParams) (*ListSocialAuthsOKHeaders, error) {
 	res, err := c.sendListSocialAuths(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendListSocialAuths(ctx context.Context, params ListSocialAuthsParams) (res ListSocialAuthsRes, err error) {
+func (c *Client) sendListSocialAuths(ctx context.Context, params ListSocialAuthsParams) (res *ListSocialAuthsOKHeaders, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListSocialAuths"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -8519,12 +9214,12 @@ func (c *Client) sendListTeams(ctx context.Context, params ListTeamsParams) (res
 // Список согласий пользователя.
 //
 // GET /users/{talent_id}/consents
-func (c *Client) ListUserConsents(ctx context.Context, params ListUserConsentsParams) (ListUserConsentsRes, error) {
+func (c *Client) ListUserConsents(ctx context.Context, params ListUserConsentsParams) ([]ListUserConsentsItem, error) {
 	res, err := c.sendListUserConsents(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendListUserConsents(ctx context.Context, params ListUserConsentsParams) (res ListUserConsentsRes, err error) {
+func (c *Client) sendListUserConsents(ctx context.Context, params ListUserConsentsParams) (res []ListUserConsentsItem, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ListUserConsents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -8639,6 +9334,491 @@ func (c *Client) sendListUserConsents(ctx context.Context, params ListUserConsen
 
 	stage = "DecodeResponse"
 	result, err := decodeListUserConsentsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ListUserTeamPersons invokes ListUserTeamPersons operation.
+//
+// Список участий в команде во всех статусах:
+//
+//   - подтвержденные участники
+//   - приглашения в команду от капитана
+//   - запросы на вступление от участников
+//   - отклоненные (какой-либо из сторон) участия
+//
+// GET /users/me/teams/{team_id}/persons
+func (c *Client) ListUserTeamPersons(ctx context.Context, params ListUserTeamPersonsParams) ([]TeamPersonWithUser, error) {
+	res, err := c.sendListUserTeamPersons(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendListUserTeamPersons(ctx context.Context, params ListUserTeamPersonsParams) (res []TeamPersonWithUser, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ListUserTeamPersons"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/users/me/teams/{team_id}/persons"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ListUserTeamPersonsOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/users/me/teams/"
+	{
+		// Encode "team_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "team_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int32ToString(params.TeamID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/persons"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "id_offset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "id_offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IDOffset.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "limit" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Limit.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "owner_accepted" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "owner_accepted",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.OwnerAccepted != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.OwnerAccepted {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "user_accepted" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "user_accepted",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.UserAccepted != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.UserAccepted {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "order_by" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "order_by",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.OrderBy.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ListUserTeamPersonsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeListUserTeamPersonsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ListUserTeams invokes ListUserTeams operation.
+//
+// Список всех существующих, прошлых и будущих участий
+// пользователя в командах.
+//
+// В качестве идентификатора используется идентификатор
+// участия, возвращаемый в `[].person.id`.
+//
+// GET /users/me/teams
+func (c *Client) ListUserTeams(ctx context.Context, params ListUserTeamsParams) ([]ListUserTeamsOKItem, error) {
+	res, err := c.sendListUserTeams(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendListUserTeams(ctx context.Context, params ListUserTeamsParams) (res []ListUserTeamsOKItem, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ListUserTeams"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/users/me/teams"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ListUserTeamsOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/users/me/teams"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "id_offset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "id_offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IDOffset.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "limit" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Limit.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "event_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "event_id",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.EventID.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "owner_accepted" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "owner_accepted",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.OwnerAccepted != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.OwnerAccepted {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "user_accepted" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "user_accepted",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.UserAccepted != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.UserAccepted {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "order_by" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "order_by",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.OrderBy.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:TalentOAuth"
+			switch err := c.securityTalentOAuth(ctx, ListUserTeamsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"TalentOAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeListUserTeamsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -8808,12 +9988,12 @@ func (c *Client) sendLoginSocialAuth(ctx context.Context, params LoginSocialAuth
 //	Неактивная блокировка равнозначна ее отсутствию.
 //
 // PATCH /mutation-locks/{object_namespace}/{object_key}
-func (c *Client) PatchMutationLock(ctx context.Context, request *PatchMutationLockReq, params PatchMutationLockParams) (PatchMutationLockRes, error) {
+func (c *Client) PatchMutationLock(ctx context.Context, request *PatchMutationLockReq, params PatchMutationLockParams) (*MutationLockPatched, error) {
 	res, err := c.sendPatchMutationLock(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendPatchMutationLock(ctx context.Context, request *PatchMutationLockReq, params PatchMutationLockParams) (res PatchMutationLockRes, err error) {
+func (c *Client) sendPatchMutationLock(ctx context.Context, request *PatchMutationLockReq, params PatchMutationLockParams) (res *MutationLockPatched, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("PatchMutationLock"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
@@ -8962,12 +10142,6 @@ func (c *Client) sendPatchMutationLock(ctx context.Context, request *PatchMutati
 // получения полного набора свойств используйте
 // параметр `extend`.
 //
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+-------------------------------------------
-//	`404`  | Мероприятие не найдено
-//
 // GET /events/{event_id}
 func (c *Client) ReadEvent(ctx context.Context, params ReadEventParams) (ReadEventOK, error) {
 	res, err := c.sendReadEvent(ctx, params)
@@ -9088,12 +10262,12 @@ func (c *Client) sendReadEvent(ctx context.Context, params ReadEventParams) (res
 // Чтение отложенного уведомления.
 //
 // GET /events/{event_id}/deferred-notification
-func (c *Client) ReadEventDeferredNotification(ctx context.Context, params ReadEventDeferredNotificationParams) (ReadEventDeferredNotificationRes, error) {
+func (c *Client) ReadEventDeferredNotification(ctx context.Context, params ReadEventDeferredNotificationParams) (*EventDeferredNotification, error) {
 	res, err := c.sendReadEventDeferredNotification(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendReadEventDeferredNotification(ctx context.Context, params ReadEventDeferredNotificationParams) (res ReadEventDeferredNotificationRes, err error) {
+func (c *Client) sendReadEventDeferredNotification(ctx context.Context, params ReadEventDeferredNotificationParams) (res *EventDeferredNotification, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadEventDeferredNotification"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -9349,15 +10523,15 @@ func (c *Client) sendReadEventDiplomaSettings(ctx context.Context, params ReadEv
 
 // ReadEventLimit invokes ReadEventLimit operation.
 //
-// Чтение лимитов мероприятия.
+// Публичное чтение ограничений мероприятия.
 //
 // GET /events/{event_id}/limit
-func (c *Client) ReadEventLimit(ctx context.Context, params ReadEventLimitParams) (ReadEventLimitRes, error) {
+func (c *Client) ReadEventLimit(ctx context.Context, params ReadEventLimitParams) (*EventLimit, error) {
 	res, err := c.sendReadEventLimit(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendReadEventLimit(ctx context.Context, params ReadEventLimitParams) (res ReadEventLimitRes, err error) {
+func (c *Client) sendReadEventLimit(ctx context.Context, params ReadEventLimitParams) (res *EventLimit, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadEventLimit"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -9452,12 +10626,12 @@ func (c *Client) sendReadEventLimit(ctx context.Context, params ReadEventLimitPa
 // полей при указании параметра `fields=true`.
 //
 // GET /events/requests/{event_request_id}
-func (c *Client) ReadEventRequest(ctx context.Context, params ReadEventRequestParams) (ReadEventRequestRes, error) {
+func (c *Client) ReadEventRequest(ctx context.Context, params ReadEventRequestParams) (*EventRequest, error) {
 	res, err := c.sendReadEventRequest(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendReadEventRequest(ctx context.Context, params ReadEventRequestParams) (res ReadEventRequestRes, err error) {
+func (c *Client) sendReadEventRequest(ctx context.Context, params ReadEventRequestParams) (res *EventRequest, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadEventRequest"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -9605,14 +10779,6 @@ func (c *Client) sendReadEventRequest(ctx context.Context, params ReadEventReque
 // организации. Включает проверку наличия актуального
 // соглашения с организацией.
 //
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+-----------------------------------------------------------------------------------------------------
-//	`403`  | Пользователь не является администратором организации
-//	`404`  | Мероприятие не найдено
-//	`404`  | Команда не найдена
-//
 // GET /events/{event_id}/teams/{team_id}
 func (c *Client) ReadEventTeam(ctx context.Context, params ReadEventTeamParams) (*TeamPrivateWithPersons, error) {
 	res, err := c.sendReadEventTeam(ctx, params)
@@ -9696,6 +10862,27 @@ func (c *Client) sendReadEventTeam(ctx context.Context, params ReadEventTeamPara
 		pathParts[3] = encoded
 	}
 	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "persons" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "persons",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Persons.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "GET", u)
@@ -9926,12 +11113,12 @@ func (c *Client) sendReadFile(ctx context.Context, params ReadFileParams) (res R
 // `files:read`.
 //
 // GET /files/{file_id}/meta
-func (c *Client) ReadFileMeta(ctx context.Context, params ReadFileMetaParams) (ReadFileMetaRes, error) {
+func (c *Client) ReadFileMeta(ctx context.Context, params ReadFileMetaParams) (*FileMeta, error) {
 	res, err := c.sendReadFileMeta(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendReadFileMeta(ctx context.Context, params ReadFileMetaParams) (res ReadFileMetaRes, err error) {
+func (c *Client) sendReadFileMeta(ctx context.Context, params ReadFileMetaParams) (res *FileMeta, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadFileMeta"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -10060,12 +11247,12 @@ func (c *Client) sendReadFileMeta(ctx context.Context, params ReadFileMetaParams
 // содержать пустые строки в значениях.
 //
 // GET /geo/{geodata_id}
-func (c *Client) ReadGeoData(ctx context.Context, params ReadGeoDataParams) (ReadGeoDataRes, error) {
+func (c *Client) ReadGeoData(ctx context.Context, params ReadGeoDataParams) (*GeoData, error) {
 	res, err := c.sendReadGeoData(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendReadGeoData(ctx context.Context, params ReadGeoDataParams) (res ReadGeoDataRes, err error) {
+func (c *Client) sendReadGeoData(ctx context.Context, params ReadGeoDataParams) (res *GeoData, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("ReadGeoData"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -10157,12 +11344,6 @@ func (c *Client) sendReadGeoData(ctx context.Context, params ReadGeoDataParams) 
 //
 // Чтение персоны, опционально ассоциированной с
 // пользователем.
-//
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+-----------------------------------
-//	`404`  | Персона не найдена
 //
 // GET /persons/{person_id}
 func (c *Client) ReadPerson(ctx context.Context, params ReadPersonParams) (*ReadPersonOK, error) {
@@ -10260,14 +11441,10 @@ func (c *Client) sendReadPerson(ctx context.Context, params ReadPersonParams) (r
 
 // ReadTeam invokes ReadTeam operation.
 //
-// Свойства команды, опционально содержащие список ее
-// участников.
+// Чтение публичных свойств команды.
 //
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+-----------------------------------
-//	`404`  | Команда не найдена
+// Опциональный массив `persons` включает в себя только
+// подтвержденных участников.
 //
 // GET /teams/{team_id}
 func (c *Client) ReadTeam(ctx context.Context, params ReadTeamParams) (*TeamPublicWithPersons, error) {
@@ -10422,12 +11599,8 @@ func (c *Client) sendReadTeam(ctx context.Context, params ReadTeamParams) (res *
 //
 // Чтение команды ее участником или капитаном.
 //
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+-----------------------------------------------------------------------------------------------------------------
-//	`403`  | Пользователь не является ни участником, ни капитаном команды
-//	`404`  | Команда не найдена
+// Опциональный массив `persons` включает в себя только
+// подтвержденных участников.
 //
 // GET /users/me/teams/{team_id}
 func (c *Client) ReadUserTeam(ctx context.Context, params ReadUserTeamParams) (*TeamPrivateWithPersons, error) {
@@ -10493,6 +11666,27 @@ func (c *Client) sendReadUserTeam(ctx context.Context, params ReadUserTeamParams
 		pathParts[1] = encoded
 	}
 	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "persons" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "persons",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Persons.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "GET", u)
@@ -10561,12 +11755,12 @@ func (c *Client) sendReadUserTeam(ctx context.Context, params ReadUserTeamParams
 // Название региона по ФИАС ID.
 //
 // GET /geo/fias/region/{fias}
-func (c *Client) RegionName(ctx context.Context, params RegionNameParams) (RegionNameRes, error) {
+func (c *Client) RegionName(ctx context.Context, params RegionNameParams) (*RegionNameOK, error) {
 	res, err := c.sendRegionName(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendRegionName(ctx context.Context, params RegionNameParams) (res RegionNameRes, err error) {
+func (c *Client) sendRegionName(ctx context.Context, params RegionNameParams) (res *RegionNameOK, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("RegionName"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -11143,15 +12337,15 @@ func (c *Client) sendSuggestGeoField(ctx context.Context, params SuggestGeoField
 
 // UpdateEvent invokes UpdateEvent operation.
 //
-// Обновление свойств мероприятия.
+// Обновление мероприятия администратором организации.
 //
 // PATCH /events/{event_id}
-func (c *Client) UpdateEvent(ctx context.Context, request *UpdateEventReq, params UpdateEventParams) (UpdateEventRes, error) {
+func (c *Client) UpdateEvent(ctx context.Context, request *OrganizationEventUpdate, params UpdateEventParams) (UpdateEventRes, error) {
 	res, err := c.sendUpdateEvent(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateEvent(ctx context.Context, request *UpdateEventReq, params UpdateEventParams) (res UpdateEventRes, err error) {
+func (c *Client) sendUpdateEvent(ctx context.Context, request *OrganizationEventUpdate, params UpdateEventParams) (res UpdateEventRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UpdateEvent"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
@@ -11281,12 +12475,12 @@ func (c *Client) sendUpdateEvent(ctx context.Context, request *UpdateEventReq, p
 // статусе `canceled`, оно будет переведено в статус `pending`.
 //
 // PATCH /events/{event_id}/deferred-notification
-func (c *Client) UpdateEventDeferredNotification(ctx context.Context, request *UpdateEventDeferredNotificationReq, params UpdateEventDeferredNotificationParams) (UpdateEventDeferredNotificationRes, error) {
+func (c *Client) UpdateEventDeferredNotification(ctx context.Context, request *UpdateEventDeferredNotificationReq, params UpdateEventDeferredNotificationParams) (*EventDeferredNotification, error) {
 	res, err := c.sendUpdateEventDeferredNotification(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateEventDeferredNotification(ctx context.Context, request *UpdateEventDeferredNotificationReq, params UpdateEventDeferredNotificationParams) (res UpdateEventDeferredNotificationRes, err error) {
+func (c *Client) sendUpdateEventDeferredNotification(ctx context.Context, request *UpdateEventDeferredNotificationReq, params UpdateEventDeferredNotificationParams) (res *EventDeferredNotification, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UpdateEventDeferredNotification"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
@@ -11416,12 +12610,12 @@ func (c *Client) sendUpdateEventDeferredNotification(ctx context.Context, reques
 // Обновление настроек дипломов мероприятия.
 //
 // PATCH /events/{event_id}/diploma-settings
-func (c *Client) UpdateEventDiplomaSettings(ctx context.Context, request *UpdateEventDiplomaSettingsReq, params UpdateEventDiplomaSettingsParams) (UpdateEventDiplomaSettingsRes, error) {
+func (c *Client) UpdateEventDiplomaSettings(ctx context.Context, request *UpdateEventDiplomaSettingsReq, params UpdateEventDiplomaSettingsParams) (*EventDiplomaSettings, error) {
 	res, err := c.sendUpdateEventDiplomaSettings(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateEventDiplomaSettings(ctx context.Context, request *UpdateEventDiplomaSettingsReq, params UpdateEventDiplomaSettingsParams) (res UpdateEventDiplomaSettingsRes, err error) {
+func (c *Client) sendUpdateEventDiplomaSettings(ctx context.Context, request *UpdateEventDiplomaSettingsReq, params UpdateEventDiplomaSettingsParams) (res *EventDiplomaSettings, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UpdateEventDiplomaSettings"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
@@ -11548,7 +12742,8 @@ func (c *Client) sendUpdateEventDiplomaSettings(ctx context.Context, request *Up
 
 // UpdateEventLimit invokes UpdateEventLimit operation.
 //
-// Обновление лимитов мероприятия.
+// Обновление ограничений мероприятия администратором
+// его организации.
 //
 // PATCH /events/{event_id}/limit
 func (c *Client) UpdateEventLimit(ctx context.Context, request *EventLimitWrite, params UpdateEventLimitParams) (UpdateEventLimitRes, error) {
@@ -11842,16 +13037,6 @@ func (c *Client) sendUpdateEventRequest(ctx context.Context, request *EventSignu
 // Обновление свойств команды администратором
 // организатора мероприятия.
 //
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+-----------------------------------------------------------------------------------------------------------------------------------------
-//	`403`  | Пользователь не является администратором организации
-//	`404`  | Мероприятие не найдено
-//	`404`  | Команда не найдена
-//	`409`  | У назначаемого капитаном пользователя уже имеется команда на мероприятии
-//	`409`  | Команда с таким названием уже имеется на мероприятии
-//
 // PATCH /events/{event_id}/teams/{team_id}
 func (c *Client) UpdateEventTeam(ctx context.Context, request *OrganizationTeamUpdate, params UpdateEventTeamParams) (UpdateEventTeamRes, error) {
 	res, err := c.sendUpdateEventTeam(ctx, request, params)
@@ -12005,16 +13190,6 @@ func (c *Client) sendUpdateEventTeam(ctx context.Context, request *OrganizationT
 //
 // Изменение статуса участника команды администратором
 // организации мероприятия.
-//
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+----------------------------------------------------------------------------------------------------------------------------
-//	`403`  | Пользователь не является администратором организации
-//	`404`  | Мероприятие не найдено
-//	`404`  | Команда не найдена
-//	`404`  | Участник команды не найден
-//	`409`  | У подтверждаемого пользователя уже имеется команда на мероприятии
 //
 // PATCH /events/{event_id}/teams/{team_id}/persons/{team_person_id}
 func (c *Client) UpdateEventTeamPerson(ctx context.Context, request *OrganizationTeamPersonUpdate, params UpdateEventTeamPersonParams) (*TeamPerson, error) {
@@ -12189,12 +13364,12 @@ func (c *Client) sendUpdateEventTeamPerson(ctx context.Context, request *Organiz
 // Обновление информации о файле.
 //
 // PATCH /files/{file_id}/meta
-func (c *Client) UpdateFileMeta(ctx context.Context, request *UpdateFileMetaReq, params UpdateFileMetaParams) (UpdateFileMetaRes, error) {
+func (c *Client) UpdateFileMeta(ctx context.Context, request *UpdateFileMetaReq, params UpdateFileMetaParams) (*FileMeta, error) {
 	res, err := c.sendUpdateFileMeta(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateFileMeta(ctx context.Context, request *UpdateFileMetaReq, params UpdateFileMetaParams) (res UpdateFileMetaRes, err error) {
+func (c *Client) sendUpdateFileMeta(ctx context.Context, request *UpdateFileMetaReq, params UpdateFileMetaParams) (res *FileMeta, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UpdateFileMeta"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
@@ -12322,19 +13497,6 @@ func (c *Client) sendUpdateFileMeta(ctx context.Context, request *UpdateFileMeta
 // UpdateOwnerTeamPerson invokes UpdateOwnerTeamPerson operation.
 //
 // Изменение статуса участника команды ее капитаном.
-//
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+-----------------------------------------------------------------------------------------------------------
-//	`403`  | Пользователь не является капитаном команды
-//	`403`  | Мероприятие команды завершено
-//	`404`  | Команда не найдена
-//	`404`  | Не найден участник команды
-//	`409`  | У пользователя уже имеется команда на мероприятии
-//	`422`  | У пользователя отсутствует заявка на мероприятие команды
-//	`422`  | Достижение допустимого количества участников команды
-//	`422`  | Достижение допустимого количества приглашений в команду
 //
 // PATCH /users/me/teams/{team_id}/persons/{team_person_id}
 func (c *Client) UpdateOwnerTeamPerson(ctx context.Context, request *OwnerTeamPersonUpdate, params UpdateOwnerTeamPersonParams) (UpdateOwnerTeamPersonRes, error) {
@@ -12489,19 +13651,6 @@ func (c *Client) sendUpdateOwnerTeamPerson(ctx context.Context, request *OwnerTe
 //
 // Обновление свойств команды ее капитаном.
 //
-// # Причины 4xx ошибок
-//
-// Таблица не включает в себя ошибки валидации
-// возвращаемые с 422 статусом.
-//
-//	Код | Описание
-//	-------+--------------------------------------------------------------------------------------------------
-//	`403`  | Пользователь не является капитаном команды
-//	`403`  | Мероприятие завершено
-//	`404`  | Команда не найдена
-//	`409`  | У пользователя уже имеется команда на мероприятии
-//	`409`  | Команда с таким названием уже имеется на мероприятии
-//
 // PATCH /users/me/teams/{team_id}
 func (c *Client) UpdateUserTeam(ctx context.Context, request *OwnerTeamUpdate, params UpdateUserTeamParams) (UpdateUserTeamRes, error) {
 	res, err := c.sendUpdateUserTeam(ctx, request, params)
@@ -12635,18 +13784,6 @@ func (c *Client) sendUpdateUserTeam(ctx context.Context, request *OwnerTeamUpdat
 // UpdateUserTeamPerson invokes UpdateUserTeamPerson operation.
 //
 // Изменение статуса участия в команде от ее участника.
-//
-// # Причины 4xx ошибок
-//
-//	Код | Описание
-//	-------+------------------------------------------------------------------------------------------------------------------------------------
-//	`403`  | Мероприятие команды завершено
-//	`404`  | Команда не найдена
-//	`404`  | Пользователь не является участником команды
-//	`409`  | У пользователя уже имеется команда на мероприятии
-//	`422`  | У пользователя отсутствует заявка на мероприятие команды
-//	`422`  | Достижение допустимого количества участников команды
-//	`422`  | Достижение допустимого количества запросов в команды для пользователя
 //
 // PATCH /users/me/teams/{team_id}/persons/me
 func (c *Client) UpdateUserTeamPerson(ctx context.Context, request *UserTeamPersonUpdate, params UpdateUserTeamPersonParams) (UpdateUserTeamPersonRes, error) {
@@ -12786,12 +13923,12 @@ func (c *Client) sendUpdateUserTeamPerson(ctx context.Context, request *UserTeam
 // версии файла (того же типа, но другого размера).
 //
 // PUT /files/{file_id}
-func (c *Client) UploadFile(ctx context.Context, request *UploadFileReq, params UploadFileParams) (UploadFileRes, error) {
+func (c *Client) UploadFile(ctx context.Context, request *UploadFileReq, params UploadFileParams) (*FilePresignedRequest, error) {
 	res, err := c.sendUploadFile(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUploadFile(ctx context.Context, request *UploadFileReq, params UploadFileParams) (res UploadFileRes, err error) {
+func (c *Client) sendUploadFile(ctx context.Context, request *UploadFileReq, params UploadFileParams) (res *FilePresignedRequest, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("UploadFile"),
 		semconv.HTTPRequestMethodKey.String("PUT"),

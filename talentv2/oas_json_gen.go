@@ -205,56 +205,698 @@ func (s *AddAchievementEvent) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *BadRequest) Encode(e *jx.Encoder) {
+func (s *AdminEventCreate) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *BadRequest) encodeFields(e *jx.Encoder) {
+func (s *AdminEventCreate) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("error")
-		e.Str(s.Error)
+		e.FieldStart("organization_id")
+		e.Int32(s.OrganizationID)
+	}
+	{
+		if s.MetaEventID.Set {
+			e.FieldStart("meta_event_id")
+			s.MetaEventID.Encode(e)
+		}
+	}
+	{
+		if s.Draft.Set {
+			e.FieldStart("draft")
+			s.Draft.Encode(e)
+		}
+	}
+	{
+		if s.Public.Set {
+			e.FieldStart("public")
+			s.Public.Encode(e)
+		}
+	}
+	{
+		if s.Hidden.Set {
+			e.FieldStart("hidden")
+			s.Hidden.Encode(e)
+		}
+	}
+	{
+		e.FieldStart("title")
+		e.Str(s.Title)
+	}
+	{
+		if s.Start.Set {
+			e.FieldStart("start")
+			s.Start.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.End.Set {
+			e.FieldStart("end")
+			s.End.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.Format.Set {
+			e.FieldStart("format")
+			s.Format.Encode(e)
+		}
+	}
+	{
+		if s.VenueID.Set {
+			e.FieldStart("venue_id")
+			s.VenueID.Encode(e)
+		}
+	}
+	{
+		if s.SimplifiedRegistration.Set {
+			e.FieldStart("simplified_registration")
+			s.SimplifiedRegistration.Encode(e)
+		}
+	}
+	{
+		if s.AutocreateMember.Set {
+			e.FieldStart("autocreate_member")
+			s.AutocreateMember.Encode(e)
+		}
+	}
+	{
+		if s.AchievementsAllowed.Set {
+			e.FieldStart("achievements_allowed")
+			s.AchievementsAllowed.Encode(e)
+		}
+	}
+	{
+		if s.RequestsAllowed.Set {
+			e.FieldStart("requests_allowed")
+			s.RequestsAllowed.Encode(e)
+		}
+	}
+	{
+		if s.SelfCheckIn.Set {
+			e.FieldStart("self_check_in")
+			s.SelfCheckIn.Encode(e)
+		}
+	}
+	{
+		if s.TeamsInvolved.Set {
+			e.FieldStart("teams_involved")
+			s.TeamsInvolved.Encode(e)
+		}
+	}
+	{
+		if s.OwnerCanModerate.Set {
+			e.FieldStart("owner_can_moderate")
+			s.OwnerCanModerate.Encode(e)
+		}
+	}
+	{
+		if s.UserInMultipleTeams.Set {
+			e.FieldStart("user_in_multiple_teams")
+			s.UserInMultipleTeams.Encode(e)
+		}
+	}
+	{
+		if s.SupportI18n.Set {
+			e.FieldStart("support_i18n")
+			s.SupportI18n.Encode(e)
+		}
+	}
+	{
+		if s.TimeMatters.Set {
+			e.FieldStart("time_matters")
+			s.TimeMatters.Encode(e)
+		}
+	}
+	{
+		if s.MaxUsers.Set {
+			e.FieldStart("max_users")
+			s.MaxUsers.Encode(e)
+		}
+	}
+	{
+		if s.TeamAssignmentMethod.Set {
+			e.FieldStart("team_assignment_method")
+			s.TeamAssignmentMethod.Encode(e)
+		}
+	}
+	{
+		if s.ExpectedStart.Set {
+			e.FieldStart("expected_start")
+			s.ExpectedStart.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.AltTitle.Set {
+			e.FieldStart("alt_title")
+			s.AltTitle.Encode(e)
+		}
+	}
+	{
+		if s.URL.Set {
+			e.FieldStart("url")
+			s.URL.Encode(e)
+		}
+	}
+	{
+		if s.TypeID.Set {
+			e.FieldStart("type_id")
+			s.TypeID.Encode(e)
+		}
+	}
+	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
+		if s.QuestionnaireCompletedMessage.Set {
+			e.FieldStart("questionnaire_completed_message")
+			s.QuestionnaireCompletedMessage.Encode(e)
+		}
+	}
+	{
+		if s.NotificationEmailMessage.Set {
+			e.FieldStart("notification_email_message")
+			s.NotificationEmailMessage.Encode(e)
+		}
+	}
+	{
+		if s.CoverURL.Set {
+			e.FieldStart("cover_url")
+			s.CoverURL.Encode(e)
+		}
+	}
+	{
+		if s.Keywords.Set {
+			e.FieldStart("keywords")
+			s.Keywords.Encode(e)
+		}
+	}
+	{
+		if s.MentorsAllowed.Set {
+			e.FieldStart("mentors_allowed")
+			s.MentorsAllowed.Encode(e)
+		}
+	}
+	{
+		if s.GirCollection.Set {
+			e.FieldStart("gir_collection")
+			s.GirCollection.Encode(e)
+		}
+	}
+	{
+		if s.Promoted.Set {
+			e.FieldStart("promoted")
+			s.Promoted.Encode(e)
+		}
+	}
+	{
+		if s.TeamCreateNotification.Set {
+			e.FieldStart("team_create_notification")
+			s.TeamCreateNotification.Encode(e)
+		}
+	}
+	{
+		if s.AchievementRoles != nil {
+			e.FieldStart("achievement_roles")
+			e.ArrStart()
+			for _, elem := range s.AchievementRoles {
+				e.Int32(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Brands != nil {
+			e.FieldStart("brands")
+			e.ArrStart()
+			for _, elem := range s.Brands {
+				e.Int32(elem)
+			}
+			e.ArrEnd()
+		}
 	}
 }
 
-var jsonFieldsNameOfBadRequest = [1]string{
-	0: "error",
+var jsonFieldsNameOfAdminEventCreate = [37]string{
+	0:  "organization_id",
+	1:  "meta_event_id",
+	2:  "draft",
+	3:  "public",
+	4:  "hidden",
+	5:  "title",
+	6:  "start",
+	7:  "end",
+	8:  "format",
+	9:  "venue_id",
+	10: "simplified_registration",
+	11: "autocreate_member",
+	12: "achievements_allowed",
+	13: "requests_allowed",
+	14: "self_check_in",
+	15: "teams_involved",
+	16: "owner_can_moderate",
+	17: "user_in_multiple_teams",
+	18: "support_i18n",
+	19: "time_matters",
+	20: "max_users",
+	21: "team_assignment_method",
+	22: "expected_start",
+	23: "alt_title",
+	24: "url",
+	25: "type_id",
+	26: "description",
+	27: "questionnaire_completed_message",
+	28: "notification_email_message",
+	29: "cover_url",
+	30: "keywords",
+	31: "mentors_allowed",
+	32: "gir_collection",
+	33: "promoted",
+	34: "team_create_notification",
+	35: "achievement_roles",
+	36: "brands",
 }
 
-// Decode decodes BadRequest from json.
-func (s *BadRequest) Decode(d *jx.Decoder) error {
+// Decode decodes AdminEventCreate from json.
+func (s *AdminEventCreate) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode BadRequest to nil")
+		return errors.New("invalid: unable to decode AdminEventCreate to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [5]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "error":
+		case "organization_id":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Str()
-				s.Error = string(v)
+				v, err := d.Int32()
+				s.OrganizationID = int32(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error\"")
+				return errors.Wrap(err, "decode field \"organization_id\"")
+			}
+		case "meta_event_id":
+			if err := func() error {
+				s.MetaEventID.Reset()
+				if err := s.MetaEventID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"meta_event_id\"")
+			}
+		case "draft":
+			if err := func() error {
+				s.Draft.Reset()
+				if err := s.Draft.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"draft\"")
+			}
+		case "public":
+			if err := func() error {
+				s.Public.Reset()
+				if err := s.Public.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"public\"")
+			}
+		case "hidden":
+			if err := func() error {
+				s.Hidden.Reset()
+				if err := s.Hidden.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hidden\"")
+			}
+		case "title":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Str()
+				s.Title = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"title\"")
+			}
+		case "start":
+			if err := func() error {
+				s.Start.Reset()
+				if err := s.Start.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"start\"")
+			}
+		case "end":
+			if err := func() error {
+				s.End.Reset()
+				if err := s.End.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"end\"")
+			}
+		case "format":
+			if err := func() error {
+				s.Format.Reset()
+				if err := s.Format.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"format\"")
+			}
+		case "venue_id":
+			if err := func() error {
+				s.VenueID.Reset()
+				if err := s.VenueID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"venue_id\"")
+			}
+		case "simplified_registration":
+			if err := func() error {
+				s.SimplifiedRegistration.Reset()
+				if err := s.SimplifiedRegistration.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"simplified_registration\"")
+			}
+		case "autocreate_member":
+			if err := func() error {
+				s.AutocreateMember.Reset()
+				if err := s.AutocreateMember.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"autocreate_member\"")
+			}
+		case "achievements_allowed":
+			if err := func() error {
+				s.AchievementsAllowed.Reset()
+				if err := s.AchievementsAllowed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"achievements_allowed\"")
+			}
+		case "requests_allowed":
+			if err := func() error {
+				s.RequestsAllowed.Reset()
+				if err := s.RequestsAllowed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"requests_allowed\"")
+			}
+		case "self_check_in":
+			if err := func() error {
+				s.SelfCheckIn.Reset()
+				if err := s.SelfCheckIn.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"self_check_in\"")
+			}
+		case "teams_involved":
+			if err := func() error {
+				s.TeamsInvolved.Reset()
+				if err := s.TeamsInvolved.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"teams_involved\"")
+			}
+		case "owner_can_moderate":
+			if err := func() error {
+				s.OwnerCanModerate.Reset()
+				if err := s.OwnerCanModerate.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"owner_can_moderate\"")
+			}
+		case "user_in_multiple_teams":
+			if err := func() error {
+				s.UserInMultipleTeams.Reset()
+				if err := s.UserInMultipleTeams.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"user_in_multiple_teams\"")
+			}
+		case "support_i18n":
+			if err := func() error {
+				s.SupportI18n.Reset()
+				if err := s.SupportI18n.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"support_i18n\"")
+			}
+		case "time_matters":
+			if err := func() error {
+				s.TimeMatters.Reset()
+				if err := s.TimeMatters.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"time_matters\"")
+			}
+		case "max_users":
+			if err := func() error {
+				s.MaxUsers.Reset()
+				if err := s.MaxUsers.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"max_users\"")
+			}
+		case "team_assignment_method":
+			if err := func() error {
+				s.TeamAssignmentMethod.Reset()
+				if err := s.TeamAssignmentMethod.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"team_assignment_method\"")
+			}
+		case "expected_start":
+			if err := func() error {
+				s.ExpectedStart.Reset()
+				if err := s.ExpectedStart.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"expected_start\"")
+			}
+		case "alt_title":
+			if err := func() error {
+				s.AltTitle.Reset()
+				if err := s.AltTitle.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"alt_title\"")
+			}
+		case "url":
+			if err := func() error {
+				s.URL.Reset()
+				if err := s.URL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"url\"")
+			}
+		case "type_id":
+			if err := func() error {
+				s.TypeID.Reset()
+				if err := s.TypeID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"type_id\"")
+			}
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
+		case "questionnaire_completed_message":
+			if err := func() error {
+				s.QuestionnaireCompletedMessage.Reset()
+				if err := s.QuestionnaireCompletedMessage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"questionnaire_completed_message\"")
+			}
+		case "notification_email_message":
+			if err := func() error {
+				s.NotificationEmailMessage.Reset()
+				if err := s.NotificationEmailMessage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"notification_email_message\"")
+			}
+		case "cover_url":
+			if err := func() error {
+				s.CoverURL.Reset()
+				if err := s.CoverURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"cover_url\"")
+			}
+		case "keywords":
+			if err := func() error {
+				s.Keywords.Reset()
+				if err := s.Keywords.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"keywords\"")
+			}
+		case "mentors_allowed":
+			if err := func() error {
+				s.MentorsAllowed.Reset()
+				if err := s.MentorsAllowed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"mentors_allowed\"")
+			}
+		case "gir_collection":
+			if err := func() error {
+				s.GirCollection.Reset()
+				if err := s.GirCollection.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"gir_collection\"")
+			}
+		case "promoted":
+			if err := func() error {
+				s.Promoted.Reset()
+				if err := s.Promoted.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"promoted\"")
+			}
+		case "team_create_notification":
+			if err := func() error {
+				s.TeamCreateNotification.Reset()
+				if err := s.TeamCreateNotification.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"team_create_notification\"")
+			}
+		case "achievement_roles":
+			if err := func() error {
+				s.AchievementRoles = make([]int32, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem int32
+					v, err := d.Int32()
+					elem = int32(v)
+					if err != nil {
+						return err
+					}
+					s.AchievementRoles = append(s.AchievementRoles, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"achievement_roles\"")
+			}
+		case "brands":
+			if err := func() error {
+				s.Brands = make([]int32, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem int32
+					v, err := d.Int32()
+					elem = int32(v)
+					if err != nil {
+						return err
+					}
+					s.Brands = append(s.Brands, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"brands\"")
 			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode BadRequest")
+		return errors.Wrap(err, "decode AdminEventCreate")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
+	for i, mask := range [5]uint8{
+		0b00100001,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -266,8 +908,8 @@ func (s *BadRequest) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfBadRequest) {
-					name = jsonFieldsNameOfBadRequest[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfAdminEventCreate) {
+					name = jsonFieldsNameOfAdminEventCreate[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -288,14 +930,689 @@ func (s *BadRequest) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *BadRequest) MarshalJSON() ([]byte, error) {
+func (s *AdminEventCreate) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *BadRequest) UnmarshalJSON(data []byte) error {
+func (s *AdminEventCreate) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *AdminEventUpdate) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *AdminEventUpdate) encodeFields(e *jx.Encoder) {
+	{
+		if s.OrganizationID.Set {
+			e.FieldStart("organization_id")
+			s.OrganizationID.Encode(e)
+		}
+	}
+	{
+		if s.MetaEventID.Set {
+			e.FieldStart("meta_event_id")
+			s.MetaEventID.Encode(e)
+		}
+	}
+	{
+		if s.Draft.Set {
+			e.FieldStart("draft")
+			s.Draft.Encode(e)
+		}
+	}
+	{
+		if s.Public.Set {
+			e.FieldStart("public")
+			s.Public.Encode(e)
+		}
+	}
+	{
+		if s.Hidden.Set {
+			e.FieldStart("hidden")
+			s.Hidden.Encode(e)
+		}
+	}
+	{
+		if s.Title.Set {
+			e.FieldStart("title")
+			s.Title.Encode(e)
+		}
+	}
+	{
+		if s.Start.Set {
+			e.FieldStart("start")
+			s.Start.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.End.Set {
+			e.FieldStart("end")
+			s.End.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.Format.Set {
+			e.FieldStart("format")
+			s.Format.Encode(e)
+		}
+	}
+	{
+		if s.VenueID.Set {
+			e.FieldStart("venue_id")
+			s.VenueID.Encode(e)
+		}
+	}
+	{
+		if s.SimplifiedRegistration.Set {
+			e.FieldStart("simplified_registration")
+			s.SimplifiedRegistration.Encode(e)
+		}
+	}
+	{
+		if s.AutocreateMember.Set {
+			e.FieldStart("autocreate_member")
+			s.AutocreateMember.Encode(e)
+		}
+	}
+	{
+		if s.AchievementsAllowed.Set {
+			e.FieldStart("achievements_allowed")
+			s.AchievementsAllowed.Encode(e)
+		}
+	}
+	{
+		if s.RequestsAllowed.Set {
+			e.FieldStart("requests_allowed")
+			s.RequestsAllowed.Encode(e)
+		}
+	}
+	{
+		if s.SelfCheckIn.Set {
+			e.FieldStart("self_check_in")
+			s.SelfCheckIn.Encode(e)
+		}
+	}
+	{
+		if s.TeamsInvolved.Set {
+			e.FieldStart("teams_involved")
+			s.TeamsInvolved.Encode(e)
+		}
+	}
+	{
+		if s.OwnerCanModerate.Set {
+			e.FieldStart("owner_can_moderate")
+			s.OwnerCanModerate.Encode(e)
+		}
+	}
+	{
+		if s.UserInMultipleTeams.Set {
+			e.FieldStart("user_in_multiple_teams")
+			s.UserInMultipleTeams.Encode(e)
+		}
+	}
+	{
+		if s.SupportI18n.Set {
+			e.FieldStart("support_i18n")
+			s.SupportI18n.Encode(e)
+		}
+	}
+	{
+		if s.TimeMatters.Set {
+			e.FieldStart("time_matters")
+			s.TimeMatters.Encode(e)
+		}
+	}
+	{
+		if s.MaxUsers.Set {
+			e.FieldStart("max_users")
+			s.MaxUsers.Encode(e)
+		}
+	}
+	{
+		if s.TeamAssignmentMethod.Set {
+			e.FieldStart("team_assignment_method")
+			s.TeamAssignmentMethod.Encode(e)
+		}
+	}
+	{
+		if s.ExpectedStart.Set {
+			e.FieldStart("expected_start")
+			s.ExpectedStart.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.AltTitle.Set {
+			e.FieldStart("alt_title")
+			s.AltTitle.Encode(e)
+		}
+	}
+	{
+		if s.URL.Set {
+			e.FieldStart("url")
+			s.URL.Encode(e)
+		}
+	}
+	{
+		if s.TypeID.Set {
+			e.FieldStart("type_id")
+			s.TypeID.Encode(e)
+		}
+	}
+	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
+		if s.QuestionnaireCompletedMessage.Set {
+			e.FieldStart("questionnaire_completed_message")
+			s.QuestionnaireCompletedMessage.Encode(e)
+		}
+	}
+	{
+		if s.NotificationEmailMessage.Set {
+			e.FieldStart("notification_email_message")
+			s.NotificationEmailMessage.Encode(e)
+		}
+	}
+	{
+		if s.CoverURL.Set {
+			e.FieldStart("cover_url")
+			s.CoverURL.Encode(e)
+		}
+	}
+	{
+		if s.Keywords.Set {
+			e.FieldStart("keywords")
+			s.Keywords.Encode(e)
+		}
+	}
+	{
+		if s.MentorsAllowed.Set {
+			e.FieldStart("mentors_allowed")
+			s.MentorsAllowed.Encode(e)
+		}
+	}
+	{
+		if s.GirCollection.Set {
+			e.FieldStart("gir_collection")
+			s.GirCollection.Encode(e)
+		}
+	}
+	{
+		if s.Promoted.Set {
+			e.FieldStart("promoted")
+			s.Promoted.Encode(e)
+		}
+	}
+	{
+		if s.TeamCreateNotification.Set {
+			e.FieldStart("team_create_notification")
+			s.TeamCreateNotification.Encode(e)
+		}
+	}
+	{
+		if s.Canceled.Set {
+			e.FieldStart("canceled")
+			s.Canceled.Encode(e)
+		}
+	}
+	{
+		if s.CancellationReason.Set {
+			e.FieldStart("cancellation_reason")
+			s.CancellationReason.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfAdminEventUpdate = [37]string{
+	0:  "organization_id",
+	1:  "meta_event_id",
+	2:  "draft",
+	3:  "public",
+	4:  "hidden",
+	5:  "title",
+	6:  "start",
+	7:  "end",
+	8:  "format",
+	9:  "venue_id",
+	10: "simplified_registration",
+	11: "autocreate_member",
+	12: "achievements_allowed",
+	13: "requests_allowed",
+	14: "self_check_in",
+	15: "teams_involved",
+	16: "owner_can_moderate",
+	17: "user_in_multiple_teams",
+	18: "support_i18n",
+	19: "time_matters",
+	20: "max_users",
+	21: "team_assignment_method",
+	22: "expected_start",
+	23: "alt_title",
+	24: "url",
+	25: "type_id",
+	26: "description",
+	27: "questionnaire_completed_message",
+	28: "notification_email_message",
+	29: "cover_url",
+	30: "keywords",
+	31: "mentors_allowed",
+	32: "gir_collection",
+	33: "promoted",
+	34: "team_create_notification",
+	35: "canceled",
+	36: "cancellation_reason",
+}
+
+// Decode decodes AdminEventUpdate from json.
+func (s *AdminEventUpdate) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode AdminEventUpdate to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "organization_id":
+			if err := func() error {
+				s.OrganizationID.Reset()
+				if err := s.OrganizationID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"organization_id\"")
+			}
+		case "meta_event_id":
+			if err := func() error {
+				s.MetaEventID.Reset()
+				if err := s.MetaEventID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"meta_event_id\"")
+			}
+		case "draft":
+			if err := func() error {
+				s.Draft.Reset()
+				if err := s.Draft.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"draft\"")
+			}
+		case "public":
+			if err := func() error {
+				s.Public.Reset()
+				if err := s.Public.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"public\"")
+			}
+		case "hidden":
+			if err := func() error {
+				s.Hidden.Reset()
+				if err := s.Hidden.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hidden\"")
+			}
+		case "title":
+			if err := func() error {
+				s.Title.Reset()
+				if err := s.Title.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"title\"")
+			}
+		case "start":
+			if err := func() error {
+				s.Start.Reset()
+				if err := s.Start.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"start\"")
+			}
+		case "end":
+			if err := func() error {
+				s.End.Reset()
+				if err := s.End.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"end\"")
+			}
+		case "format":
+			if err := func() error {
+				s.Format.Reset()
+				if err := s.Format.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"format\"")
+			}
+		case "venue_id":
+			if err := func() error {
+				s.VenueID.Reset()
+				if err := s.VenueID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"venue_id\"")
+			}
+		case "simplified_registration":
+			if err := func() error {
+				s.SimplifiedRegistration.Reset()
+				if err := s.SimplifiedRegistration.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"simplified_registration\"")
+			}
+		case "autocreate_member":
+			if err := func() error {
+				s.AutocreateMember.Reset()
+				if err := s.AutocreateMember.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"autocreate_member\"")
+			}
+		case "achievements_allowed":
+			if err := func() error {
+				s.AchievementsAllowed.Reset()
+				if err := s.AchievementsAllowed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"achievements_allowed\"")
+			}
+		case "requests_allowed":
+			if err := func() error {
+				s.RequestsAllowed.Reset()
+				if err := s.RequestsAllowed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"requests_allowed\"")
+			}
+		case "self_check_in":
+			if err := func() error {
+				s.SelfCheckIn.Reset()
+				if err := s.SelfCheckIn.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"self_check_in\"")
+			}
+		case "teams_involved":
+			if err := func() error {
+				s.TeamsInvolved.Reset()
+				if err := s.TeamsInvolved.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"teams_involved\"")
+			}
+		case "owner_can_moderate":
+			if err := func() error {
+				s.OwnerCanModerate.Reset()
+				if err := s.OwnerCanModerate.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"owner_can_moderate\"")
+			}
+		case "user_in_multiple_teams":
+			if err := func() error {
+				s.UserInMultipleTeams.Reset()
+				if err := s.UserInMultipleTeams.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"user_in_multiple_teams\"")
+			}
+		case "support_i18n":
+			if err := func() error {
+				s.SupportI18n.Reset()
+				if err := s.SupportI18n.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"support_i18n\"")
+			}
+		case "time_matters":
+			if err := func() error {
+				s.TimeMatters.Reset()
+				if err := s.TimeMatters.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"time_matters\"")
+			}
+		case "max_users":
+			if err := func() error {
+				s.MaxUsers.Reset()
+				if err := s.MaxUsers.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"max_users\"")
+			}
+		case "team_assignment_method":
+			if err := func() error {
+				s.TeamAssignmentMethod.Reset()
+				if err := s.TeamAssignmentMethod.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"team_assignment_method\"")
+			}
+		case "expected_start":
+			if err := func() error {
+				s.ExpectedStart.Reset()
+				if err := s.ExpectedStart.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"expected_start\"")
+			}
+		case "alt_title":
+			if err := func() error {
+				s.AltTitle.Reset()
+				if err := s.AltTitle.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"alt_title\"")
+			}
+		case "url":
+			if err := func() error {
+				s.URL.Reset()
+				if err := s.URL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"url\"")
+			}
+		case "type_id":
+			if err := func() error {
+				s.TypeID.Reset()
+				if err := s.TypeID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"type_id\"")
+			}
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
+		case "questionnaire_completed_message":
+			if err := func() error {
+				s.QuestionnaireCompletedMessage.Reset()
+				if err := s.QuestionnaireCompletedMessage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"questionnaire_completed_message\"")
+			}
+		case "notification_email_message":
+			if err := func() error {
+				s.NotificationEmailMessage.Reset()
+				if err := s.NotificationEmailMessage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"notification_email_message\"")
+			}
+		case "cover_url":
+			if err := func() error {
+				s.CoverURL.Reset()
+				if err := s.CoverURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"cover_url\"")
+			}
+		case "keywords":
+			if err := func() error {
+				s.Keywords.Reset()
+				if err := s.Keywords.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"keywords\"")
+			}
+		case "mentors_allowed":
+			if err := func() error {
+				s.MentorsAllowed.Reset()
+				if err := s.MentorsAllowed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"mentors_allowed\"")
+			}
+		case "gir_collection":
+			if err := func() error {
+				s.GirCollection.Reset()
+				if err := s.GirCollection.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"gir_collection\"")
+			}
+		case "promoted":
+			if err := func() error {
+				s.Promoted.Reset()
+				if err := s.Promoted.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"promoted\"")
+			}
+		case "team_create_notification":
+			if err := func() error {
+				s.TeamCreateNotification.Reset()
+				if err := s.TeamCreateNotification.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"team_create_notification\"")
+			}
+		case "canceled":
+			if err := func() error {
+				s.Canceled.Reset()
+				if err := s.Canceled.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"canceled\"")
+			}
+		case "cancellation_reason":
+			if err := func() error {
+				s.CancellationReason.Reset()
+				if err := s.CancellationReason.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"cancellation_reason\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode AdminEventUpdate")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *AdminEventUpdate) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *AdminEventUpdate) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -920,102 +2237,6 @@ func (s *ConfirmEventSignupReq) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode implements json.Marshaler.
-func (s *Conflict) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *Conflict) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("error")
-		e.Str(s.Error)
-	}
-}
-
-var jsonFieldsNameOfConflict = [1]string{
-	0: "error",
-}
-
-// Decode decodes Conflict from json.
-func (s *Conflict) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode Conflict to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "error":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Error = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode Conflict")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfConflict) {
-					name = jsonFieldsNameOfConflict[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *Conflict) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *Conflict) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes ContentLength as json.
 func (s ContentLength) Encode(e *jx.Encoder) {
 	unwrapped := int32(s)
@@ -1052,102 +2273,6 @@ func (s ContentLength) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ContentLength) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *ContentTooLarge) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *ContentTooLarge) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("error")
-		e.Str(s.Error)
-	}
-}
-
-var jsonFieldsNameOfContentTooLarge = [1]string{
-	0: "error",
-}
-
-// Decode decodes ContentTooLarge from json.
-func (s *ContentTooLarge) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ContentTooLarge to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "error":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Error = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode ContentTooLarge")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfContentTooLarge) {
-					name = jsonFieldsNameOfContentTooLarge[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *ContentTooLarge) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ContentTooLarge) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1424,744 +2549,6 @@ func (s *CreateEventDiplomaSettingsReq) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *CreateEventDiplomaSettingsReq) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *CreateEventReq) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *CreateEventReq) encodeFields(e *jx.Encoder) {
-	{
-		if s.MetaEventID.Set {
-			e.FieldStart("meta_event_id")
-			s.MetaEventID.Encode(e)
-		}
-	}
-	{
-		if s.Draft.Set {
-			e.FieldStart("draft")
-			s.Draft.Encode(e)
-		}
-	}
-	{
-		if s.Public.Set {
-			e.FieldStart("public")
-			s.Public.Encode(e)
-		}
-	}
-	{
-		if s.Hidden.Set {
-			e.FieldStart("hidden")
-			s.Hidden.Encode(e)
-		}
-	}
-	{
-		e.FieldStart("title")
-		e.Str(s.Title)
-	}
-	{
-		if s.Start.Set {
-			e.FieldStart("start")
-			s.Start.Encode(e, json.EncodeDateTime)
-		}
-	}
-	{
-		if s.End.Set {
-			e.FieldStart("end")
-			s.End.Encode(e, json.EncodeDateTime)
-		}
-	}
-	{
-		if s.Format.Set {
-			e.FieldStart("format")
-			s.Format.Encode(e)
-		}
-	}
-	{
-		if s.VenueID.Set {
-			e.FieldStart("venue_id")
-			s.VenueID.Encode(e)
-		}
-	}
-	{
-		if s.SimplifiedRegistration.Set {
-			e.FieldStart("simplified_registration")
-			s.SimplifiedRegistration.Encode(e)
-		}
-	}
-	{
-		if s.AutocreateMember.Set {
-			e.FieldStart("autocreate_member")
-			s.AutocreateMember.Encode(e)
-		}
-	}
-	{
-		if s.AchievementsAllowed.Set {
-			e.FieldStart("achievements_allowed")
-			s.AchievementsAllowed.Encode(e)
-		}
-	}
-	{
-		if s.RequestsAllowed.Set {
-			e.FieldStart("requests_allowed")
-			s.RequestsAllowed.Encode(e)
-		}
-	}
-	{
-		if s.SelfCheckIn.Set {
-			e.FieldStart("self_check_in")
-			s.SelfCheckIn.Encode(e)
-		}
-	}
-	{
-		if s.TeamsInvolved.Set {
-			e.FieldStart("teams_involved")
-			s.TeamsInvolved.Encode(e)
-		}
-	}
-	{
-		if s.OwnerCanModerate.Set {
-			e.FieldStart("owner_can_moderate")
-			s.OwnerCanModerate.Encode(e)
-		}
-	}
-	{
-		if s.UserInMultipleTeams.Set {
-			e.FieldStart("user_in_multiple_teams")
-			s.UserInMultipleTeams.Encode(e)
-		}
-	}
-	{
-		if s.MentorsAllowed.Set {
-			e.FieldStart("mentors_allowed")
-			s.MentorsAllowed.Encode(e)
-		}
-	}
-	{
-		if s.SupportI18n.Set {
-			e.FieldStart("support_i18n")
-			s.SupportI18n.Encode(e)
-		}
-	}
-	{
-		if s.GirCollection.Set {
-			e.FieldStart("gir_collection")
-			s.GirCollection.Encode(e)
-		}
-	}
-	{
-		if s.Promoted.Set {
-			e.FieldStart("promoted")
-			s.Promoted.Encode(e)
-		}
-	}
-	{
-		if s.TimeMatters.Set {
-			e.FieldStart("time_matters")
-			s.TimeMatters.Encode(e)
-		}
-	}
-	{
-		if s.MaxUsers.Set {
-			e.FieldStart("max_users")
-			s.MaxUsers.Encode(e)
-		}
-	}
-	{
-		if s.TeamCreateNotification.Set {
-			e.FieldStart("team_create_notification")
-			s.TeamCreateNotification.Encode(e)
-		}
-	}
-	{
-		if s.TeamAssignmentMethod.Set {
-			e.FieldStart("team_assignment_method")
-			s.TeamAssignmentMethod.Encode(e)
-		}
-	}
-	{
-		if s.ExpectedStart.Set {
-			e.FieldStart("expected_start")
-			s.ExpectedStart.Encode(e, json.EncodeDateTime)
-		}
-	}
-	{
-		if s.AltTitle.Set {
-			e.FieldStart("alt_title")
-			s.AltTitle.Encode(e)
-		}
-	}
-	{
-		if s.URL.Set {
-			e.FieldStart("url")
-			s.URL.Encode(e)
-		}
-	}
-	{
-		if s.TypeID.Set {
-			e.FieldStart("type_id")
-			s.TypeID.Encode(e)
-		}
-	}
-	{
-		if s.Description.Set {
-			e.FieldStart("description")
-			s.Description.Encode(e)
-		}
-	}
-	{
-		if s.QuestionnaireCompletedMessage.Set {
-			e.FieldStart("questionnaire_completed_message")
-			s.QuestionnaireCompletedMessage.Encode(e)
-		}
-	}
-	{
-		if s.NotificationEmailMessage.Set {
-			e.FieldStart("notification_email_message")
-			s.NotificationEmailMessage.Encode(e)
-		}
-	}
-	{
-		if s.CoverURL.Set {
-			e.FieldStart("cover_url")
-			s.CoverURL.Encode(e)
-		}
-	}
-	{
-		if s.Keywords.Set {
-			e.FieldStart("keywords")
-			s.Keywords.Encode(e)
-		}
-	}
-	{
-		e.FieldStart("organization_id")
-		e.Int32(s.OrganizationID)
-	}
-	{
-		if s.AchievementRoles != nil {
-			e.FieldStart("achievement_roles")
-			e.ArrStart()
-			for _, elem := range s.AchievementRoles {
-				e.Int32(elem)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.Brands != nil {
-			e.FieldStart("brands")
-			e.ArrStart()
-			for _, elem := range s.Brands {
-				e.Int32(elem)
-			}
-			e.ArrEnd()
-		}
-	}
-}
-
-var jsonFieldsNameOfCreateEventReq = [37]string{
-	0:  "meta_event_id",
-	1:  "draft",
-	2:  "public",
-	3:  "hidden",
-	4:  "title",
-	5:  "start",
-	6:  "end",
-	7:  "format",
-	8:  "venue_id",
-	9:  "simplified_registration",
-	10: "autocreate_member",
-	11: "achievements_allowed",
-	12: "requests_allowed",
-	13: "self_check_in",
-	14: "teams_involved",
-	15: "owner_can_moderate",
-	16: "user_in_multiple_teams",
-	17: "mentors_allowed",
-	18: "support_i18n",
-	19: "gir_collection",
-	20: "promoted",
-	21: "time_matters",
-	22: "max_users",
-	23: "team_create_notification",
-	24: "team_assignment_method",
-	25: "expected_start",
-	26: "alt_title",
-	27: "url",
-	28: "type_id",
-	29: "description",
-	30: "questionnaire_completed_message",
-	31: "notification_email_message",
-	32: "cover_url",
-	33: "keywords",
-	34: "organization_id",
-	35: "achievement_roles",
-	36: "brands",
-}
-
-// Decode decodes CreateEventReq from json.
-func (s *CreateEventReq) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode CreateEventReq to nil")
-	}
-	var requiredBitSet [5]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "meta_event_id":
-			if err := func() error {
-				s.MetaEventID.Reset()
-				if err := s.MetaEventID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"meta_event_id\"")
-			}
-		case "draft":
-			if err := func() error {
-				s.Draft.Reset()
-				if err := s.Draft.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"draft\"")
-			}
-		case "public":
-			if err := func() error {
-				s.Public.Reset()
-				if err := s.Public.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"public\"")
-			}
-		case "hidden":
-			if err := func() error {
-				s.Hidden.Reset()
-				if err := s.Hidden.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"hidden\"")
-			}
-		case "title":
-			requiredBitSet[0] |= 1 << 4
-			if err := func() error {
-				v, err := d.Str()
-				s.Title = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"title\"")
-			}
-		case "start":
-			if err := func() error {
-				s.Start.Reset()
-				if err := s.Start.Decode(d, json.DecodeDateTime); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"start\"")
-			}
-		case "end":
-			if err := func() error {
-				s.End.Reset()
-				if err := s.End.Decode(d, json.DecodeDateTime); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"end\"")
-			}
-		case "format":
-			if err := func() error {
-				s.Format.Reset()
-				if err := s.Format.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"format\"")
-			}
-		case "venue_id":
-			if err := func() error {
-				s.VenueID.Reset()
-				if err := s.VenueID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"venue_id\"")
-			}
-		case "simplified_registration":
-			if err := func() error {
-				s.SimplifiedRegistration.Reset()
-				if err := s.SimplifiedRegistration.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"simplified_registration\"")
-			}
-		case "autocreate_member":
-			if err := func() error {
-				s.AutocreateMember.Reset()
-				if err := s.AutocreateMember.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"autocreate_member\"")
-			}
-		case "achievements_allowed":
-			if err := func() error {
-				s.AchievementsAllowed.Reset()
-				if err := s.AchievementsAllowed.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"achievements_allowed\"")
-			}
-		case "requests_allowed":
-			if err := func() error {
-				s.RequestsAllowed.Reset()
-				if err := s.RequestsAllowed.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"requests_allowed\"")
-			}
-		case "self_check_in":
-			if err := func() error {
-				s.SelfCheckIn.Reset()
-				if err := s.SelfCheckIn.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"self_check_in\"")
-			}
-		case "teams_involved":
-			if err := func() error {
-				s.TeamsInvolved.Reset()
-				if err := s.TeamsInvolved.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"teams_involved\"")
-			}
-		case "owner_can_moderate":
-			if err := func() error {
-				s.OwnerCanModerate.Reset()
-				if err := s.OwnerCanModerate.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"owner_can_moderate\"")
-			}
-		case "user_in_multiple_teams":
-			if err := func() error {
-				s.UserInMultipleTeams.Reset()
-				if err := s.UserInMultipleTeams.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"user_in_multiple_teams\"")
-			}
-		case "mentors_allowed":
-			if err := func() error {
-				s.MentorsAllowed.Reset()
-				if err := s.MentorsAllowed.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"mentors_allowed\"")
-			}
-		case "support_i18n":
-			if err := func() error {
-				s.SupportI18n.Reset()
-				if err := s.SupportI18n.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"support_i18n\"")
-			}
-		case "gir_collection":
-			if err := func() error {
-				s.GirCollection.Reset()
-				if err := s.GirCollection.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"gir_collection\"")
-			}
-		case "promoted":
-			if err := func() error {
-				s.Promoted.Reset()
-				if err := s.Promoted.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"promoted\"")
-			}
-		case "time_matters":
-			if err := func() error {
-				s.TimeMatters.Reset()
-				if err := s.TimeMatters.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"time_matters\"")
-			}
-		case "max_users":
-			if err := func() error {
-				s.MaxUsers.Reset()
-				if err := s.MaxUsers.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"max_users\"")
-			}
-		case "team_create_notification":
-			if err := func() error {
-				s.TeamCreateNotification.Reset()
-				if err := s.TeamCreateNotification.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"team_create_notification\"")
-			}
-		case "team_assignment_method":
-			if err := func() error {
-				s.TeamAssignmentMethod.Reset()
-				if err := s.TeamAssignmentMethod.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"team_assignment_method\"")
-			}
-		case "expected_start":
-			if err := func() error {
-				s.ExpectedStart.Reset()
-				if err := s.ExpectedStart.Decode(d, json.DecodeDateTime); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"expected_start\"")
-			}
-		case "alt_title":
-			if err := func() error {
-				s.AltTitle.Reset()
-				if err := s.AltTitle.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"alt_title\"")
-			}
-		case "url":
-			if err := func() error {
-				s.URL.Reset()
-				if err := s.URL.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"url\"")
-			}
-		case "type_id":
-			if err := func() error {
-				s.TypeID.Reset()
-				if err := s.TypeID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"type_id\"")
-			}
-		case "description":
-			if err := func() error {
-				s.Description.Reset()
-				if err := s.Description.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"description\"")
-			}
-		case "questionnaire_completed_message":
-			if err := func() error {
-				s.QuestionnaireCompletedMessage.Reset()
-				if err := s.QuestionnaireCompletedMessage.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"questionnaire_completed_message\"")
-			}
-		case "notification_email_message":
-			if err := func() error {
-				s.NotificationEmailMessage.Reset()
-				if err := s.NotificationEmailMessage.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"notification_email_message\"")
-			}
-		case "cover_url":
-			if err := func() error {
-				s.CoverURL.Reset()
-				if err := s.CoverURL.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"cover_url\"")
-			}
-		case "keywords":
-			if err := func() error {
-				s.Keywords.Reset()
-				if err := s.Keywords.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"keywords\"")
-			}
-		case "organization_id":
-			requiredBitSet[4] |= 1 << 2
-			if err := func() error {
-				v, err := d.Int32()
-				s.OrganizationID = int32(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"organization_id\"")
-			}
-		case "achievement_roles":
-			if err := func() error {
-				s.AchievementRoles = make([]int32, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem int32
-					v, err := d.Int32()
-					elem = int32(v)
-					if err != nil {
-						return err
-					}
-					s.AchievementRoles = append(s.AchievementRoles, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"achievement_roles\"")
-			}
-		case "brands":
-			if err := func() error {
-				s.Brands = make([]int32, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem int32
-					v, err := d.Int32()
-					elem = int32(v)
-					if err != nil {
-						return err
-					}
-					s.Brands = append(s.Brands, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"brands\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode CreateEventReq")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [5]uint8{
-		0b00010000,
-		0b00000000,
-		0b00000000,
-		0b00000000,
-		0b00000100,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfCreateEventReq) {
-					name = jsonFieldsNameOfCreateEventReq[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *CreateEventReq) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *CreateEventReq) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -4455,102 +4842,6 @@ func (s *EventDeferredNotificationBeforeStart) UnmarshalJSON(data []byte) error 
 	return s.Decode(d)
 }
 
-// Encode implements json.Marshaler.
-func (s *EventDeferredNotificationLocked) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *EventDeferredNotificationLocked) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("error")
-		e.Str(s.Error)
-	}
-}
-
-var jsonFieldsNameOfEventDeferredNotificationLocked = [1]string{
-	0: "error",
-}
-
-// Decode decodes EventDeferredNotificationLocked from json.
-func (s *EventDeferredNotificationLocked) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode EventDeferredNotificationLocked to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "error":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Error = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode EventDeferredNotificationLocked")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfEventDeferredNotificationLocked) {
-					name = jsonFieldsNameOfEventDeferredNotificationLocked[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *EventDeferredNotificationLocked) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *EventDeferredNotificationLocked) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes EventDeferredNotificationTemplateID as json.
 func (s EventDeferredNotificationTemplateID) Encode(e *jx.Encoder) {
 	unwrapped := int16(s)
@@ -5375,6 +5666,10 @@ func (s *EventLimit) encodeFields(e *jx.Encoder) {
 		e.Bool(s.CollectPhones)
 	}
 	{
+		e.FieldStart("group_events_as_one")
+		e.Bool(s.GroupEventsAsOne)
+	}
+	{
 		e.FieldStart("participant_limit")
 		s.ParticipantLimit.Encode(e)
 	}
@@ -5476,31 +5771,32 @@ func (s *EventLimit) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfEventLimit = [24]string{
+var jsonFieldsNameOfEventLimit = [25]string{
 	0:  "id",
 	1:  "event_id",
 	2:  "auto_approve",
 	3:  "collect_snils",
 	4:  "collect_phones",
-	5:  "participant_limit",
-	6:  "date_end_request",
-	7:  "date_end_update",
-	8:  "user_age_start",
-	9:  "user_age_end",
-	10: "requires_project",
-	11: "requires_stepik",
-	12: "requires_github",
-	13: "requires_yandex",
-	14: "requires_kaggle",
-	15: "requires_leader",
-	16: "requires_vk",
-	17: "requires_telegram",
-	18: "regions_fias",
-	19: "cities_fias",
-	20: "countries",
-	21: "regions",
-	22: "cities",
-	23: "description",
+	5:  "group_events_as_one",
+	6:  "participant_limit",
+	7:  "date_end_request",
+	8:  "date_end_update",
+	9:  "user_age_start",
+	10: "user_age_end",
+	11: "requires_project",
+	12: "requires_stepik",
+	13: "requires_github",
+	14: "requires_yandex",
+	15: "requires_kaggle",
+	16: "requires_leader",
+	17: "requires_vk",
+	18: "requires_telegram",
+	19: "regions_fias",
+	20: "cities_fias",
+	21: "countries",
+	22: "regions",
+	23: "cities",
+	24: "description",
 }
 
 // Decode decodes EventLimit from json.
@@ -5508,7 +5804,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode EventLimit to nil")
 	}
-	var requiredBitSet [3]uint8
+	var requiredBitSet [4]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -5572,8 +5868,20 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"collect_phones\"")
 			}
-		case "participant_limit":
+		case "group_events_as_one":
 			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Bool()
+				s.GroupEventsAsOne = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"group_events_as_one\"")
+			}
+		case "participant_limit":
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
 				if err := s.ParticipantLimit.Decode(d); err != nil {
 					return err
@@ -5583,7 +5891,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"participant_limit\"")
 			}
 		case "date_end_request":
-			requiredBitSet[0] |= 1 << 6
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
 				if err := s.DateEndRequest.Decode(d, json.DecodeDateTime); err != nil {
 					return err
@@ -5593,7 +5901,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"date_end_request\"")
 			}
 		case "date_end_update":
-			requiredBitSet[0] |= 1 << 7
+			requiredBitSet[1] |= 1 << 0
 			if err := func() error {
 				if err := s.DateEndUpdate.Decode(d, json.DecodeDateTime); err != nil {
 					return err
@@ -5603,7 +5911,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"date_end_update\"")
 			}
 		case "user_age_start":
-			requiredBitSet[1] |= 1 << 0
+			requiredBitSet[1] |= 1 << 1
 			if err := func() error {
 				if err := s.UserAgeStart.Decode(d); err != nil {
 					return err
@@ -5613,7 +5921,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"user_age_start\"")
 			}
 		case "user_age_end":
-			requiredBitSet[1] |= 1 << 1
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				if err := s.UserAgeEnd.Decode(d); err != nil {
 					return err
@@ -5623,7 +5931,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"user_age_end\"")
 			}
 		case "requires_project":
-			requiredBitSet[1] |= 1 << 2
+			requiredBitSet[1] |= 1 << 3
 			if err := func() error {
 				v, err := d.Bool()
 				s.RequiresProject = bool(v)
@@ -5635,7 +5943,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"requires_project\"")
 			}
 		case "requires_stepik":
-			requiredBitSet[1] |= 1 << 3
+			requiredBitSet[1] |= 1 << 4
 			if err := func() error {
 				v, err := d.Bool()
 				s.RequiresStepik = bool(v)
@@ -5647,7 +5955,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"requires_stepik\"")
 			}
 		case "requires_github":
-			requiredBitSet[1] |= 1 << 4
+			requiredBitSet[1] |= 1 << 5
 			if err := func() error {
 				v, err := d.Bool()
 				s.RequiresGithub = bool(v)
@@ -5659,7 +5967,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"requires_github\"")
 			}
 		case "requires_yandex":
-			requiredBitSet[1] |= 1 << 5
+			requiredBitSet[1] |= 1 << 6
 			if err := func() error {
 				v, err := d.Bool()
 				s.RequiresYandex = bool(v)
@@ -5671,7 +5979,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"requires_yandex\"")
 			}
 		case "requires_kaggle":
-			requiredBitSet[1] |= 1 << 6
+			requiredBitSet[1] |= 1 << 7
 			if err := func() error {
 				v, err := d.Bool()
 				s.RequiresKaggle = bool(v)
@@ -5683,7 +5991,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"requires_kaggle\"")
 			}
 		case "requires_leader":
-			requiredBitSet[1] |= 1 << 7
+			requiredBitSet[2] |= 1 << 0
 			if err := func() error {
 				v, err := d.Bool()
 				s.RequiresLeader = bool(v)
@@ -5695,7 +6003,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"requires_leader\"")
 			}
 		case "requires_vk":
-			requiredBitSet[2] |= 1 << 0
+			requiredBitSet[2] |= 1 << 1
 			if err := func() error {
 				v, err := d.Bool()
 				s.RequiresVk = bool(v)
@@ -5707,7 +6015,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"requires_vk\"")
 			}
 		case "requires_telegram":
-			requiredBitSet[2] |= 1 << 1
+			requiredBitSet[2] |= 1 << 2
 			if err := func() error {
 				v, err := d.Bool()
 				s.RequiresTelegram = bool(v)
@@ -5757,7 +6065,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"cities_fias\"")
 			}
 		case "countries":
-			requiredBitSet[2] |= 1 << 4
+			requiredBitSet[2] |= 1 << 5
 			if err := func() error {
 				s.Countries = make([]string, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -5777,7 +6085,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"countries\"")
 			}
 		case "regions":
-			requiredBitSet[2] |= 1 << 5
+			requiredBitSet[2] |= 1 << 6
 			if err := func() error {
 				s.Regions = make([]string, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -5797,7 +6105,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"regions\"")
 			}
 		case "cities":
-			requiredBitSet[2] |= 1 << 6
+			requiredBitSet[2] |= 1 << 7
 			if err := func() error {
 				s.Cities = make([]string, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -5817,7 +6125,7 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"cities\"")
 			}
 		case "description":
-			requiredBitSet[2] |= 1 << 7
+			requiredBitSet[3] |= 1 << 0
 			if err := func() error {
 				v, err := d.Str()
 				s.Description = string(v)
@@ -5837,10 +6145,11 @@ func (s *EventLimit) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [3]uint8{
+	for i, mask := range [4]uint8{
 		0b11111111,
 		0b11111111,
-		0b11110011,
+		0b11100111,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -6008,6 +6317,12 @@ func (s *EventLimitWrite) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.GroupEventsAsOne.Set {
+			e.FieldStart("group_events_as_one")
+			s.GroupEventsAsOne.Encode(e)
+		}
+	}
+	{
 		if s.ParticipantLimit.Set {
 			e.FieldStart("participant_limit")
 			s.ParticipantLimit.Encode(e)
@@ -6143,29 +6458,30 @@ func (s *EventLimitWrite) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfEventLimitWrite = [22]string{
+var jsonFieldsNameOfEventLimitWrite = [23]string{
 	0:  "auto_approve",
 	1:  "collect_snils",
 	2:  "collect_phones",
-	3:  "participant_limit",
-	4:  "date_end_request",
-	5:  "date_end_update",
-	6:  "user_age_start",
-	7:  "user_age_end",
-	8:  "requires_project",
-	9:  "requires_stepik",
-	10: "requires_github",
-	11: "requires_yandex",
-	12: "requires_kaggle",
-	13: "requires_leader",
-	14: "requires_vk",
-	15: "requires_telegram",
-	16: "regions_fias",
-	17: "cities_fias",
-	18: "countries",
-	19: "regions",
-	20: "cities",
-	21: "description",
+	3:  "group_events_as_one",
+	4:  "participant_limit",
+	5:  "date_end_request",
+	6:  "date_end_update",
+	7:  "user_age_start",
+	8:  "user_age_end",
+	9:  "requires_project",
+	10: "requires_stepik",
+	11: "requires_github",
+	12: "requires_yandex",
+	13: "requires_kaggle",
+	14: "requires_leader",
+	15: "requires_vk",
+	16: "requires_telegram",
+	17: "regions_fias",
+	18: "cities_fias",
+	19: "countries",
+	20: "regions",
+	21: "cities",
+	22: "description",
 }
 
 // Decode decodes EventLimitWrite from json.
@@ -6205,6 +6521,16 @@ func (s *EventLimitWrite) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"collect_phones\"")
+			}
+		case "group_events_as_one":
+			if err := func() error {
+				s.GroupEventsAsOne.Reset()
+				if err := s.GroupEventsAsOne.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"group_events_as_one\"")
 			}
 		case "participant_limit":
 			if err := func() error {
@@ -9784,10 +10110,8 @@ func (s *IssueTokenSuccess) encodeFields(e *jx.Encoder) {
 		e.Str(s.TokenType)
 	}
 	{
-		if s.ExpiresIn.Set {
-			e.FieldStart("expires_in")
-			s.ExpiresIn.Encode(e)
-		}
+		e.FieldStart("expires_in")
+		e.Int32(s.ExpiresIn)
 	}
 	{
 		if s.RefreshToken.Set {
@@ -9845,9 +10169,11 @@ func (s *IssueTokenSuccess) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"token_type\"")
 			}
 		case "expires_in":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.ExpiresIn.Reset()
-				if err := s.ExpiresIn.Decode(d); err != nil {
+				v, err := d.Int32()
+				s.ExpiresIn = int32(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -9884,7 +10210,7 @@ func (s *IssueTokenSuccess) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000011,
+		0b00000111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -10395,52 +10721,111 @@ func (s *ListUserConsentsItem) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes ListUserConsentsOKApplicationJSON as json.
-func (s ListUserConsentsOKApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := []ListUserConsentsItem(s)
-
-	e.ArrStart()
-	for _, elem := range unwrapped {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
+// Encode implements json.Marshaler.
+func (s *ListUserTeamsOKItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
 }
 
-// Decode decodes ListUserConsentsOKApplicationJSON from json.
-func (s *ListUserConsentsOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ListUserConsentsOKApplicationJSON to nil")
+// encodeFields encodes fields.
+func (s *ListUserTeamsOKItem) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("person")
+		s.Person.Encode(e)
 	}
-	var unwrapped []ListUserConsentsItem
-	if err := func() error {
-		unwrapped = make([]ListUserConsentsItem, 0)
-		if err := d.Arr(func(d *jx.Decoder) error {
-			var elem ListUserConsentsItem
-			if err := elem.Decode(d); err != nil {
-				return err
+	{
+		e.FieldStart("team")
+		s.Team.Encode(e)
+	}
+}
+
+var jsonFieldsNameOfListUserTeamsOKItem = [2]string{
+	0: "person",
+	1: "team",
+}
+
+// Decode decodes ListUserTeamsOKItem from json.
+func (s *ListUserTeamsOKItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ListUserTeamsOKItem to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "person":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Person.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"person\"")
 			}
-			unwrapped = append(unwrapped, elem)
-			return nil
-		}); err != nil {
-			return err
+		case "team":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				if err := s.Team.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"team\"")
+			}
+		default:
+			return d.Skip()
 		}
 		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
+	}); err != nil {
+		return errors.Wrap(err, "decode ListUserTeamsOKItem")
 	}
-	*s = ListUserConsentsOKApplicationJSON(unwrapped)
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfListUserTeamsOKItem) {
+					name = jsonFieldsNameOfListUserTeamsOKItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s ListUserConsentsOKApplicationJSON) MarshalJSON() ([]byte, error) {
+func (s *ListUserTeamsOKItem) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ListUserConsentsOKApplicationJSON) UnmarshalJSON(data []byte) error {
+func (s *ListUserTeamsOKItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -10765,198 +11150,6 @@ func (s NilUUID) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *NilUUID) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *NotFound) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *NotFound) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("error")
-		e.Str(s.Error)
-	}
-}
-
-var jsonFieldsNameOfNotFound = [1]string{
-	0: "error",
-}
-
-// Decode decodes NotFound from json.
-func (s *NotFound) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode NotFound to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "error":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Error = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode NotFound")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfNotFound) {
-					name = jsonFieldsNameOfNotFound[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *NotFound) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NotFound) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *NotImplemented) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *NotImplemented) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("error")
-		e.Str(s.Error)
-	}
-}
-
-var jsonFieldsNameOfNotImplemented = [1]string{
-	0: "error",
-}
-
-// Decode decodes NotImplemented from json.
-func (s *NotImplemented) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode NotImplemented to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "error":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Error = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode NotImplemented")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfNotImplemented) {
-					name = jsonFieldsNameOfNotImplemented[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *NotImplemented) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NotImplemented) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -12418,6 +12611,1283 @@ func (s *OrganizationEvent) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OrganizationEvent) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *OrganizationEventCreate) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *OrganizationEventCreate) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("organization_id")
+		e.Int32(s.OrganizationID)
+	}
+	{
+		if s.MetaEventID.Set {
+			e.FieldStart("meta_event_id")
+			s.MetaEventID.Encode(e)
+		}
+	}
+	{
+		if s.Draft.Set {
+			e.FieldStart("draft")
+			s.Draft.Encode(e)
+		}
+	}
+	{
+		if s.Public.Set {
+			e.FieldStart("public")
+			s.Public.Encode(e)
+		}
+	}
+	{
+		if s.Hidden.Set {
+			e.FieldStart("hidden")
+			s.Hidden.Encode(e)
+		}
+	}
+	{
+		e.FieldStart("title")
+		e.Str(s.Title)
+	}
+	{
+		if s.Start.Set {
+			e.FieldStart("start")
+			s.Start.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.End.Set {
+			e.FieldStart("end")
+			s.End.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.Format.Set {
+			e.FieldStart("format")
+			s.Format.Encode(e)
+		}
+	}
+	{
+		if s.VenueID.Set {
+			e.FieldStart("venue_id")
+			s.VenueID.Encode(e)
+		}
+	}
+	{
+		if s.SimplifiedRegistration.Set {
+			e.FieldStart("simplified_registration")
+			s.SimplifiedRegistration.Encode(e)
+		}
+	}
+	{
+		if s.AutocreateMember.Set {
+			e.FieldStart("autocreate_member")
+			s.AutocreateMember.Encode(e)
+		}
+	}
+	{
+		if s.AchievementsAllowed.Set {
+			e.FieldStart("achievements_allowed")
+			s.AchievementsAllowed.Encode(e)
+		}
+	}
+	{
+		if s.RequestsAllowed.Set {
+			e.FieldStart("requests_allowed")
+			s.RequestsAllowed.Encode(e)
+		}
+	}
+	{
+		if s.SelfCheckIn.Set {
+			e.FieldStart("self_check_in")
+			s.SelfCheckIn.Encode(e)
+		}
+	}
+	{
+		if s.TeamsInvolved.Set {
+			e.FieldStart("teams_involved")
+			s.TeamsInvolved.Encode(e)
+		}
+	}
+	{
+		if s.OwnerCanModerate.Set {
+			e.FieldStart("owner_can_moderate")
+			s.OwnerCanModerate.Encode(e)
+		}
+	}
+	{
+		if s.UserInMultipleTeams.Set {
+			e.FieldStart("user_in_multiple_teams")
+			s.UserInMultipleTeams.Encode(e)
+		}
+	}
+	{
+		if s.SupportI18n.Set {
+			e.FieldStart("support_i18n")
+			s.SupportI18n.Encode(e)
+		}
+	}
+	{
+		if s.TimeMatters.Set {
+			e.FieldStart("time_matters")
+			s.TimeMatters.Encode(e)
+		}
+	}
+	{
+		if s.MaxUsers.Set {
+			e.FieldStart("max_users")
+			s.MaxUsers.Encode(e)
+		}
+	}
+	{
+		if s.TeamAssignmentMethod.Set {
+			e.FieldStart("team_assignment_method")
+			s.TeamAssignmentMethod.Encode(e)
+		}
+	}
+	{
+		if s.ExpectedStart.Set {
+			e.FieldStart("expected_start")
+			s.ExpectedStart.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.AltTitle.Set {
+			e.FieldStart("alt_title")
+			s.AltTitle.Encode(e)
+		}
+	}
+	{
+		if s.URL.Set {
+			e.FieldStart("url")
+			s.URL.Encode(e)
+		}
+	}
+	{
+		if s.TypeID.Set {
+			e.FieldStart("type_id")
+			s.TypeID.Encode(e)
+		}
+	}
+	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
+		if s.QuestionnaireCompletedMessage.Set {
+			e.FieldStart("questionnaire_completed_message")
+			s.QuestionnaireCompletedMessage.Encode(e)
+		}
+	}
+	{
+		if s.NotificationEmailMessage.Set {
+			e.FieldStart("notification_email_message")
+			s.NotificationEmailMessage.Encode(e)
+		}
+	}
+	{
+		if s.CoverURL.Set {
+			e.FieldStart("cover_url")
+			s.CoverURL.Encode(e)
+		}
+	}
+	{
+		if s.Keywords.Set {
+			e.FieldStart("keywords")
+			s.Keywords.Encode(e)
+		}
+	}
+	{
+		if s.AchievementRoles != nil {
+			e.FieldStart("achievement_roles")
+			e.ArrStart()
+			for _, elem := range s.AchievementRoles {
+				e.Int32(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Brands != nil {
+			e.FieldStart("brands")
+			e.ArrStart()
+			for _, elem := range s.Brands {
+				e.Int32(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+}
+
+var jsonFieldsNameOfOrganizationEventCreate = [33]string{
+	0:  "organization_id",
+	1:  "meta_event_id",
+	2:  "draft",
+	3:  "public",
+	4:  "hidden",
+	5:  "title",
+	6:  "start",
+	7:  "end",
+	8:  "format",
+	9:  "venue_id",
+	10: "simplified_registration",
+	11: "autocreate_member",
+	12: "achievements_allowed",
+	13: "requests_allowed",
+	14: "self_check_in",
+	15: "teams_involved",
+	16: "owner_can_moderate",
+	17: "user_in_multiple_teams",
+	18: "support_i18n",
+	19: "time_matters",
+	20: "max_users",
+	21: "team_assignment_method",
+	22: "expected_start",
+	23: "alt_title",
+	24: "url",
+	25: "type_id",
+	26: "description",
+	27: "questionnaire_completed_message",
+	28: "notification_email_message",
+	29: "cover_url",
+	30: "keywords",
+	31: "achievement_roles",
+	32: "brands",
+}
+
+// Decode decodes OrganizationEventCreate from json.
+func (s *OrganizationEventCreate) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode OrganizationEventCreate to nil")
+	}
+	var requiredBitSet [5]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "organization_id":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int32()
+				s.OrganizationID = int32(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"organization_id\"")
+			}
+		case "meta_event_id":
+			if err := func() error {
+				s.MetaEventID.Reset()
+				if err := s.MetaEventID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"meta_event_id\"")
+			}
+		case "draft":
+			if err := func() error {
+				s.Draft.Reset()
+				if err := s.Draft.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"draft\"")
+			}
+		case "public":
+			if err := func() error {
+				s.Public.Reset()
+				if err := s.Public.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"public\"")
+			}
+		case "hidden":
+			if err := func() error {
+				s.Hidden.Reset()
+				if err := s.Hidden.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hidden\"")
+			}
+		case "title":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Str()
+				s.Title = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"title\"")
+			}
+		case "start":
+			if err := func() error {
+				s.Start.Reset()
+				if err := s.Start.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"start\"")
+			}
+		case "end":
+			if err := func() error {
+				s.End.Reset()
+				if err := s.End.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"end\"")
+			}
+		case "format":
+			if err := func() error {
+				s.Format.Reset()
+				if err := s.Format.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"format\"")
+			}
+		case "venue_id":
+			if err := func() error {
+				s.VenueID.Reset()
+				if err := s.VenueID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"venue_id\"")
+			}
+		case "simplified_registration":
+			if err := func() error {
+				s.SimplifiedRegistration.Reset()
+				if err := s.SimplifiedRegistration.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"simplified_registration\"")
+			}
+		case "autocreate_member":
+			if err := func() error {
+				s.AutocreateMember.Reset()
+				if err := s.AutocreateMember.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"autocreate_member\"")
+			}
+		case "achievements_allowed":
+			if err := func() error {
+				s.AchievementsAllowed.Reset()
+				if err := s.AchievementsAllowed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"achievements_allowed\"")
+			}
+		case "requests_allowed":
+			if err := func() error {
+				s.RequestsAllowed.Reset()
+				if err := s.RequestsAllowed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"requests_allowed\"")
+			}
+		case "self_check_in":
+			if err := func() error {
+				s.SelfCheckIn.Reset()
+				if err := s.SelfCheckIn.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"self_check_in\"")
+			}
+		case "teams_involved":
+			if err := func() error {
+				s.TeamsInvolved.Reset()
+				if err := s.TeamsInvolved.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"teams_involved\"")
+			}
+		case "owner_can_moderate":
+			if err := func() error {
+				s.OwnerCanModerate.Reset()
+				if err := s.OwnerCanModerate.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"owner_can_moderate\"")
+			}
+		case "user_in_multiple_teams":
+			if err := func() error {
+				s.UserInMultipleTeams.Reset()
+				if err := s.UserInMultipleTeams.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"user_in_multiple_teams\"")
+			}
+		case "support_i18n":
+			if err := func() error {
+				s.SupportI18n.Reset()
+				if err := s.SupportI18n.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"support_i18n\"")
+			}
+		case "time_matters":
+			if err := func() error {
+				s.TimeMatters.Reset()
+				if err := s.TimeMatters.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"time_matters\"")
+			}
+		case "max_users":
+			if err := func() error {
+				s.MaxUsers.Reset()
+				if err := s.MaxUsers.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"max_users\"")
+			}
+		case "team_assignment_method":
+			if err := func() error {
+				s.TeamAssignmentMethod.Reset()
+				if err := s.TeamAssignmentMethod.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"team_assignment_method\"")
+			}
+		case "expected_start":
+			if err := func() error {
+				s.ExpectedStart.Reset()
+				if err := s.ExpectedStart.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"expected_start\"")
+			}
+		case "alt_title":
+			if err := func() error {
+				s.AltTitle.Reset()
+				if err := s.AltTitle.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"alt_title\"")
+			}
+		case "url":
+			if err := func() error {
+				s.URL.Reset()
+				if err := s.URL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"url\"")
+			}
+		case "type_id":
+			if err := func() error {
+				s.TypeID.Reset()
+				if err := s.TypeID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"type_id\"")
+			}
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
+		case "questionnaire_completed_message":
+			if err := func() error {
+				s.QuestionnaireCompletedMessage.Reset()
+				if err := s.QuestionnaireCompletedMessage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"questionnaire_completed_message\"")
+			}
+		case "notification_email_message":
+			if err := func() error {
+				s.NotificationEmailMessage.Reset()
+				if err := s.NotificationEmailMessage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"notification_email_message\"")
+			}
+		case "cover_url":
+			if err := func() error {
+				s.CoverURL.Reset()
+				if err := s.CoverURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"cover_url\"")
+			}
+		case "keywords":
+			if err := func() error {
+				s.Keywords.Reset()
+				if err := s.Keywords.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"keywords\"")
+			}
+		case "achievement_roles":
+			if err := func() error {
+				s.AchievementRoles = make([]int32, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem int32
+					v, err := d.Int32()
+					elem = int32(v)
+					if err != nil {
+						return err
+					}
+					s.AchievementRoles = append(s.AchievementRoles, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"achievement_roles\"")
+			}
+		case "brands":
+			if err := func() error {
+				s.Brands = make([]int32, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem int32
+					v, err := d.Int32()
+					elem = int32(v)
+					if err != nil {
+						return err
+					}
+					s.Brands = append(s.Brands, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"brands\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode OrganizationEventCreate")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [5]uint8{
+		0b00100001,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfOrganizationEventCreate) {
+					name = jsonFieldsNameOfOrganizationEventCreate[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *OrganizationEventCreate) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OrganizationEventCreate) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *OrganizationEventUpdate) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *OrganizationEventUpdate) encodeFields(e *jx.Encoder) {
+	{
+		if s.OrganizationID.Set {
+			e.FieldStart("organization_id")
+			s.OrganizationID.Encode(e)
+		}
+	}
+	{
+		if s.MetaEventID.Set {
+			e.FieldStart("meta_event_id")
+			s.MetaEventID.Encode(e)
+		}
+	}
+	{
+		if s.Draft.Set {
+			e.FieldStart("draft")
+			s.Draft.Encode(e)
+		}
+	}
+	{
+		if s.Public.Set {
+			e.FieldStart("public")
+			s.Public.Encode(e)
+		}
+	}
+	{
+		if s.Hidden.Set {
+			e.FieldStart("hidden")
+			s.Hidden.Encode(e)
+		}
+	}
+	{
+		if s.Title.Set {
+			e.FieldStart("title")
+			s.Title.Encode(e)
+		}
+	}
+	{
+		if s.Start.Set {
+			e.FieldStart("start")
+			s.Start.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.End.Set {
+			e.FieldStart("end")
+			s.End.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.Format.Set {
+			e.FieldStart("format")
+			s.Format.Encode(e)
+		}
+	}
+	{
+		if s.VenueID.Set {
+			e.FieldStart("venue_id")
+			s.VenueID.Encode(e)
+		}
+	}
+	{
+		if s.SimplifiedRegistration.Set {
+			e.FieldStart("simplified_registration")
+			s.SimplifiedRegistration.Encode(e)
+		}
+	}
+	{
+		if s.AutocreateMember.Set {
+			e.FieldStart("autocreate_member")
+			s.AutocreateMember.Encode(e)
+		}
+	}
+	{
+		if s.AchievementsAllowed.Set {
+			e.FieldStart("achievements_allowed")
+			s.AchievementsAllowed.Encode(e)
+		}
+	}
+	{
+		if s.RequestsAllowed.Set {
+			e.FieldStart("requests_allowed")
+			s.RequestsAllowed.Encode(e)
+		}
+	}
+	{
+		if s.SelfCheckIn.Set {
+			e.FieldStart("self_check_in")
+			s.SelfCheckIn.Encode(e)
+		}
+	}
+	{
+		if s.TeamsInvolved.Set {
+			e.FieldStart("teams_involved")
+			s.TeamsInvolved.Encode(e)
+		}
+	}
+	{
+		if s.OwnerCanModerate.Set {
+			e.FieldStart("owner_can_moderate")
+			s.OwnerCanModerate.Encode(e)
+		}
+	}
+	{
+		if s.UserInMultipleTeams.Set {
+			e.FieldStart("user_in_multiple_teams")
+			s.UserInMultipleTeams.Encode(e)
+		}
+	}
+	{
+		if s.SupportI18n.Set {
+			e.FieldStart("support_i18n")
+			s.SupportI18n.Encode(e)
+		}
+	}
+	{
+		if s.TimeMatters.Set {
+			e.FieldStart("time_matters")
+			s.TimeMatters.Encode(e)
+		}
+	}
+	{
+		if s.MaxUsers.Set {
+			e.FieldStart("max_users")
+			s.MaxUsers.Encode(e)
+		}
+	}
+	{
+		if s.TeamAssignmentMethod.Set {
+			e.FieldStart("team_assignment_method")
+			s.TeamAssignmentMethod.Encode(e)
+		}
+	}
+	{
+		if s.ExpectedStart.Set {
+			e.FieldStart("expected_start")
+			s.ExpectedStart.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.AltTitle.Set {
+			e.FieldStart("alt_title")
+			s.AltTitle.Encode(e)
+		}
+	}
+	{
+		if s.URL.Set {
+			e.FieldStart("url")
+			s.URL.Encode(e)
+		}
+	}
+	{
+		if s.TypeID.Set {
+			e.FieldStart("type_id")
+			s.TypeID.Encode(e)
+		}
+	}
+	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
+		if s.QuestionnaireCompletedMessage.Set {
+			e.FieldStart("questionnaire_completed_message")
+			s.QuestionnaireCompletedMessage.Encode(e)
+		}
+	}
+	{
+		if s.NotificationEmailMessage.Set {
+			e.FieldStart("notification_email_message")
+			s.NotificationEmailMessage.Encode(e)
+		}
+	}
+	{
+		if s.CoverURL.Set {
+			e.FieldStart("cover_url")
+			s.CoverURL.Encode(e)
+		}
+	}
+	{
+		if s.Keywords.Set {
+			e.FieldStart("keywords")
+			s.Keywords.Encode(e)
+		}
+	}
+	{
+		if s.Canceled.Set {
+			e.FieldStart("canceled")
+			s.Canceled.Encode(e)
+		}
+	}
+	{
+		if s.CancellationReason.Set {
+			e.FieldStart("cancellation_reason")
+			s.CancellationReason.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfOrganizationEventUpdate = [33]string{
+	0:  "organization_id",
+	1:  "meta_event_id",
+	2:  "draft",
+	3:  "public",
+	4:  "hidden",
+	5:  "title",
+	6:  "start",
+	7:  "end",
+	8:  "format",
+	9:  "venue_id",
+	10: "simplified_registration",
+	11: "autocreate_member",
+	12: "achievements_allowed",
+	13: "requests_allowed",
+	14: "self_check_in",
+	15: "teams_involved",
+	16: "owner_can_moderate",
+	17: "user_in_multiple_teams",
+	18: "support_i18n",
+	19: "time_matters",
+	20: "max_users",
+	21: "team_assignment_method",
+	22: "expected_start",
+	23: "alt_title",
+	24: "url",
+	25: "type_id",
+	26: "description",
+	27: "questionnaire_completed_message",
+	28: "notification_email_message",
+	29: "cover_url",
+	30: "keywords",
+	31: "canceled",
+	32: "cancellation_reason",
+}
+
+// Decode decodes OrganizationEventUpdate from json.
+func (s *OrganizationEventUpdate) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode OrganizationEventUpdate to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "organization_id":
+			if err := func() error {
+				s.OrganizationID.Reset()
+				if err := s.OrganizationID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"organization_id\"")
+			}
+		case "meta_event_id":
+			if err := func() error {
+				s.MetaEventID.Reset()
+				if err := s.MetaEventID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"meta_event_id\"")
+			}
+		case "draft":
+			if err := func() error {
+				s.Draft.Reset()
+				if err := s.Draft.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"draft\"")
+			}
+		case "public":
+			if err := func() error {
+				s.Public.Reset()
+				if err := s.Public.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"public\"")
+			}
+		case "hidden":
+			if err := func() error {
+				s.Hidden.Reset()
+				if err := s.Hidden.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hidden\"")
+			}
+		case "title":
+			if err := func() error {
+				s.Title.Reset()
+				if err := s.Title.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"title\"")
+			}
+		case "start":
+			if err := func() error {
+				s.Start.Reset()
+				if err := s.Start.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"start\"")
+			}
+		case "end":
+			if err := func() error {
+				s.End.Reset()
+				if err := s.End.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"end\"")
+			}
+		case "format":
+			if err := func() error {
+				s.Format.Reset()
+				if err := s.Format.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"format\"")
+			}
+		case "venue_id":
+			if err := func() error {
+				s.VenueID.Reset()
+				if err := s.VenueID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"venue_id\"")
+			}
+		case "simplified_registration":
+			if err := func() error {
+				s.SimplifiedRegistration.Reset()
+				if err := s.SimplifiedRegistration.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"simplified_registration\"")
+			}
+		case "autocreate_member":
+			if err := func() error {
+				s.AutocreateMember.Reset()
+				if err := s.AutocreateMember.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"autocreate_member\"")
+			}
+		case "achievements_allowed":
+			if err := func() error {
+				s.AchievementsAllowed.Reset()
+				if err := s.AchievementsAllowed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"achievements_allowed\"")
+			}
+		case "requests_allowed":
+			if err := func() error {
+				s.RequestsAllowed.Reset()
+				if err := s.RequestsAllowed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"requests_allowed\"")
+			}
+		case "self_check_in":
+			if err := func() error {
+				s.SelfCheckIn.Reset()
+				if err := s.SelfCheckIn.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"self_check_in\"")
+			}
+		case "teams_involved":
+			if err := func() error {
+				s.TeamsInvolved.Reset()
+				if err := s.TeamsInvolved.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"teams_involved\"")
+			}
+		case "owner_can_moderate":
+			if err := func() error {
+				s.OwnerCanModerate.Reset()
+				if err := s.OwnerCanModerate.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"owner_can_moderate\"")
+			}
+		case "user_in_multiple_teams":
+			if err := func() error {
+				s.UserInMultipleTeams.Reset()
+				if err := s.UserInMultipleTeams.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"user_in_multiple_teams\"")
+			}
+		case "support_i18n":
+			if err := func() error {
+				s.SupportI18n.Reset()
+				if err := s.SupportI18n.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"support_i18n\"")
+			}
+		case "time_matters":
+			if err := func() error {
+				s.TimeMatters.Reset()
+				if err := s.TimeMatters.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"time_matters\"")
+			}
+		case "max_users":
+			if err := func() error {
+				s.MaxUsers.Reset()
+				if err := s.MaxUsers.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"max_users\"")
+			}
+		case "team_assignment_method":
+			if err := func() error {
+				s.TeamAssignmentMethod.Reset()
+				if err := s.TeamAssignmentMethod.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"team_assignment_method\"")
+			}
+		case "expected_start":
+			if err := func() error {
+				s.ExpectedStart.Reset()
+				if err := s.ExpectedStart.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"expected_start\"")
+			}
+		case "alt_title":
+			if err := func() error {
+				s.AltTitle.Reset()
+				if err := s.AltTitle.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"alt_title\"")
+			}
+		case "url":
+			if err := func() error {
+				s.URL.Reset()
+				if err := s.URL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"url\"")
+			}
+		case "type_id":
+			if err := func() error {
+				s.TypeID.Reset()
+				if err := s.TypeID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"type_id\"")
+			}
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
+		case "questionnaire_completed_message":
+			if err := func() error {
+				s.QuestionnaireCompletedMessage.Reset()
+				if err := s.QuestionnaireCompletedMessage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"questionnaire_completed_message\"")
+			}
+		case "notification_email_message":
+			if err := func() error {
+				s.NotificationEmailMessage.Reset()
+				if err := s.NotificationEmailMessage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"notification_email_message\"")
+			}
+		case "cover_url":
+			if err := func() error {
+				s.CoverURL.Reset()
+				if err := s.CoverURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"cover_url\"")
+			}
+		case "keywords":
+			if err := func() error {
+				s.Keywords.Reset()
+				if err := s.Keywords.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"keywords\"")
+			}
+		case "canceled":
+			if err := func() error {
+				s.Canceled.Reset()
+				if err := s.Canceled.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"canceled\"")
+			}
+		case "cancellation_reason":
+			if err := func() error {
+				s.CancellationReason.Reset()
+				if err := s.CancellationReason.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"cancellation_reason\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode OrganizationEventUpdate")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *OrganizationEventUpdate) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OrganizationEventUpdate) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -13931,102 +15401,6 @@ func (s *PatchMutationLockReq) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *PatchMutationLockReq) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *PermissionDenied) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *PermissionDenied) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("error")
-		e.Str(s.Error)
-	}
-}
-
-var jsonFieldsNameOfPermissionDenied = [1]string{
-	0: "error",
-}
-
-// Decode decodes PermissionDenied from json.
-func (s *PermissionDenied) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode PermissionDenied to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "error":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Error = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode PermissionDenied")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfPermissionDenied) {
-					name = jsonFieldsNameOfPermissionDenied[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *PermissionDenied) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *PermissionDenied) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -16255,14 +17629,19 @@ func (s *TeamPersonWithUserPersonUser) encodeFields(e *jx.Encoder) {
 			s.MiddleName.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("public_page")
+		e.Bool(s.PublicPage)
+	}
 }
 
-var jsonFieldsNameOfTeamPersonWithUserPersonUser = [5]string{
+var jsonFieldsNameOfTeamPersonWithUserPersonUser = [6]string{
 	0: "id",
 	1: "avatar",
 	2: "last_name",
 	3: "first_name",
 	4: "middle_name",
+	5: "public_page",
 }
 
 // Decode decodes TeamPersonWithUserPersonUser from json.
@@ -16330,6 +17709,18 @@ func (s *TeamPersonWithUserPersonUser) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"middle_name\"")
 			}
+		case "public_page":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Bool()
+				s.PublicPage = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"public_page\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -16340,7 +17731,7 @@ func (s *TeamPersonWithUserPersonUser) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00001101,
+		0b00101101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -16725,12 +18116,14 @@ func (s *TeamPrivateWithPersons) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("persons")
-		e.ArrStart()
-		for _, elem := range s.Persons {
-			elem.Encode(e)
+		if s.Persons != nil {
+			e.FieldStart("persons")
+			e.ArrStart()
+			for _, elem := range s.Persons {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
 		}
-		e.ArrEnd()
 	}
 }
 
@@ -16897,7 +18290,6 @@ func (s *TeamPrivateWithPersons) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"invite_code\"")
 			}
 		case "persons":
-			requiredBitSet[1] |= 1 << 4
 			if err := func() error {
 				s.Persons = make([]TeamPersonWithUser, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -16925,7 +18317,7 @@ func (s *TeamPrivateWithPersons) Decode(d *jx.Decoder) error {
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b11111111,
-		0b00010111,
+		0b00000111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -17542,198 +18934,6 @@ func (s *UUIDs) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *Unauthorized) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *Unauthorized) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("error")
-		e.Str(s.Error)
-	}
-}
-
-var jsonFieldsNameOfUnauthorized = [1]string{
-	0: "error",
-}
-
-// Decode decodes Unauthorized from json.
-func (s *Unauthorized) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode Unauthorized to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "error":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Error = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode Unauthorized")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfUnauthorized) {
-					name = jsonFieldsNameOfUnauthorized[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *Unauthorized) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *Unauthorized) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *UnproccessableEntity) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *UnproccessableEntity) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("error")
-		e.Str(s.Error)
-	}
-}
-
-var jsonFieldsNameOfUnproccessableEntity = [1]string{
-	0: "error",
-}
-
-// Decode decodes UnproccessableEntity from json.
-func (s *UnproccessableEntity) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode UnproccessableEntity to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "error":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Error = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode UnproccessableEntity")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfUnproccessableEntity) {
-					name = jsonFieldsNameOfUnproccessableEntity[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *UnproccessableEntity) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *UnproccessableEntity) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
 func (s *UpdateEventDeferredNotificationReq) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -17941,681 +19141,6 @@ func (s *UpdateEventDiplomaSettingsReq) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *UpdateEventDiplomaSettingsReq) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *UpdateEventReq) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *UpdateEventReq) encodeFields(e *jx.Encoder) {
-	{
-		if s.MetaEventID.Set {
-			e.FieldStart("meta_event_id")
-			s.MetaEventID.Encode(e)
-		}
-	}
-	{
-		if s.Draft.Set {
-			e.FieldStart("draft")
-			s.Draft.Encode(e)
-		}
-	}
-	{
-		if s.Public.Set {
-			e.FieldStart("public")
-			s.Public.Encode(e)
-		}
-	}
-	{
-		if s.Hidden.Set {
-			e.FieldStart("hidden")
-			s.Hidden.Encode(e)
-		}
-	}
-	{
-		if s.Title.Set {
-			e.FieldStart("title")
-			s.Title.Encode(e)
-		}
-	}
-	{
-		if s.Start.Set {
-			e.FieldStart("start")
-			s.Start.Encode(e, json.EncodeDateTime)
-		}
-	}
-	{
-		if s.End.Set {
-			e.FieldStart("end")
-			s.End.Encode(e, json.EncodeDateTime)
-		}
-	}
-	{
-		if s.Format.Set {
-			e.FieldStart("format")
-			s.Format.Encode(e)
-		}
-	}
-	{
-		if s.VenueID.Set {
-			e.FieldStart("venue_id")
-			s.VenueID.Encode(e)
-		}
-	}
-	{
-		if s.SimplifiedRegistration.Set {
-			e.FieldStart("simplified_registration")
-			s.SimplifiedRegistration.Encode(e)
-		}
-	}
-	{
-		if s.AutocreateMember.Set {
-			e.FieldStart("autocreate_member")
-			s.AutocreateMember.Encode(e)
-		}
-	}
-	{
-		if s.AchievementsAllowed.Set {
-			e.FieldStart("achievements_allowed")
-			s.AchievementsAllowed.Encode(e)
-		}
-	}
-	{
-		if s.RequestsAllowed.Set {
-			e.FieldStart("requests_allowed")
-			s.RequestsAllowed.Encode(e)
-		}
-	}
-	{
-		if s.SelfCheckIn.Set {
-			e.FieldStart("self_check_in")
-			s.SelfCheckIn.Encode(e)
-		}
-	}
-	{
-		if s.TeamsInvolved.Set {
-			e.FieldStart("teams_involved")
-			s.TeamsInvolved.Encode(e)
-		}
-	}
-	{
-		if s.OwnerCanModerate.Set {
-			e.FieldStart("owner_can_moderate")
-			s.OwnerCanModerate.Encode(e)
-		}
-	}
-	{
-		if s.UserInMultipleTeams.Set {
-			e.FieldStart("user_in_multiple_teams")
-			s.UserInMultipleTeams.Encode(e)
-		}
-	}
-	{
-		if s.MentorsAllowed.Set {
-			e.FieldStart("mentors_allowed")
-			s.MentorsAllowed.Encode(e)
-		}
-	}
-	{
-		if s.SupportI18n.Set {
-			e.FieldStart("support_i18n")
-			s.SupportI18n.Encode(e)
-		}
-	}
-	{
-		if s.GirCollection.Set {
-			e.FieldStart("gir_collection")
-			s.GirCollection.Encode(e)
-		}
-	}
-	{
-		if s.Promoted.Set {
-			e.FieldStart("promoted")
-			s.Promoted.Encode(e)
-		}
-	}
-	{
-		if s.TimeMatters.Set {
-			e.FieldStart("time_matters")
-			s.TimeMatters.Encode(e)
-		}
-	}
-	{
-		if s.MaxUsers.Set {
-			e.FieldStart("max_users")
-			s.MaxUsers.Encode(e)
-		}
-	}
-	{
-		if s.TeamCreateNotification.Set {
-			e.FieldStart("team_create_notification")
-			s.TeamCreateNotification.Encode(e)
-		}
-	}
-	{
-		if s.TeamAssignmentMethod.Set {
-			e.FieldStart("team_assignment_method")
-			s.TeamAssignmentMethod.Encode(e)
-		}
-	}
-	{
-		if s.ExpectedStart.Set {
-			e.FieldStart("expected_start")
-			s.ExpectedStart.Encode(e, json.EncodeDateTime)
-		}
-	}
-	{
-		if s.AltTitle.Set {
-			e.FieldStart("alt_title")
-			s.AltTitle.Encode(e)
-		}
-	}
-	{
-		if s.URL.Set {
-			e.FieldStart("url")
-			s.URL.Encode(e)
-		}
-	}
-	{
-		if s.TypeID.Set {
-			e.FieldStart("type_id")
-			s.TypeID.Encode(e)
-		}
-	}
-	{
-		if s.Description.Set {
-			e.FieldStart("description")
-			s.Description.Encode(e)
-		}
-	}
-	{
-		if s.QuestionnaireCompletedMessage.Set {
-			e.FieldStart("questionnaire_completed_message")
-			s.QuestionnaireCompletedMessage.Encode(e)
-		}
-	}
-	{
-		if s.NotificationEmailMessage.Set {
-			e.FieldStart("notification_email_message")
-			s.NotificationEmailMessage.Encode(e)
-		}
-	}
-	{
-		if s.CoverURL.Set {
-			e.FieldStart("cover_url")
-			s.CoverURL.Encode(e)
-		}
-	}
-	{
-		if s.Keywords.Set {
-			e.FieldStart("keywords")
-			s.Keywords.Encode(e)
-		}
-	}
-	{
-		if s.OrganizationID.Set {
-			e.FieldStart("organization_id")
-			s.OrganizationID.Encode(e)
-		}
-	}
-	{
-		if s.Canceled.Set {
-			e.FieldStart("canceled")
-			s.Canceled.Encode(e)
-		}
-	}
-	{
-		if s.CancellationReason.Set {
-			e.FieldStart("cancellation_reason")
-			s.CancellationReason.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfUpdateEventReq = [37]string{
-	0:  "meta_event_id",
-	1:  "draft",
-	2:  "public",
-	3:  "hidden",
-	4:  "title",
-	5:  "start",
-	6:  "end",
-	7:  "format",
-	8:  "venue_id",
-	9:  "simplified_registration",
-	10: "autocreate_member",
-	11: "achievements_allowed",
-	12: "requests_allowed",
-	13: "self_check_in",
-	14: "teams_involved",
-	15: "owner_can_moderate",
-	16: "user_in_multiple_teams",
-	17: "mentors_allowed",
-	18: "support_i18n",
-	19: "gir_collection",
-	20: "promoted",
-	21: "time_matters",
-	22: "max_users",
-	23: "team_create_notification",
-	24: "team_assignment_method",
-	25: "expected_start",
-	26: "alt_title",
-	27: "url",
-	28: "type_id",
-	29: "description",
-	30: "questionnaire_completed_message",
-	31: "notification_email_message",
-	32: "cover_url",
-	33: "keywords",
-	34: "organization_id",
-	35: "canceled",
-	36: "cancellation_reason",
-}
-
-// Decode decodes UpdateEventReq from json.
-func (s *UpdateEventReq) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode UpdateEventReq to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "meta_event_id":
-			if err := func() error {
-				s.MetaEventID.Reset()
-				if err := s.MetaEventID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"meta_event_id\"")
-			}
-		case "draft":
-			if err := func() error {
-				s.Draft.Reset()
-				if err := s.Draft.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"draft\"")
-			}
-		case "public":
-			if err := func() error {
-				s.Public.Reset()
-				if err := s.Public.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"public\"")
-			}
-		case "hidden":
-			if err := func() error {
-				s.Hidden.Reset()
-				if err := s.Hidden.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"hidden\"")
-			}
-		case "title":
-			if err := func() error {
-				s.Title.Reset()
-				if err := s.Title.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"title\"")
-			}
-		case "start":
-			if err := func() error {
-				s.Start.Reset()
-				if err := s.Start.Decode(d, json.DecodeDateTime); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"start\"")
-			}
-		case "end":
-			if err := func() error {
-				s.End.Reset()
-				if err := s.End.Decode(d, json.DecodeDateTime); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"end\"")
-			}
-		case "format":
-			if err := func() error {
-				s.Format.Reset()
-				if err := s.Format.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"format\"")
-			}
-		case "venue_id":
-			if err := func() error {
-				s.VenueID.Reset()
-				if err := s.VenueID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"venue_id\"")
-			}
-		case "simplified_registration":
-			if err := func() error {
-				s.SimplifiedRegistration.Reset()
-				if err := s.SimplifiedRegistration.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"simplified_registration\"")
-			}
-		case "autocreate_member":
-			if err := func() error {
-				s.AutocreateMember.Reset()
-				if err := s.AutocreateMember.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"autocreate_member\"")
-			}
-		case "achievements_allowed":
-			if err := func() error {
-				s.AchievementsAllowed.Reset()
-				if err := s.AchievementsAllowed.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"achievements_allowed\"")
-			}
-		case "requests_allowed":
-			if err := func() error {
-				s.RequestsAllowed.Reset()
-				if err := s.RequestsAllowed.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"requests_allowed\"")
-			}
-		case "self_check_in":
-			if err := func() error {
-				s.SelfCheckIn.Reset()
-				if err := s.SelfCheckIn.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"self_check_in\"")
-			}
-		case "teams_involved":
-			if err := func() error {
-				s.TeamsInvolved.Reset()
-				if err := s.TeamsInvolved.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"teams_involved\"")
-			}
-		case "owner_can_moderate":
-			if err := func() error {
-				s.OwnerCanModerate.Reset()
-				if err := s.OwnerCanModerate.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"owner_can_moderate\"")
-			}
-		case "user_in_multiple_teams":
-			if err := func() error {
-				s.UserInMultipleTeams.Reset()
-				if err := s.UserInMultipleTeams.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"user_in_multiple_teams\"")
-			}
-		case "mentors_allowed":
-			if err := func() error {
-				s.MentorsAllowed.Reset()
-				if err := s.MentorsAllowed.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"mentors_allowed\"")
-			}
-		case "support_i18n":
-			if err := func() error {
-				s.SupportI18n.Reset()
-				if err := s.SupportI18n.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"support_i18n\"")
-			}
-		case "gir_collection":
-			if err := func() error {
-				s.GirCollection.Reset()
-				if err := s.GirCollection.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"gir_collection\"")
-			}
-		case "promoted":
-			if err := func() error {
-				s.Promoted.Reset()
-				if err := s.Promoted.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"promoted\"")
-			}
-		case "time_matters":
-			if err := func() error {
-				s.TimeMatters.Reset()
-				if err := s.TimeMatters.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"time_matters\"")
-			}
-		case "max_users":
-			if err := func() error {
-				s.MaxUsers.Reset()
-				if err := s.MaxUsers.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"max_users\"")
-			}
-		case "team_create_notification":
-			if err := func() error {
-				s.TeamCreateNotification.Reset()
-				if err := s.TeamCreateNotification.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"team_create_notification\"")
-			}
-		case "team_assignment_method":
-			if err := func() error {
-				s.TeamAssignmentMethod.Reset()
-				if err := s.TeamAssignmentMethod.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"team_assignment_method\"")
-			}
-		case "expected_start":
-			if err := func() error {
-				s.ExpectedStart.Reset()
-				if err := s.ExpectedStart.Decode(d, json.DecodeDateTime); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"expected_start\"")
-			}
-		case "alt_title":
-			if err := func() error {
-				s.AltTitle.Reset()
-				if err := s.AltTitle.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"alt_title\"")
-			}
-		case "url":
-			if err := func() error {
-				s.URL.Reset()
-				if err := s.URL.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"url\"")
-			}
-		case "type_id":
-			if err := func() error {
-				s.TypeID.Reset()
-				if err := s.TypeID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"type_id\"")
-			}
-		case "description":
-			if err := func() error {
-				s.Description.Reset()
-				if err := s.Description.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"description\"")
-			}
-		case "questionnaire_completed_message":
-			if err := func() error {
-				s.QuestionnaireCompletedMessage.Reset()
-				if err := s.QuestionnaireCompletedMessage.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"questionnaire_completed_message\"")
-			}
-		case "notification_email_message":
-			if err := func() error {
-				s.NotificationEmailMessage.Reset()
-				if err := s.NotificationEmailMessage.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"notification_email_message\"")
-			}
-		case "cover_url":
-			if err := func() error {
-				s.CoverURL.Reset()
-				if err := s.CoverURL.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"cover_url\"")
-			}
-		case "keywords":
-			if err := func() error {
-				s.Keywords.Reset()
-				if err := s.Keywords.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"keywords\"")
-			}
-		case "organization_id":
-			if err := func() error {
-				s.OrganizationID.Reset()
-				if err := s.OrganizationID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"organization_id\"")
-			}
-		case "canceled":
-			if err := func() error {
-				s.Canceled.Reset()
-				if err := s.Canceled.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"canceled\"")
-			}
-		case "cancellation_reason":
-			if err := func() error {
-				s.CancellationReason.Reset()
-				if err := s.CancellationReason.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"cancellation_reason\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode UpdateEventReq")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *UpdateEventReq) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *UpdateEventReq) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
